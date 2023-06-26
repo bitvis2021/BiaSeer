@@ -1,0 +1,19 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
+
+app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADER'] = 'Content-Type'
+
+
+@app.route('/media_top_data', methods=['GET'])
+@cross_origin()
+def getBuildingData():
+    # args_dict = request.args
+    # args_dict.to_dict()['mediatopData[]']
+    return {'data': 'test'}
+
+if __name__ == "__main__":
+    print('run 0.0.0.0:14449')
+    app.run(host='0.0.0.0', port=14449)
+
