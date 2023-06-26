@@ -62,12 +62,15 @@ def getFeatureTrending(domain, feature):
     date_list = create_date_range([20210601,20220831])
     if feature not in ['doctone', 'docnums']:
         return result
+    
     tmp = pd.read_csv(MEDIA_CONCAT + domain + '.' + feature +'.csv')
     topicList = list(tmp.columns)
+    
     for topic in topicList:
         # print(type(topic))
         tmp_topic = str(int(topic)+1)
         result[tmp_topic] = []
         for index, value in enumerate(tmp[topic].to_list()):
             result[tmp_topic].append({'date': date_list[index], 'value': value})
+    
     return result

@@ -29,6 +29,7 @@ export default {
             innerHeight: null,
             innerWidth: null,
             lineg: null,
+            updateg: null,
             lineGenerate: null,
             all: null,
             actor1: null,
@@ -40,6 +41,12 @@ export default {
         ...mapState([
             'currMedium',
         ])
+    },
+    watch: {
+        currMedium: function(){
+            let self = this;
+            self.renderFeatureTrending();
+        }
     },
     mounted: function() {
         let self = this;
@@ -107,15 +114,15 @@ export default {
             let tmpdata = data['details'].filter(ele=>ele['domain'] == medium)[0];
             // console.log("tmpdata: ", tmpdata);
 
-            let draw_data = tmpdata['doctone']['1'];
+            let draw_data = tmpdata['doctone']['16'];
             console.log("draw_data: ", draw_data);
 
             
             let toneValue = d => d.value;
             let toneMinMax = d3.extent(draw_data, toneValue);
             console.log('toneMinMax', toneMinMax);
-            let min_extent = toneMinMax[0];
-            let max_extent = toneMinMax[1];
+            let min_extent = -30;//toneMinMax[0];
+            let max_extent = 10; //toneMinMax[1];
 
             
             // let keys = Object.keys(tmpdata[0]);
@@ -175,12 +182,13 @@ export default {
             self.xyg.selectAll(".myYaxis").select('.domain').attr("stroke-width", 0.5);
             self.xyg.selectAll(".myYaxis").select('.feature_trending_title').remove();
             self.xyg.selectAll(".myYaxis").append('text')
+                .attr("transform", "translate(-0,0)rotate(-90)")
                 .attr('class', 'feature_trending_title')
-                .attr('y', 3)
-                .attr('x', self.innerWidth)
+                .attr('y', -self.margin.left / 1.5)
+                .attr('x', -self.innerHeight / 2)
                 .attr('fill', '#606266')
                 .attr('font-size', '1.3em')
-                .style('text-anchor', 'end')
+                .style('text-anchor', 'middle')
                 .text(self.currMedium);
             
             self.xyg.selectAll(".myYaxis").selectAll("text")
@@ -192,9 +200,10 @@ export default {
                             .classed("line-hover", false);
                     });
             
+            self.lineg.selectAll('.feature_trending').remove();   
             let updateg = self.lineg.selectAll(".line-path")
-                .data(draw_data);
-            
+                .data([1]);
+
             self.lineGenerate = d3.line()
                     .x(d => self.xScale(self.xValue(d)))
                     .y(d => self.yScale(self.yValue(d)));
@@ -230,8 +239,8 @@ export default {
                         .call(update => update
                             .attr("class", 'feature_trending')
                             // .attr("class", d=> "line-path "+ "line-path-" + d)
-                            .transition()
-                            .duration(2000)
+                            // .transition()
+                            // .duration(2000)
                             .attr("d", d=>{
                                 // self.yValue = xd => xd[feature_name][d];
                                 return self.lineGenerate(draw_data)
@@ -345,6 +354,7 @@ export default {
 
 <style>
 .feature_trending{
-    fill: steelblue;
+    fill: none;
+    stroke: steelblue;
 }
 </style>

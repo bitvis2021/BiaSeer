@@ -15,6 +15,7 @@ export default new Vuex.Store({
       state.displayMode = displayMode;
     },
     ['UPDATE_CURRENT_MEDIUM'] (state, currMedium) {
+      console.log(currMedium);
       state.currMedium = currMedium;
     },
   },

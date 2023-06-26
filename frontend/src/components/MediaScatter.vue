@@ -4,6 +4,10 @@
 </template>
   
 <script>
+
+import { mapState, mapMutations } from 'vuex';
+
+
 export default {
     name: 'MediaScatter',
     props: {
@@ -20,6 +24,10 @@ export default {
         this.drawContour(this.width, this.height);
     },
     methods: {
+        ...mapMutations([
+            'UPDATE_CURRENT_MEDIUM'
+        ]),
+
         drawContour(width, height) {
             // https://vizhub.com/curran/65a26f760f5b4d3f976d1cd7cb43a221
 
@@ -139,6 +147,7 @@ export default {
                     )
                     .on("mouseover", function(d) {
                         console.log(d);
+                        self.UPDATE_CURRENT_MEDIUM(d.domain);
                     })
                     // .on("mouseover", function(d) {
                     //     console.log(d.media_name);
