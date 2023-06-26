@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-from gaindata.dataprocess import fuctionA, mediaDataSet
+from gaindata.dataprocess import mediaDataSet
 
 app = Flask(__name__)
 cors = CORS(app)

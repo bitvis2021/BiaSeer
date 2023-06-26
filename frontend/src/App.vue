@@ -4,7 +4,9 @@
       <div class="media-topic-vector-reduction-view">
         <MediaScatter></MediaScatter>
       </div>
-      <div class="media-topic-difference-concat-view"></div>
+      <div class="media-topic-difference-concat-view">
+        <MediaTrend></MediaTrend>
+      </div>
     </div>
     <div class="event-evolution">
       <div class="union-event-evolution"></div>
@@ -20,6 +22,7 @@ import { getMediaData } from '@/communication/communicator.js'
 import { Dataset } from '@/dataset/dataset.js'
 // Components
 import MediaScatter from './components/MediaScatter.vue';
+import MediaTrend from './components/MediaTrend.vue';
 
 
 export default {
@@ -31,6 +34,7 @@ export default {
   },
   components: {
     MediaScatter,
+    MediaTrend,
   },
   beforeMount: function () {
     let self = this;
@@ -59,10 +63,10 @@ export default {
 </script>
 
 <style lang="less">
-div{
-  border-radius: 5px;
-  margin: 1.5px;
-}
+// div{
+//   border-radius: 5px;
+//   margin: .5px;
+// }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
