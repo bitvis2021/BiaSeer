@@ -1,8 +1,12 @@
 <template>
   <div id="app" v-if="!loadingData">
     <div class="media-topic">
-      <div class="media-topic-vector-reduction-view"></div>
-      <div class="media-topic-difference-concat-view"></div>
+      <div class="media-topic-vector-reduction-view">
+        <MediaScatter></MediaScatter>
+      </div>
+      <div class="media-topic-difference-concat-view">
+        <MediaTrend></MediaTrend>
+      </div>
     </div>
     <div class="event-evolution">
       <div class="union-event-evolution"></div>
@@ -12,26 +16,57 @@
 </template>
 
 <script>
+// Structors
+import { mapState, mapMutations } from 'vuex';
+import { getMediaData } from '@/communication/communicator.js'
+import { Dataset } from '@/dataset/dataset.js'
+// Components
+import MediaScatter from './components/MediaScatter.vue';
+import MediaTrend from './components/MediaTrend.vue';
 
 
 export default {
   name: 'App',
   data() {
     return {
-      loadingData: false,
+      loadingData: true,
     }
   },
   components: {
+    MediaScatter,
+    MediaTrend,
+  },
+  beforeMount: function () {
+    let self = this;
+    window.sysDatasetObj = new Dataset();
+    // lodaing data, during beforemount 
+    let mediaDataDeferObj = $.Deferred();
+    $.when(mediaDataDeferObj).then(async() => {
+      self.loadingData = false;
+    })
+    getMediaData(function(data){
+      sysDatasetObj.updateMediaDataSet(data);
+      mediaDataDeferObj.resolve();
+    });
+
+  },
+  methods: {
+
+  },
+  computed: {
+
+  },
+  watch: {
 
   }
 }
 </script>
 
 <style lang="less">
-div{
-  border-radius: 5px;
-  margin: 1.5px;
-}
+// div{
+//   border-radius: 5px;
+//   margin: .5px;
+// }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
