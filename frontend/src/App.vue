@@ -1,7 +1,9 @@
 <template>
   <div id="app" v-if="!loadingData">
     <div class="media-topic">
-      <div class="media-topic-vector-reduction-view"></div>
+      <div class="media-topic-vector-reduction-view">
+        <MediaScatter></MediaScatter>
+      </div>
       <div class="media-topic-difference-concat-view"></div>
     </div>
     <div class="event-evolution">
@@ -12,16 +14,45 @@
 </template>
 
 <script>
+// Structors
+import { mapState, mapMutations } from 'vuex';
+import { getMediaData } from '@/communication/communicator.js'
+import { Dataset } from '@/dataset/dataset.js'
+// Components
+import MediaScatter from './components/MediaScatter.vue';
 
 
 export default {
   name: 'App',
   data() {
     return {
-      loadingData: false,
+      loadingData: true,
     }
   },
   components: {
+    MediaScatter,
+  },
+  beforeMount: function () {
+    let self = this;
+    window.sysDatasetObj = new Dataset();
+    // lodaing data, during beforemount 
+    let mediaDataDeferObj = $.Deferred();
+    $.when(mediaDataDeferObj).then(async() => {
+      self.loadingData = false;
+    })
+    getMediaData(function(data){
+      sysDatasetObj.updateMediaDataSet(data);
+      mediaDataDeferObj.resolve();
+    });
+
+  },
+  methods: {
+
+  },
+  computed: {
+
+  },
+  watch: {
 
   }
 }
