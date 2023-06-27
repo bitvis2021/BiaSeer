@@ -19,7 +19,8 @@ def mediaDataSet():
         'timerange': timerange,
         'media': media[0],
         'media_nums': media[1],
-        'details': media[2]
+        'details': media[2],
+        'topicCodeList': [str(ele + 1) for ele in range(20)]
     }
     return result
 
@@ -59,10 +60,17 @@ def getDocNums(domain):
 
 def getFeatureTrending(domain, feature):
     result = {}
-    date_list = create_date_range([20210601,20220831])
+    time_range = timeRange()
     if feature not in ['doctone', 'docnums']:
         return result
     
+    if time_range == 'time-time':
+        return result
+    
+    tsplit = time_range.split('-')
+    date_list = create_date_range([int(tsplit[0]),int(tsplit[1])])
+
+
     tmp = pd.read_csv(MEDIA_CONCAT + domain + '.' + feature +'.csv')
     topicList = list(tmp.columns)
     
@@ -71,6 +79,12 @@ def getFeatureTrending(domain, feature):
         tmp_topic = str(int(topic)+1)
         result[tmp_topic] = []
         for index, value in enumerate(tmp[topic].to_list()):
-            result[tmp_topic].append({'date': date_list[index], 'value': value})
+            if value >= 0:
+                max_v = value
+                min_v = 0
+            else:
+                max_v = 0
+                min_v = value
+            result[tmp_topic].append({'date': date_list[index], 'value': max_v, 'value1': min_v })
     
     return result
