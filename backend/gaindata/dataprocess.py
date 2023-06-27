@@ -19,7 +19,8 @@ def mediaDataSet():
         'timerange': timerange,
         'media': media[0],
         'media_nums': media[1],
-        'details': media[2]
+        'details': media[2],
+        'topicCodeList': [str(ele + 1) for ele in range(20)]
     }
     return result
 
@@ -78,6 +79,12 @@ def getFeatureTrending(domain, feature):
         tmp_topic = str(int(topic)+1)
         result[tmp_topic] = []
         for index, value in enumerate(tmp[topic].to_list()):
-            result[tmp_topic].append({'date': date_list[index], 'value': value})
+            if value >= 0:
+                max_v = value
+                min_v = 0
+            else:
+                max_v = 0
+                min_v = value
+            result[tmp_topic].append({'date': date_list[index], 'value': max_v, 'value1': min_v })
     
     return result

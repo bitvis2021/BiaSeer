@@ -5,7 +5,8 @@
         <MediaScatter></MediaScatter>
       </div>
       <div class="media-topic-difference-concat-view">
-        <MediaTrend></MediaTrend>
+        <!-- <MediaTrend></MediaTrend> -->
+        <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend>
       </div>
     </div>
     <div class="event-evolution">
@@ -30,6 +31,7 @@ export default {
   data() {
     return {
       loadingData: true,
+      topicCodeList: null,
     }
   },
   components: {
@@ -45,6 +47,8 @@ export default {
       self.loadingData = false;
     })
     getMediaData(function(data){
+      self.topicCodeList = data['topicCodeList'];
+      console.log(self.topicCodeList);
       sysDatasetObj.updateMediaDataSet(data);
       mediaDataDeferObj.resolve();
     });
