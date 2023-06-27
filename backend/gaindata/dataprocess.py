@@ -59,10 +59,17 @@ def getDocNums(domain):
 
 def getFeatureTrending(domain, feature):
     result = {}
-    date_list = create_date_range([20210601,20220831])
+    time_range = timeRange()
     if feature not in ['doctone', 'docnums']:
         return result
     
+    if time_range == 'time-time':
+        return result
+    
+    tsplit = time_range.split('-')
+    date_list = create_date_range([int(tsplit[0]),int(tsplit[1])])
+
+
     tmp = pd.read_csv(MEDIA_CONCAT + domain + '.' + feature +'.csv')
     topicList = list(tmp.columns)
     

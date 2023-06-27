@@ -72,7 +72,7 @@ export default {
                 .attr('transform', `translate(${self.margin.left},${self.margin.top})`);
             
             self.xScale = d3.scaleTime().range([0, self.innerWidth]);
-            self.xAxis = d3.axisBottom(self.xScale).ticks(5);
+            self.xAxis = d3.axisBottom(self.xScale);//.ticks(5);
             self.xyg.append("g")
                 .attr('transform', `translate(${0},${self.innerHeight})`)
                 .attr("class","myXaxis");
@@ -129,8 +129,9 @@ export default {
             self.xyg.selectAll(".myXaxis").select('.domain').attr("stroke-width", 0.5);
             self.xyg.selectAll(".myXaxis")
                 .selectAll("text")
-                .attr("transform", "translate(-0,0)rotate(-30)")
-                .style("text-anchor", "end");
+                // .attr("transform", "translate(-0,0)rotate(-30)")
+                // .style("text-anchor", "end");
+                .style("text-anchor", "middle");
 
             self.yScale.domain([min_extent, max_extent]);
 
