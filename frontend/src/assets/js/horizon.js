@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-
+// https://github.com/colwilson/vue2-d3-horizon-chart
 let d3HorizonArea = d3.area()
 let d3HorizonId = 0
 
