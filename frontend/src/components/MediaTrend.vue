@@ -174,10 +174,12 @@ export default {
                 .join(
                     enter => enter.append("path")
                             .attr("class", "feature_trending")
-                            .attr("d", d=>self.areaGenerator(d)),
-                    update => update
-                        .call(update => update.transition(t)
-                            .attr("d", d =>self.areaGenerator(d))),
+                            .attr("d", d=>self.areaGenerator(d))
+                        ,
+                    update => update.call(
+                            update => update.transition(t)
+                            .attr("d", d =>self.areaGenerator(d))
+                        ),
                     exit => exit
                             .remove()
                 );

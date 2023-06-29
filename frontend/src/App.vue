@@ -6,12 +6,13 @@
       </div>
       <div class="media-topic-difference-concat-view">
         <!-- <MediaTrend></MediaTrend> -->
-        <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend>
+        <!-- <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend> -->
+        <MediaHorizonChart></MediaHorizonChart>
       </div>
     </div>
     <div class="event-evolution">
       <div class="union-event-evolution">
-        <MediaHorizonChart></MediaHorizonChart>
+        <!-- <MediaHorizonChart></MediaHorizonChart> -->
       </div>
       <div class="single-event-evolution"></div>
     </div>
