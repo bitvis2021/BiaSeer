@@ -22,7 +22,7 @@ export default {
             overlap: 2,
             margin: null,
             step: null,
-            colorScale: null,
+            color: null,
             mirror: null,
             xValue: null,
             yValue: null,
@@ -82,9 +82,9 @@ export default {
             self.innerHeight = height - self.margin.top - self.margin.bottom;
 
             self.step = (height - (self.margin.top + self.margin.bottom) ) /  self.draw_data.length - 1;
-            
+            let colorArr = ["#4393c3", "#92c5de", "#fddbc7", "#f4a582", "#d6604d", "#b2182b", "#67001f"];
+            self.color = i => colorArr[i + (i >= 0) + self.overlap];
             // self.step = self.step * 1;
-            self.colorScale = d3.scaleLinear().domain([-self.overlap, self.overlap]).range([0, 1]);
             self.mirror = false;
             self.xValue = d => new Date(d.date);
             self.yValue = d => d.value + d.value1;
@@ -158,7 +158,7 @@ export default {
                 })
                 .enter().append("use")
                     .attr("fill", d => {
-                        return d3.interpolateReds(self.colorScale(d.index))
+                        return self.color(d.index)
                     })
                     .attr("transform", d => self.mirror && i < 0
                         ? `scale(1,-1) translate(0,${d.index * self.step})`
@@ -166,59 +166,6 @@ export default {
                     .attr("xlink:href", d => d.path.href);
             
             self.clipPath.append("text")
-                .attr("x", 4)
-                .attr("y", self.step / 2)
-                .attr("dy", "0.35em")
-                .text(d => d.key);
-        },
-
-
-
-
-        render1MediaHorizonChart(width, height){
-            let self = this;
-            
-            self.horizong = self.svg.append("g")
-                .selectAll("g")
-                .data(self.draw_data)
-                .enter().append("g")
-                .attr("transform", (d, i) => `translate(0,${i * (self.step + 1) + self.margin.top})`);
-            
-            self.horizong.append("clipPath")
-                    .attr("id", (d,i)=>"area-clip-"+i)
-                .append("rect")
-                    .attr("width", width)
-                    .attr("height", self.step);
-            
-            self.horizong.append("defs").append("path")
-                .attr("id", (d,i)=>{
-                    d.path = {'id': "path-defs-"+i, 'href': '#path-defs-'+i}
-                    return "path-defs-"+i;
-                })
-                .attr("d", d => self.areaGenerator(d.values));
-            
-            self.horizong.append("g")
-                    .attr("clip-path", (d,i) => "url(#area-clip-" + i + ")")
-                .selectAll("use")
-                .data(d => {
-                    return Array.from(
-                        {length: self.overlap * 2}, 
-                        (_, i) => {
-                            console.log(i);
-                            return Object.assign({index: i < self.overlap ? -i - 1 : i - self.overlap}, d)
-                        }
-                    )
-                })
-                .enter().append("use")
-                    .attr("fill", d => {
-                        return d3.interpolateReds(self.colorScale(d.index))
-                    })
-                    .attr("transform", d => self.mirror && d.index < 0
-                        ? `scale(1,-1) translate(0,${d.index * self.step})`
-                        : `translate(0,${(d.index + 1) * self.step})`)
-                    .attr("xlink:href", d => d.path.href);
-            
-            self.horizong.append("text")
                 .attr("x", 4)
                 .attr("y", self.step / 2)
                 .attr("dy", "0.35em")
