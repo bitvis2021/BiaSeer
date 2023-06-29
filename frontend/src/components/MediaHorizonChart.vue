@@ -128,18 +128,10 @@ export default {
 
             self.clipPath = self.horizong.selectAll("g")
                 .data(self.draw_data)
-                .join(
-                    enter => enter.append("g")
-                            .attr("class", "horizon-graph-sub")
-                            .attr("transform", (d, i) => `translate(0,${i * (self.step + 1) + self.margin.top})`)
-                        ,
-                    update => update.call(
-                            update => update.transition(t)
-                            .attr("transform", (d, i) => `translate(0,${i * (self.step + 1) + self.margin.top})`)
-                        ),
-                    exit => exit
-                            .remove()
-                )
+                .enter().append("g")
+                    .attr("class", "horizon-graph-sub")
+                    .attr("transform", (d, i) => `translate(0,${i * (self.step + 1) + self.margin.top})`)
+            
             self.clipPath.append("clipPath")
                     .attr("id", (d,i)=>"area-clip-"+i)
                 .append("rect")
