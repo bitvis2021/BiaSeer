@@ -7,7 +7,7 @@
       <div class="media-topic-difference-concat-view">
         <!-- <MediaTrend></MediaTrend> -->
         <!-- <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend> -->
-        <MediaHorizonChart></MediaHorizonChart>
+        <!-- <MediaHorizonChart></MediaHorizonChart> -->
       </div>
     </div>
     <div class="event-evolution">

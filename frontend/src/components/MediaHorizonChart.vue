@@ -120,11 +120,7 @@ export default {
             
         },
         renderMediaHorizonChart(width, height){
-            let self = this;
-
-            const t = self.horizong.transition()
-                .duration(750);
-            
+            let self = this;            
             
             self.horizong.selectAll('g').remove();
 
@@ -186,7 +182,4 @@ export default {
 </style>
 
 <style>
-/* path{
-    fill: steelblue;
-} */
 </style>

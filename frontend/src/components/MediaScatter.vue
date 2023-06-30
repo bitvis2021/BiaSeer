@@ -6,6 +6,7 @@
 <script>
 
 import { mapState, mapMutations } from 'vuex';
+import { getTopic } from '../assets/data/topicList'
 
 
 export default {
@@ -15,13 +16,47 @@ export default {
     },
     data() {
         return{
-
+            width: null,
+            height: null,
+            innerWidth: null,
+            innerHeight: null,
+            overlap: 2,
+            margin: null,
+            step: null,
+            color: null,
+            mirror: null,
+            xValue: null,
+            yValue: null,
+            max: null,
+            yScale: null,
+            xScale: null,
+            tmpdata: null,
+            draw_data: null,
+            data: null,
+            svg: null,
+            horizong: null,
+            xg: null,
+            clipPath: null,
+            mouse_this: null,
+            horizon_chart_class: null,
         }
     },
     mounted: function() {
         this.width = this.$refs.mediascatter.clientWidth;
         this.height = this.$refs.mediascatter.clientHeight;
         this.drawContour(this.width, this.height);
+    },
+    computed: {
+        ...mapState([
+            'currMedium',
+        ]),
+    },
+    watch: {
+        currMedium: function () {
+            let self = this;
+            self.gainMediaHorizonChartData(self.currMedium);
+            self.drawMediaHorizonChart(self.currMedium);
+        },
     },
     methods: {
         ...mapMutations([
@@ -148,243 +183,8 @@ export default {
                     .on("mouseover", function(d) {
                         console.log(d);
                         self.UPDATE_CURRENT_MEDIUM(d.domain);
+                        self.mouse_this = d3.mouse(this);
                     })
-                    // .on("mouseover", function(d) {
-                    //     console.log(d.media_name);
-
-
-                    //     d3.select(this)
-                    //         .classed("dot-hover", true);
-                        
-                    //     let m_data = [];
-                    //     let m_cols = ["EventNums", "NumMentions", "NumArticles", "NumSources", "GoldsteinScale", "AvgTone"];
-                    //     m_cols.forEach(ele=>{
-                    //         // m_data.push(+d[ele]);
-                    //         console.log(ele, d[ele]);
-                    //         m_data.push(feature_extent_list[ele](+d[ele]));
-                    //     })
-                    //     console.log(m_data);
-                    //     // console.log(m_cols);
-
-                    //     let m_width = 100;
-                    //     let m_height = 80;
-                    //     let m_margin = { top: 5, right: 5, bottom: 5, left: 5 };
-                    //     let m_innerWidth = m_width - m_margin.left - m_margin.right;
-                    //     let m_innerHeight = m_height - m_margin.top - m_margin.bottom;
-
-                    //     let tmp_g = circle_g
-                    //         .append('g')
-                    //             .attr('class', 'circlr_g__contour_tooltip')
-                    //             .attr("transform",`translate(${xScale(d.x1)+45} , ${yScale(d.x2)+50} )`);
-                        
-                    //     let show_m_cols = ["Nums", "Mentions", "Articles", "Sources", "Impact", "Tone"];
-                    //     let tmp_data = {
-                    //         fieldNames: show_m_cols,
-                    //         values: [
-                    //             m_data
-                    //         ]
-                    //     };
-
-                    //     console.log(tmp_data);
-                        
-                    //     // 设定一些方便计算的常量
-                    //     let radius = 55;
-                    //     let total = m_data.length;
-                    //     let level = 4;
-                    //     let rangeMin = 0;
-                    //     let rangeMax = 100;
-                    //     let arc = 2 * Math.PI;
-                    //     let onePiece = arc / total;
-                    //     // 计算网轴的正多边形的坐标
-                    //     let polygons = {
-                    //         webs: [],
-                    //         webPoints: []
-                    //     };
-                    //     for(var k=level;k>0;k--) {
-                    //         var webs = '',
-                    //         webPoints = [];
-                    //         var r = radius / level * k;
-                    //         for(var i=0;i<total;i++) {
-                    //             var x = r * Math.sin(i * onePiece),
-                    //             y = r * Math.cos(i * onePiece);
-                    //             webs += x + ',' + y + ' ';
-                    //             webPoints.push({
-                    //                 x: x,
-                    //                 y: y
-                    //             });
-                    //         }
-                    //         polygons.webs.push(webs);
-                    //         polygons.webPoints.push(webPoints);
-                    //     }
-                    //     // 绘制网轴
-                    //     var webs = tmp_g.append('g')
-                    //             .classed('webs', true);
-                    //     webs.selectAll('polygon')
-                    //             .data(polygons.webs)
-                    //             .enter()
-                    //             .append('polygon')
-                    //             .attr("id", (d,i) =>"webs-ploygon-" + i)
-                    //             .attr('points', function(d) {
-                    //                 return d;
-                    //             });
-                        
-                    //     // 添加纵轴
-                    //     var lines = tmp_g.append('g')
-                    //             .classed('lines', true);
-                    //     lines.selectAll('line')
-                    //             .data(polygons.webPoints[0])
-                    //             .enter()
-                    //             .append('line')
-                    //             .attr('x1', 0)
-                    //             .attr('y1', 0)
-                    //             .attr('x2', function(d) {
-                    //                 return d.x;
-                    //             })
-                    //             .attr('y2', function(d) {
-                    //                 return d.y;
-                    //             });
-                        
-                    //     // 计算雷达图表的坐标
-                    //     var areasData = [];
-                    //     var values = tmp_data.values;
-                    //     for(var i=0;i<values.length;i++) {
-                    //         var value = values[i],
-                    //         area = '',
-                    //         points = [];
-                    //         for(var k=0;k<total;k++) {
-                    //             var r = radius * (value[k] - rangeMin)/(rangeMax - rangeMin);
-                    //             var x = r * Math.sin(k * onePiece),
-                    //             y = r * Math.cos(k * onePiece);
-                    //             area += x + ',' + y + ' ';
-                    //             points.push({
-                    //                 x: x,
-                    //                 y: y
-                    //             })
-                    //         }
-                    //         areasData.push({
-                    //             polygon: area,
-                    //             points: points
-                    //         });
-                    //     }
-                    //     // 添加g分组包含所有雷达图区域
-                    //     var areas = tmp_g.append('g')
-                    //             .classed('areas', true);
-                    //     // 添加g分组用来包含一个雷达图区域下的多边形以及圆点
-                    //     areas.selectAll('g')
-                    //             .data(areasData)
-                    //             .enter()
-                    //             .append('g')
-                    //             .attr('class',function(d, i) {
-                    //                 return 'area' + (i+1);
-                    //             });
-                    //     for(var i=0;i<areasData.length;i++) {
-                    //         // 依次循环每个雷达图区域
-                    //         var area = areas.select('.area' + (i+1)),
-                    //         areaData = areasData[i];
-                    //         // 绘制雷达图区域下的多边形
-                    //         area.append('polygon')
-                    //                 .attr('points', areaData.polygon)
-                    //                 // .attr('stroke', (d,i)=> getColor(i))
-                    //                 // .attr('fill', (d,i)=> getColor(i));
-                    //                 .attr('stroke', "#a65628")
-                    //                 .attr('fill', "#a65628");
-                                    
-                    //         // 绘制雷达图区域下的点
-                    //         var circles = area.append('g')
-                    //                 .classed('circles', true);
-                    //         circles.selectAll('circle')
-                    //                 .data(areaData.points)
-                    //                 .enter()
-                    //                 .append('circle')
-                    //                 .attr('cx', d=> d.x)
-                    //                 .attr('cy', d=> d.y)
-                    //                 .attr('r', 3)
-                    //                 // .attr('stroke', (d,i)=>getColor(i))
-                    //                 // .attr('fill', (d,i)=>getColor(i));
-                    //                 .attr('stroke', "#a65628")
-                    //                 .attr('fill', "#a65628");
-                    //     }
-                    //     // 计算文字标签坐标
-                    //     var textPoints = [];
-                    //     let delta_dis = 5;
-                    //     var textRadius = radius + delta_dis;
-                    //     for(var i=0; i < total; i++) {
-                    //         var x = textRadius * Math.sin(i * onePiece);
-                    //         var y = textRadius * Math.cos(i * onePiece);
-                    //         textPoints.push({
-                    //             x: x,
-                    //             y: y
-                    //         });
-                    //     }
-                    //     // 绘制文字标签
-                    //     var texts = tmp_g.append('g')
-                    //             .classed('texts', true);
-                    //     texts.selectAll('text')
-                    //             .data(textPoints)
-                    //             .enter()
-                    //             .append('text')
-                    //             .attr('x', d=> d.x)
-                    //             .attr('y', (d,i) => {
-                    //                 if(i==0){
-                    //                     return d.y + delta_dis;
-                    //                 }
-                    //                 return d.y
-                    //             })
-                    //             .attr('fill', "gray")
-                    //             // .attr('fill', (d,i)=> getColor(i))
-                    //             .attr('text-anchor', (d,i)=> {
-                    //                 if(i==0 || i==3){
-                    //                     return "middle";
-                    //                 }else if(i==1 || i==2){
-                    //                     return "start";
-                    //                 }else{
-                    //                     return "end";
-                    //                 }
-                    //             })
-                    //             .text((d, i) => tmp_data.fieldNames[i]);
-                        
-                    //     // domain title
-                    //     tmp_g.append("g")
-                    //         .append('text')
-                    //         .attr('class', 'domain-title')
-                    //         .attr('y', textPoints[3].y - 2.5 * delta_dis)
-                    //         .attr('x' , textPoints[3].x )
-                    //         .text(d.media_name + " " + d.nums.toFixed(0));
-                        
-                    // })
-                    // .on("mouseout", function(d) {
-                    //     d3.select(this)
-                    //         .classed("dot-hover", false);  
-                    //     circle_g
-                    //         .select(".circlr_g__contour_tooltip")
-                    //         .remove();
-                        
-                    //     d3.select(self.$el)
-                    //         .select(".media__contour__svg")
-                    //         .select(".media-point-circle-g")
-                    //         .selectAll("circle").classed("dot-search-hover", false);
-                    // })
-                    // .on("click", function(d) {
-                    //     self.mSrc_list.forEach((ele,ie)=>{
-                    //         d3.select("#media_id_"+ele.replaceAll(".","_")).classed("dot-click-"+ie, false)
-                    //     })
-                    //     if(self.click_media_id_list.indexOf(d.media_id)==-1){
-                    //         self.click_count = self.click_count + 1;
-                    //         self.click_media_id_list[self.click_count % self.click_media_id_list.length] = d.media_id;
-                    //         self.mSrc_list[self.click_count % self.click_media_id_list.length] = d.media_name;
-                    //         console.log("self.mSrc_list", self.mSrc_list);
-                    //         self.update_selected_media_sources(self.mSrc_list.join("+"))
-                            
-                    //         // keep red-click
-                    //         for(let i=0;i<17;i++){
-                    //             d["zoom_"+i] = "1"
-                    //         }
-                    //     }
-                    //     self.mSrc_list.forEach((ele,ie)=>{
-                    //         d3.select("#media_id_"+ele.replaceAll(".","_")).classed("dot-click-"+ie, true)
-                    //     });
-
-                    // });
             }
 
             function transform(d) {
@@ -447,8 +247,161 @@ export default {
             //     renderCircles(tdata);
             //     renderContours(tdata, 25);
             // }
+        },
+        drawMediaHorizonChart(domain){
+            console.log(domain);
+            let self = this;
+            let width = 761 / 2;
+            let height = 293 / 2;
+
+            let delta = 30;
+
+            self.horizon_chart_class = "media_horizon_chart_tooltip_div";
+            d3.select("body").selectAll("." + self.horizon_chart_class).remove();
+            
+            let add_div = d3.select("body").append("div")
+                .attr("class", self.horizon_chart_class)
+                .attr("id", "div1024")
+                .style('position', 'absolute')
+                .style('top', d=>{
+                    return delta + self.mouse_this[1]+"px";
+                })
+                .style('left', function(){
+                    return delta + self.mouse_this[0]+"px"
+                })
+                .style('width', width + "px")
+                .style('height', height + "px");
+            
+            self.move("div1024");
+            self.drawMediaHorizonChartII(width, height, self.horizon_chart_class);
+        },
+        drawMediaHorizonChartII(width, height, selected_div) {
+            let self = this;
+            //==================
+            self.overlap = 2;
+            
+            self.margin = {top: 0, right: 0, bottom: 0, left: 0};
+            self.innerWidth = width - self.margin.left - self.margin.right;
+            self.innerHeight = height - self.margin.top - self.margin.bottom;
+
+            self.step = (height - (self.margin.top + self.margin.bottom) ) /  self.draw_data.length - 1;
+            let colorArr = ["#4393c3", "#92c5de", "#fddbc7", "#f4a582", "#d6604d", "#b2182b", "#67001f"];
+            self.color = i => colorArr[i + (i >= 0) + self.overlap];
+            self.mirror = false;
+            self.xValue = d => new Date(d.date);
+            self.yValue = d => d.value + d.value1;
+            self.max = d3.max(self.data, d => Math.abs(self.yValue(d)));
+            self.yScale = d3.scaleLinear().range([self.overlap * self.step, -self.overlap * self.step]).domain([-self.max, +self.max]);
+            self.xScale = d3.scaleTime().range([0, width]).domain(d3.extent(self.data, self.xValue));
+            
+            self.xAxis = g => g
+                .attr("transform", `translate(0,${self.margin.top})`)
+                .call(d3.axisTop(self.xScale).ticks(width / 40).tickSizeOuter(0))
+                .call(g => g.selectAll(".tick").filter(d => self.xScale(d) < self.margin.left || self.xScale(d) >= width - self.margin.right).remove())
+                .call(g => g.select(".domain").remove());
+            
+            self.areaGenerator = d3.area()
+                .curve(d3.curveBasis)
+                .x(d => self.xScale(self.xValue(d)))
+                .y0(d => 0)
+                .y1(d => self.yScale(self.yValue(d)));
+            
+            self.svg = d3.select("." + selected_div)
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("viewBox", [0, 0, width, height])
+                // .attr("viewBox", [0, height / 2, 2 * width, height])
+                .attr("style", "font: 6px sans-serif;");
+                // .attr("style", "max-width: 100%; height: auto; font: 6px sans-serif;");
+            
+            self.horizong = self.svg.append("g").attr("class", "horizon-graph");
+
+            self.horizong.selectAll('g').remove();
+
+            self.clipPath = self.horizong.selectAll("g")
+                .data(self.draw_data)
+                .enter().append("g")
+                    .attr("class", "horizon-graph-sub")
+                    .attr("transform", (d, i) => `translate(0,${i * (self.step + 1) + self.margin.top})`)
+            
+            self.clipPath.append("clipPath")
+                    .attr("id", (d,i)=>"area-clip-"+i)
+                .append("rect")
+                    .attr("width", width)
+                    .attr("height", self.step);
+            
+            self.clipPath.append("defs").append("path")
+                .attr("id", (d,i)=>{
+                    d.path = {'id': "path-defs-"+i, 'href': '#path-defs-'+i}
+                    return "path-defs-"+i;
+                })
+                .attr("d", d => self.areaGenerator(d.values));
+
+            self.clipPath.append("g")
+                    .attr("clip-path", (d,i) => "url(#area-clip-" + i + ")")
+                .selectAll("use")
+                .data(d => {
+                    return Array.from(
+                        {length: self.overlap * 2}, 
+                        (_, i) => {
+                            return Object.assign({index: i < self.overlap ? -i - 1 : i - self.overlap}, d)
+                        }
+                    )
+                })
+                .enter().append("use")
+                    .attr("fill", d => {
+                        return self.color(d.index)
+                    })
+                    .attr("transform", d => self.mirror && i < 0
+                        ? `scale(1,-1) translate(0,${d.index * self.step})`
+                        : `translate(0,${(d.index + 1) * self.step})`)
+                    .attr("xlink:href", d => d.path.href);
+            
+            self.clipPath.append("text")
+                .attr("x", 4)
+                .attr("y", self.step / 2)
+                .attr("dy", "0.35em")
+                .text(d => getTopic(d.key));
+        },
+        gainMediaHorizonChartData(domain){
+            let self = this;
+            self.domain = domain;
+            self.tmpdata = sysDatasetObj.mediaDataSet['details'].filter(ele => ele['domain'] == self.domain)[0];
+            self.data = Object.values(self.tmpdata['doctone']).flat();
+            self.draw_data = Object.values(self.tmpdata['doctone']).map(function (item, id) {
+                return {'key': id + 1, 'values': item};
+            });
+        },
+        move(div_id) {
+            console.log('div_id', div_id);
+            var _move = false;
+            div_id = '#'+div_id
+            var _x, _y;
+            $(div_id).click(function () {
+                // alert("click")
+            }).mousedown(function (e) {
+                _move = true;
+                _x = e.pageX - parseInt($(div_id).css("left"));
+                _y = e.pageY - parseInt($(div_id).css("top"));
+                $(div_id).fadeTo(20, 0.5);
+            });
+            $(document).mousemove(function (e) {
+                if (_move) {
+                    var x = e.pageX - _x;
+                    var y = e.pageY - _y;
+                    $(div_id).css({ top: y, left: x }); 
+                }
+            }).mouseup(function () {
+                _move = false;
+                $(div_id).fadeTo("fast", 1);
+            });
+        },
+        clearHorizonGraphTooltip(){
+            let self = this;
+            d3.select("body").selectAll("." + self.horizon_chart_class).remove();
         }
-    }
+    },
 }
 </script>
   
@@ -464,5 +417,9 @@ export default {
 .dot{
     fill: steelblue;
     opacity: 0.5;
+}
+.media_horizon_chart_tooltip_div{
+    border: 1px solid black;
+    background-color: white;
 }
 </style>
