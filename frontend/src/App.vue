@@ -6,11 +6,14 @@
       </div>
       <div class="media-topic-difference-concat-view">
         <!-- <MediaTrend></MediaTrend> -->
-        <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend>
+        <!-- <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend> -->
+        <!-- <MediaHorizonChart></MediaHorizonChart> -->
       </div>
     </div>
     <div class="event-evolution">
-      <div class="union-event-evolution"></div>
+      <div class="union-event-evolution">
+        <!-- <MediaHorizonChart></MediaHorizonChart> -->
+      </div>
       <div class="single-event-evolution"></div>
     </div>
   </div>
@@ -24,6 +27,7 @@ import { Dataset } from '@/dataset/dataset.js'
 // Components
 import MediaScatter from './components/MediaScatter.vue';
 import MediaTrend from './components/MediaTrend.vue';
+import MediaHorizonChart from './components/MediaHorizonChart.vue';
 
 
 export default {
@@ -37,6 +41,7 @@ export default {
   components: {
     MediaScatter,
     MediaTrend,
+    MediaHorizonChart,
   },
   beforeMount: function () {
     let self = this;

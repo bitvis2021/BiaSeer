@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from gaindata.dataprocess import mediaDataSet
+# from utils.helper import saveDictoJson
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -11,6 +12,7 @@ app.config['CORS_HEADER'] = 'Content-Type'
 @cross_origin()
 def getMediaDataSet():
     data = mediaDataSet()
+    # saveDictoJson(data, 'mediaDataSet')
     # print(data)
     # args_dict = request.args
     # args_dict.to_dict()['mediatopData[]']
