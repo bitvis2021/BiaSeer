@@ -6,6 +6,7 @@
 <script>
 
 import { mapState, mapMutations } from 'vuex';
+import { getTopic } from '../assets/data/topicList'
 
 export default {
     name: 'MediaHorizonChart',
@@ -77,7 +78,7 @@ export default {
             //==================
             self.overlap = 2;
             
-            self.margin = {top: 30, right: 30, bottom: 0, left: 30};
+            self.margin = {top: 0, right: 0, bottom: 0, left: 0};
             self.innerWidth = width - self.margin.left - self.margin.right;
             self.innerHeight = height - self.margin.top - self.margin.bottom;
 
@@ -100,6 +101,7 @@ export default {
             
             self.areaGenerator = d3.area()
                 // .curve(d3.curveStep)
+                .curve(d3.curveBasis)
                 .x(d => self.xScale(self.xValue(d)))
                 .y0(d => 0)
                 .y1(d => self.yScale(self.yValue(d)));
@@ -109,10 +111,10 @@ export default {
                 .attr("width", width)
                 .attr("height", height)
                 .attr("viewBox", [0, 0, width, height])
-                .attr("style", "max-width: 100%; height: auto; font: 10px sans-serif;");
+                .attr("style", "max-width: 100%; height: auto; font: 6px sans-serif;");
             
-            self.xg = self.svg.append("g")
-                .call(self.xAxis);
+            // self.xg = self.svg.append("g")
+            //     .call(self.xAxis);
             
             self.horizong = self.svg.append("g").attr("class", "horizon-graph");
             
@@ -169,7 +171,7 @@ export default {
                 .attr("x", 4)
                 .attr("y", self.step / 2)
                 .attr("dy", "0.35em")
-                .text(d => d.key);
+                .text(d => getTopic(d.key));
         }
     }
 }
