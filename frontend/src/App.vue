@@ -8,6 +8,7 @@
         <!-- <MediaTrend></MediaTrend> -->
         <!-- <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend> -->
         <!-- <MediaHorizonChart></MediaHorizonChart> -->
+        <MediaMatrixTrend></MediaMatrixTrend>
       </div>
     </div>
     <div class="event-evolution">
@@ -28,6 +29,7 @@ import { Dataset } from '@/dataset/dataset.js'
 import MediaScatter from './components/MediaScatter.vue';
 import MediaTrend from './components/MediaTrend.vue';
 import MediaHorizonChart from './components/MediaHorizonChart.vue';
+import MediaMatrixTrend from './components/MediaMatrixTrend.vue';
 
 
 export default {
@@ -42,6 +44,7 @@ export default {
     MediaScatter,
     MediaTrend,
     MediaHorizonChart,
+    MediaMatrixTrend,
   },
   beforeMount: function () {
     let self = this;
