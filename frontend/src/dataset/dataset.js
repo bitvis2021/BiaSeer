@@ -2,6 +2,8 @@ export function Dataset () {
     this.buildingDatasetList = [];
 
     this.mediaDataSet = null;
+
+    this.mediaMatrixDataSet = null;
 }
 
 Dataset.prototype = {
@@ -13,5 +15,9 @@ Dataset.prototype = {
 
     updateMediaDataSet: function(data) {
         this.mediaDataSet = data
+    },
+
+    updateMediaMatrixDataSet: function(data) {
+        this.mediaMatrixDataSet = data
     }
 }

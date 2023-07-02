@@ -16,3 +16,17 @@ export function getMediaData(callback) {
         callback(mediaDataSet);
     })
 }
+
+export function getMediaMatrixData(callback) {
+    axios({
+        methods: 'get',
+        url: server_address + '/media_matrix_dataset',
+        // params: formData,
+        timeout: 1000000
+    })
+    .then((res) => {
+        let mediaMatrixData = res["data"]["data"];
+        console.log('mediaMatrixData:', mediaMatrixData);
+        callback(mediaMatrixData);
+    })
+}

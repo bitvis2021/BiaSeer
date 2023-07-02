@@ -1,7 +1,7 @@
 import os
 import json
 import pandas as pd
-from utils.helper import create_date_range
+from utils.helper import create_date_range,saveDictoJson
 
 TOPIC = 'RUS_UKR'
 ROOT_PATH = '../../preprocessv2/datasets/mergesets/' + TOPIC +'/'
@@ -9,6 +9,8 @@ MEDIA_CONCAT = '../../preprocessv2/same_event/concat/'
 
 MEDIA_XY = '../../preprocessv2/datasets/mediaxy/doctone_results.json'
 MEDIA_NUMS = '../../preprocessv2/datasets/mediaxy/media_nums.json'
+
+TIME_BINS = 54
 
 def mediaDataSet():
     # print(os.listdir(ROOT_PATH))
@@ -87,4 +89,47 @@ def getFeatureTrending(domain, feature):
                 min_v = value
             result[tmp_topic].append({'date': date_list[index], 'value': max_v, 'value1': min_v })
     
+    return result
+
+
+
+
+def mediaMatrixDataSet():
+    result = []
+    media = meidaList()[0]
+    
+    timeBins, timeBinsIndex = gainTimeBins()
+
+    for mele in media:
+        tmp = {'domain' : mele, 'values': []}
+        for mtopic in [str(ele + 1) for ele in range(20)]:
+            tmp['values'].append({'topic':mtopic, 'details': gainMediaTopicTimeBinsData(mele, mtopic, timeBins, timeBinsIndex)})
+        
+        result.append(tmp)
+    return result
+
+def gainTimeBins():
+    result = []
+    time_range = timeRange()
+    
+    if time_range == 'time-time':
+        return result
+    
+    tsplit = time_range.split('-')
+    date_list = create_date_range([int(tsplit[0]),int(tsplit[1])])
+    step = int(len(date_list) / TIME_BINS)
+    timeBins = [date_list[i : i + step] for i in range(0,len(date_list), step)]
+
+    timeBinsIndex = [list(range(i,i + step)) for i in range(0,len(date_list), step)]
+    # print(timeBinsIndex)
+    # print(len(timeBinsIndex))
+    return timeBins, timeBinsIndex
+
+
+def gainMediaTopicTimeBinsData(mele, mtopic, timeBins, timeBinsIndex):
+    result = []
+    tmp = pd.read_csv(MEDIA_CONCAT + mele + '.' + 'doctone.csv')
+    for index, time in enumerate(timeBins):
+        value = sum(tmp.loc[timeBinsIndex[index][0]:timeBinsIndex[index][-1], str(int(mtopic) - 1)]) / len(time)
+        result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value })
     return result

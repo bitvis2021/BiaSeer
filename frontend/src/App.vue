@@ -23,7 +23,7 @@
 <script>
 // Structors
 import { mapState, mapMutations } from 'vuex';
-import { getMediaData } from '@/communication/communicator.js'
+import { getMediaData, getMediaMatrixData } from '@/communication/communicator.js'
 import { Dataset } from '@/dataset/dataset.js'
 // Components
 import MediaScatter from './components/MediaScatter.vue';
@@ -51,14 +51,19 @@ export default {
     window.sysDatasetObj = new Dataset();
     // lodaing data, during beforemount 
     let mediaDataDeferObj = $.Deferred();
-    $.when(mediaDataDeferObj).then(async() => {
+    let mediaMatrixDataDeferObj = $.Deferred();
+
+    $.when(mediaDataDeferObj, mediaMatrixDataDeferObj).then(async() => {
       self.loadingData = false;
     })
     getMediaData(function(data){
       self.topicCodeList = data['topicCodeList'];
-      console.log(self.topicCodeList);
       sysDatasetObj.updateMediaDataSet(data);
       mediaDataDeferObj.resolve();
+    });
+    getMediaMatrixData(function(data){
+      sysDatasetObj.updateMediaMatrixDataSet(data);
+      mediaMatrixDataDeferObj.resolve();
     });
 
   },
