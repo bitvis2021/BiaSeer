@@ -69,7 +69,7 @@ export default {
 
             let yAxis = g => g.append('g')
                 .attr('transform', `translate(${m.l}, 0)`)
-                .call(d3.axisLeft(y))
+                .call(d3.axisLeft(y).ticks(20))
 
             d3.select(self.$el).select('svg').remove();
 
