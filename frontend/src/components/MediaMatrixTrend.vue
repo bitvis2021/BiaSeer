@@ -18,6 +18,7 @@ export default {
             width: null,
             height: null,
             domain: 'msn.com',
+            selected: {'topics': new Set(), 'date': new Set()},
         }
     },
     computed: {
@@ -39,12 +40,8 @@ export default {
     },
     methods: {
         drawExample(width, height, domain) {
+            // https://observablehq.com/d/8d37e6aa05ce1b9a
             let self = this;
-            let data = d3.range(200).map(d => {
-                return { x: d, y: Math.random() }
-            });
-
-            console.log(data);
 
             let data1 = sysDatasetObj.mediaMatrixDataSet.filter(ele => ele['domain'] == domain)[0];
             console.log(data1);
@@ -61,7 +58,7 @@ export default {
             
             let y = d3.scaleLinear()
                 .domain(d3.extent(ydata, d => +d))
-                .range([height - m.b, m.t])
+                .range([m.t, height - m.b])
             
             let xAxis = g => g.append('g')
                 .attr('transform', `translate(0, ${height - m.b})`)
@@ -88,7 +85,7 @@ export default {
                 .call(yAxis);
             xyG.select(".domain").remove();
                 
-            rectsG.selectAll('g')
+            let charts = rectsG.selectAll('g')
                 .data(data1.values)
                 .join('g')
                 .attr('class', 'ggg')
@@ -103,48 +100,49 @@ export default {
                 .attr("width",8)
                 .attr("height",8)
                 .attr("fill", d=> d.value != 0 ? 'steelblue' : 'none')
-
+                .attr("stroke", 'steelblue')
             
+            // charts.append('title')
+            //     .text(d=>`from ${d.date0} to ${d.date1}, avgtone: ${d.value}`)
+
+            let brush = d3.brush()
+                .extent([[0, 0], [width, height]])
+                .on('start brush end', brushed)
+
+            function brushed() {
+                let selection = d3.event.selection;
+                if (selection === null){
+                    charts.attr('fill', d=> d.value != 0 ? 'steelblue' : 'none');
+                    self.selected = {'topics': new Set(), 'date': new Set()};
+                }
+                else {
+                    let [minX, minY] = d3.event.selection[0] || [];
+                    let [maxX, maxY] = d3.event.selection[1] || [];
+
+                    charts.attr('stroke', (d,i) =>{ // i represents the i-th time range index
+                        if(minX <= x(new Date(d.date0)) 
+                            && x(new Date(d.date0)) <= maxX
+                            && minY <= y(d.topic)
+                            && y(d.topic) <= maxY 
+                        ){
+                            self.selected['topics'].add(d.topic);
+                            self.selected['date'].add(i);
+                            // self.selected['date'].add(d.date0);
+                            return 'red';
+                        }
+                        else{
+                            return 'steelblue';
+                        }
+                    })
+                }
+            }
+
+            let brushG = svg.append('g')
+                .attr("class", "brushG")
+                .call(brush)
             
-            
-
-            // charts
-            // let chart = svg.append('g')
-            //     .call(xAxis)
-            //     .call(yAxis)
-            //     .selectAll('circle')
-            //     .data(data)
-            //     .join('circle')
-            //     .attr('cx', d => x(d.x))
-            //     .attr('cy', d => y(d.y))
-            //     .attr('r', 5)
-            //     // .attr('fill', 'steelblue')
-            //     .attr('opacity', 0.4)
-                // .on('mouseover', function() { d3.select(this).attr('fill', 'red') })
-                // .on('mouseout', function() { d3.select(this).attr('fill', 'steelblue') })
-
-            // chart.append('title')
-            //     .text(d => d.y)
-
-            // brush
-
-            // let brush = d3.brushX()
-            //     .extent([[m.l, m.t], [width - m.r, height - m.b]])
-            //     .on('start brush end', brushed)
-
-            // function brushed() {
-            //     let selection = d3.event.selection
-
-            //     if (selection === null) chart.attr('fill', null)
-            //     else {
-            //         let sx = selection.map(x.invert)
-            //         chart.attr('fill', d => (sx[0] < d.x && d.x < sx[1]) ? 'red' : null)
-            //             .attr('opacity', d => (sx[0] < d.x && d.x < sx[1]) ? 0.7 : 0.4)
-            //             .attr('stroke', d => (sx[0] < d.x && d.x < sx[1]) ? 'red' : null)
-            //     }
-            // }
-
-            // svg.append('g').call(brush)
+            brushG.select('.selection').append('title')
+                .text('aaa')
         }
     }
 }
@@ -158,7 +156,8 @@ export default {
 }
 </style>
 <style>
-/* .media_matrix_rect{
-    fill-opacity: 0.5;
-} */
+.media_matrix_rect{
+    /* stroke: steelblue; */
+    stroke-width: 1px;
+}
 </style>

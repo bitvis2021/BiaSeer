@@ -131,5 +131,5 @@ def gainMediaTopicTimeBinsData(mele, mtopic, timeBins, timeBinsIndex):
     tmp = pd.read_csv(MEDIA_CONCAT + mele + '.' + 'doctone.csv')
     for index, time in enumerate(timeBins):
         value = sum(tmp.loc[timeBinsIndex[index][0]:timeBinsIndex[index][-1], str(int(mtopic) - 1)]) / len(time)
-        result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value })
+        result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value , 'topic': mtopic})
     return result
