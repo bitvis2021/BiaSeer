@@ -49,6 +49,23 @@ export default {
             let xdata = data1['values'][0]['details'].map(ele=>ele['date0']);
             // console.log(xdata);
             let ydata = data1.values.map(ele => ele.topic);
+            let vdata = [];
+            data1.values.forEach(element => {
+                element.details.forEach(ele=>{
+                    vdata.push(ele.value);
+                })
+            });
+
+            let computeColorNeg = d3.interpolate('green', 'white');
+            let linearVDataNeg = d3.scaleLinear()  
+                .domain([d3.min(vdata), 0])
+                .range([0, 1]);
+            
+            let computeColorPos = d3.interpolate('white', 'red');
+            let linearVDataPos = d3.scaleLinear()  
+                .domain([0, d3.max(vdata)])
+                .range([0, 1]);
+
             let m = ({ l: 30, r: 25, t: 10, b: 10 });            
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
             let y = d3.scaleLinear()
@@ -95,11 +112,16 @@ export default {
                 .attr("ry",2)
                 .attr("width",8)
                 .attr("height",8)
-                .attr("fill", d=> d.value != 0 ? 'steelblue' : 'none')
+                .attr('fill', d=> {
+                    if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
+                    else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
+                    else return 'none';
+                })
+                // .attr("fill", d=> d.value != 0 ? 'steelblue' : 'none')
                 .attr("stroke", 'steelblue')
             
-            // charts.append('title')
-            //     .text(d=>`from ${d.date0} to ${d.date1}, avgtone: ${d.value}`)
+            charts.append('title')
+                .text(d=>`from ${d.date0} to ${d.date1}, avgtone: ${d.value}`)
 
             let brush = d3.brush()
                 .extent([[0, 0], [width, height]])
@@ -108,7 +130,12 @@ export default {
             function brushed() {
                 let selection = d3.event.selection;
                 if (selection === null){
-                    charts.attr('fill', d=> d.value != 0 ? 'steelblue' : 'none');
+                    // charts.attr('fill', d=> d.value != 0 ? 'steelblue' : 'none');
+                    charts.attr('fill', d=> {
+                        if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
+                        else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
+                        else return 'none';
+                    })
                     self.selected = {'topics': new Set(), 'date': new Set()};
                 }
                 else {
