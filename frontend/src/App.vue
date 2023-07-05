@@ -14,6 +14,7 @@
     <div class="event-evolution">
       <div class="union-event-evolution">
         <!-- <MediaHorizonChart></MediaHorizonChart> -->
+        <MediaStoryTree></MediaStoryTree>
       </div>
       <div class="single-event-evolution"></div>
     </div>
@@ -30,6 +31,7 @@ import MediaScatter from './components/MediaScatter.vue';
 import MediaTrend from './components/MediaTrend.vue';
 import MediaHorizonChart from './components/MediaHorizonChart.vue';
 import MediaMatrixTrend from './components/MediaMatrixTrend.vue';
+import MediaStoryTree from './components/MediaStoryTree.vue';
 
 
 export default {
@@ -45,6 +47,7 @@ export default {
     MediaTrend,
     MediaHorizonChart,
     MediaMatrixTrend,
+    MediaStoryTree,
   },
   beforeMount: function () {
     let self = this;

@@ -40,6 +40,9 @@ export default {
 
     },
     methods: {
+        ...mapMutations([
+            'UPDATE_MATRIX_SELECTED_SIGNAL'
+        ]),
         drawExample(width, height, domain) {
             // https://observablehq.com/d/8d37e6aa05ce1b9a
             let self = this;
@@ -127,8 +130,8 @@ export default {
                 .extent([[0, 0], [width, height]])
                 .on('start brush', brushed)
                 .on('end', d=>{ // ending brush, gain storytree and draw stroytree
-                    console.log(self.selected);
-                    
+                    sysDatasetObj.updateMediaMatrixSelected(self.selected);
+                    self.UPDATE_MATRIX_SELECTED_SIGNAL();
                     return brushed;
                 })
 
@@ -145,6 +148,7 @@ export default {
                 else {
                     let [minX, minY] = d3.event.selection[0] || [];
                     let [maxX, maxY] = d3.event.selection[1] || [];
+                    self.selected = {'topics': new Set(), 'date_index': new Set(), 'date': new Set()};
 
                     charts.attr('stroke', (d,i) =>{ // i represents the i-th time range index
                         if(minX <= x(new Date(d.date0)) 
