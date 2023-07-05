@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from gaindata.dataprocess import mediaDataSet, mediaMatrixDataSet
+import json
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -19,9 +20,21 @@ def getMediaDataSet():
 
 @app.route('/media_matrix_dataset', methods=['GET'])
 @cross_origin()
-def getmediaMatrixDataSet():
+def getMediaMatrixDataSet():
     data = mediaMatrixDataSet()
     return {'data': data}
+
+@app.route('/media_matrix_stroytree', methods=['GET'])
+@cross_origin()
+def getMediaMatrixStoryTreeDataSet():
+    args_dict = request.args
+    topics = args_dict.getlist('topics[]')
+    date_index = args_dict.getlist('date_index[]')
+    date = args_dict.getlist('date[]')
+    print(topics)
+    print(date_index)
+    print(date)
+    return {'data': 'test'}
 
 if __name__ == "__main__":
     print('run 0.0.0.0:14449')

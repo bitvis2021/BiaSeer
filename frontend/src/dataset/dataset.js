@@ -6,6 +6,8 @@ export function Dataset () {
     this.mediaMatrixDataSet = null;
 
     this.mediaMatrixSelected = null;
+
+    this.storyTreeDataset = null;
 }
 
 Dataset.prototype = {
@@ -24,7 +26,10 @@ Dataset.prototype = {
     },
 
     updateMediaMatrixSelected: function(data) {
-        // console.log(data);
         this.mediaMatrixSelected = data;
+    },
+
+    updateStoryTreeDataset: function(data) {
+        this.storyTreeDataset = data;
     }
 }

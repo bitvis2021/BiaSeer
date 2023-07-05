@@ -6,6 +6,7 @@
 <script>
 
 import { mapState, mapMutations } from 'vuex';
+import { getMediaStoryTreeData } from '@/communication/communicator.js'
 
 export default {
     name: 'MediaStoryTree',
@@ -33,7 +34,9 @@ export default {
         mediaMatrixSelectedSignal: function(){
             let self = this;
             console.log(self.mediaMatrixSelectedSignal);
-            console.log(sysDatasetObj.mediaMatrixSelected);
+            if(self.isToGetStroytree()){
+                self.getStroyTree();
+            }
         }
     },
     mounted: function () {
@@ -43,7 +46,26 @@ export default {
 
     },
     methods: {
-
+        isToGetStroytree(){
+            let data = sysDatasetObj.mediaMatrixSelected;
+            console.log(data);
+            console.log(data['date'].size);
+            if(data['date'].size > 0){
+                return true;
+            }
+            return false;
+        },
+        getStroyTree(){
+            let self = this;
+            let mediaMatrixSelectedDataDeferObj = $.Deferred();
+            $.when(mediaMatrixSelectedDataDeferObj).then(async() => {
+                // self.loadingData = false;
+            })
+            getMediaStoryTreeData(sysDatasetObj.mediaMatrixSelected, function(data){
+                sysDatasetObj.updateStoryTreeDataset(data);
+                mediaMatrixSelectedDataDeferObj.resolve();
+            });
+        }
     }
 }
 </script>

@@ -148,7 +148,6 @@ export default {
                 else {
                     let [minX, minY] = d3.event.selection[0] || [];
                     let [maxX, maxY] = d3.event.selection[1] || [];
-                    self.selected = {'topics': new Set(), 'date_index': new Set(), 'date': new Set()};
 
                     charts.attr('stroke', (d,i) =>{ // i represents the i-th time range index
                         if(minX <= x(new Date(d.date0)) 

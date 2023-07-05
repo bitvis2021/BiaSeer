@@ -30,3 +30,29 @@ export function getMediaMatrixData(callback) {
         callback(mediaMatrixData);
     })
 }
+
+export function getMediaStoryTreeData(tree_param, callback) {
+    console.log("tree_param: ", tree_param);
+    let topics = Array.from(tree_param['topics']);
+    let date_index = Array.from(tree_param['date_index']);
+    let date = Array.from(tree_param['date']);
+    // console.log(topics);
+    // console.log(date_index);
+    // console.log(date);
+    let formData = {
+        "topics": topics,
+        "date_index": date_index,
+        "date": date
+    }
+    axios({
+        methods: 'get',
+        url: server_address + '/media_matrix_stroytree',
+        params: formData,
+        timeout: 1000000,
+    })
+    .then((res) => {
+        let mediaMatrixStoryTreeData = res["data"]["data"];
+        console.log('mediaMatrixStoryTreeData:', mediaMatrixStoryTreeData);
+        callback(mediaMatrixStoryTreeData);
+    })
+}
