@@ -18,7 +18,7 @@ export default {
             width: null,
             height: null,
             domain: 'msn.com',
-            selected: {'topics': new Set(), 'date': new Set()},
+            selected: {'topics': new Set(), 'date_index': new Set(), 'date': new Set()},
         }
     },
     computed: {
@@ -125,18 +125,22 @@ export default {
 
             let brush = d3.brush()
                 .extent([[0, 0], [width, height]])
-                .on('start brush end', brushed)
+                .on('start brush', brushed)
+                .on('end', d=>{ // ending brush, gain storytree and draw stroytree
+                    console.log(self.selected);
+                    
+                    return brushed;
+                })
 
             function brushed() {
                 let selection = d3.event.selection;
                 if (selection === null){
-                    // charts.attr('fill', d=> d.value != 0 ? 'steelblue' : 'none');
                     charts.attr('fill', d=> {
                         if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                         else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
                         else return 'none';
                     })
-                    self.selected = {'topics': new Set(), 'date': new Set()};
+                    self.selected = {'topics': new Set(), 'date_index': new Set(), 'date': new Set()};
                 }
                 else {
                     let [minX, minY] = d3.event.selection[0] || [];
@@ -149,14 +153,14 @@ export default {
                             && y(d.topic) <= maxY 
                         ){
                             self.selected['topics'].add(d.topic);
-                            self.selected['date'].add(i);
-                            // self.selected['date'].add(d.date0);
+                            self.selected['date_index'].add(i);
+                            self.selected['date'].add(d.date0);
                             return 'red';
                         }
                         else{
                             return 'steelblue';
                         }
-                    })
+                    })                    
                 }
             }
 
@@ -164,7 +168,7 @@ export default {
                 .attr("class", "brushG")
                 .call(brush)
                 .select('.selection').append('title')
-                .text('aaa')
+                .text('aaa');
         }
     }
 }
