@@ -3,6 +3,7 @@
 /frontend/dist/
 
 /backend/**/__pycache__/
+/backend/**/**.jar
 
 
 # local env files
