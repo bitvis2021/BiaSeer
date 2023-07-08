@@ -25,5 +25,6 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+/backend/testinput_basecode/**/*.txt
 
 /backend/mediaDataSet.json

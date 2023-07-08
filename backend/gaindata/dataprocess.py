@@ -11,6 +11,7 @@ MEDIA_XY = '../../preprocessv2/datasets/mediaxy/doctone_results.json'
 MEDIA_NUMS = '../../preprocessv2/datasets/mediaxy/media_nums.json'
 
 TIME_BINS = 54
+TIME_STEP = 7
 
 def mediaDataSet():
     # print(os.listdir(ROOT_PATH))
@@ -117,10 +118,10 @@ def gainTimeBins():
     
     tsplit = time_range.split('-')
     date_list = create_date_range([int(tsplit[0]),int(tsplit[1])])
-    step = int(len(date_list) / TIME_BINS)
-    timeBins = [date_list[i : i + step] for i in range(0,len(date_list), step)]
 
-    timeBinsIndex = [list(range(i,i + step)) for i in range(0,len(date_list), step)]
+    timeBins = [date_list[i : i + TIME_STEP] for i in range(0,len(date_list), TIME_STEP)]
+
+    timeBinsIndex = [list(range(i,i + TIME_STEP)) for i in range(0,len(date_list), TIME_STEP)]
     # print(timeBinsIndex)
     # print(len(timeBinsIndex))
     return timeBins, timeBinsIndex

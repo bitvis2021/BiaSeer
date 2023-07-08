@@ -29,7 +29,7 @@ def javaMain(txt_path='test_data50',jar_path="keywordExtract/storyteller_1.jar")
         file_name=txt_path+'/' +file_list[0]
         os.remove(file_name)
 
-    jar = PyJar("keywordExtract/storyteller_1_hjl_324.jar")
+    jar = PyJar("keywordExtract/storyteller_1_gbr_eur.jar")
 
     jar.initialize()
     # pr

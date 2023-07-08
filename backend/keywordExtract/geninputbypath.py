@@ -1,7 +1,6 @@
 #encoding=utf8
 import json
 import sys
-sys.path.append('./utils')
 import nltk
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -30,7 +29,7 @@ import utils.config as config
 TOPIC = config.TOPIC
 
 PUNCTUATION = string.punctuation.replace('\'', '').replace('-','')  # Do not use apostrophe as a delimiter
-stop_words = pd.read_csv('stopwords-en.txt', index_col=False, quoting=3, sep="\t", names=['stopword'],encoding='utf-8')
+stop_words = pd.read_csv('./keywordExtract/stopwords-en.txt', index_col=False, quoting=3, sep="\t", names=['stopword'],encoding='utf-8')
 stop_words = stop_words['stopword'].values
 # import io
 # import sys
@@ -103,7 +102,7 @@ def toknizing(text):
     #stp = my_stopwords
     # stops = set(stopwords.words('english'))
     # stop_words = set(stops)    #ͣ�ô�û��storyForest�࣡��
-    stop_words = pd.read_csv('stopwords-en.txt', index_col=False, quoting=3, sep="\t", names=['stopword'],encoding='utf-8')
+    stop_words = pd.read_csv('./keywordExtract/stopwords-en.txt', index_col=False, quoting=3, sep="\t", names=['stopword'],encoding='utf-8')
     stop_words = stop_words['stopword'].values
     #print("len:",len(stop_words))
     tokens = word_tokenize(text)
@@ -968,231 +967,3 @@ if __name__=="__main__":
     country_list = '["ALL"]'
     classnum = '3'  # ѡ����
     genStoryForestInput(time_scope,mSrc_list,classnum,country_list)
-    # totalGroupList=[]
-    # totalTimeList=[]
-    # #filepath= '..\\articles\\msn2'
-    # # filepath="D:\\coding\\Event\\Event\\newartile\\p_articles\\msn"
-    # #filepath = "D:\\coding\\Event\\Event\\testmsn"
-    # # o_path="D:\\coding\\Event\\testinput_group"
-    # # o_path="D:\\coding\\Event\\testinput_muti"
-    # # o_path = "D:\\coding\\Event\\testinput_basecode"
-    # o_path = "..\\testinput_basecode"
-    # #filepath = '..\\en-ae'
-    # #print(os.listdir(filepath))
-    #
-    # #grouppath = "D:\coding\Event\www.msn.com"
-    # # grouppath = "D:\\coding\\Event\\test_18"
-    # # #grouppath = "D:\\coding\\Event\\5diffsources\\www.dailymail.co.uk\\Class_18_WithCorpus_Keywords.json"
-    # # grouppath = "D:\\coding\\Event\\5d_test"
-    # # grouppath = "D:\\coding\\Event\\test_multiS18"
-    # # grouppath = "D:\\\coding\\Event\\preprocess\\news_processing\\results\\same_events_class_EventCode"
-    # # grouppath = "D:\\\coding\\Event\\preprocess\\news_processing\\results\\same_events_class_EventCode"
-    # grouppath="..//..//..//preprocess\\news_processing\\results\\same_events_class_EventCode"
-    # # groupfiles = os.listdir(grouppath)
-    #
-    # mSrc_list=['www.msn.com','www.dw.com','tass.com','menafn.com']
-    # time_scope='["2021-06-01","2022-08-31"]'
-    # country_list='["ALL"]'
-    # country_list = '["EUR","RUS","UKR"]' #��rus+ukr �൱��all��������
-    # country_list = '["GBR"]'
-    # print(groupfiles)
-    #
-    # class_num=18#ѡ����
-    # print('class:',class_num)
-    #
-    # docn_list=genArticleGroup(grouppath,mSrc_list,class_num)
-    # print('lendict',len(totalSrcDict))
-    # event_num=0
-    # for key in totalSrcDict:
-    #     for event_list in totalSrcDict[key]:
-    #         for event in event_list:
-    #             event_num=event_num+1
-    # # print(totalSrcDict)
-    # print(event_num)
-    # f = open('testjson1.json', 'w', encoding='utf-8')
-    # json.dump(totalSrcDict,f,indent=4)
-    # f.close()
-    # # exit(111)
-    # # for file in groupfiles: #�����
-    # #     [septotallist,timedict_sep]=groupArticle(grouppath,file)
-    # [septotallist, timedict_sep] = gencorpus(mSrc_list,time_scope,country_list)
-    #
-    #
-    #
-    # #print("corpus read done,num=",corpus_index)
-    # #print("Error file num: ",errorfileNum)
-    #
-    #     #lda����corpus����
-    # corpus=[]
-    #
-    # for edict in septotallist:
-    #     #�����Ͻ���Ԥ����
-    #     temp_corpus=edict['corpus']
-    #     temp_token=preprocess_text(temp_corpus)
-    #     corpus.append(' '.join(temp_token))
-    # print('lencorpus',len(corpus))
-    # num_key = 20 # ǰ��λ
-    #
-    # print("begin lda")
-    # # �������ϵĴ���ʵ䣬ÿ�������Ĵ��ﶼ�ᱻ����һ������
-    #
-    # corpus_lda=[ corpus_single.split() for corpus_single in corpus] #��list��ÿ��corpus stringת��Ϊ����list
-    # dictionary = corpora.Dictionary(corpus_lda)
-    #
-    # # ʹ������Ĵʵ䣬��ת���ĵ��б������ϣ���� DT ����
-    # doc_term_matrix = [dictionary.doc2bow(doc) for doc in corpus_lda]
-    #
-    # # ʹ�� gensim ������ LDA ģ�Ͷ���
-    # Lda = gensim.models.ldamodel.LdaModel
-    #
-    # # �� DT ���������к�ѵ�� LDA ģ��
-    # num_topic=20
-    # ldamodel = Lda(doc_term_matrix, num_topics=num_topic, id2word=dictionary, passes=1)   #������Ϊ1����debug
-    #
-    # # ������
-    # # print(ldamodel.print_topics(num_topics=3, num_words=3))
-    # # res = ldamodel.print_topics(30)
-    # # print(len(res))
-    # # print(len(res[1]))
-    # # output_lda("ldaresult", 1)
-    #
-    # # ���lda
-    # for i in range(len(corpus_lda)):
-    #     doc_bow = dictionary.doc2bow(corpus_lda[i])
-    #     doc_lda = ldamodel[doc_bow]
-    #     templist=["0"]*20
-    #     for temptuple in doc_lda:
-    #         templist[temptuple[0]]=str(temptuple[1])
-    #
-    #     septotallist[i]['lda']=','.join(templist)
-    #
-    #
-    #
-    #
-    #
-    #
-    # print("begin writing")
-    # #print(len(corpus))
-    # #print(len(keywordlist))
-    # print("time num:",len(timedict_sep.keys()))
-    # print(timedict_sep)
-    # time_sort = sorted(timedict_sep.items(), key=lambda x: x[0], reverse=False)
-    # timedict_sort=dict(time_sort)
-    # class_n='class'+str(class_num)
-    # o_path_sep=os.sep.join([o_path,class_n])
-    # if os.path.exists(o_path_sep):
-    #     shutil.rmtree(o_path_sep)
-    # os.mkdir(o_path_sep)
-    # #print(timedict)
-    # #o_path="G:\\testinput_test"
-    # #o_path = "G:\\testinput_phra"
-    # #o_path="testinput"
-    # #�Ƿ�Ϊ���� (��ҪDF)
-    # for timename in timedict_sort.keys():
-    #
-    #     index_list = timedict_sort[timename]
-    #     if len(index_list)==0:
-    #         continue
-    #
-    #     #�ļ�������
-    #     timestr='-'.join([timename[0:4],timename[4:6],timename[6:]])
-    #     time_stamp=datetime.datetime(int(timename[0:4]),int(timename[4:6]),int(timename[6:]))
-    #     time_stamp=str(time_stamp.timestamp())
-    #     f=open(os.sep.join([o_path_sep,timestr+'.txt']),'w',encoding='utf-8')
-    #     #f = open('testinput_1.txt', 'w')
-    #     #f.write("id|segment_title|keywords|LDA|time|original\n")
-    #     f.write("id|segment_title|titlekeys|keywords|LDA|time|original|url|eventbasecode|eventcode|resouce_n|avgTone|goldsteinscale|nummentions|numarticles|numsources|mSrc_list|docn_list|mSrcName\n")
-    #     #f.write("id|segment_title|keywords|DF|LDA|time|original\n")
-    #
-    #     for index_corpus in index_list:
-    #
-    #         temp_id=index_corpus+10# ��0����
-    #         temp_original=septotallist[index_corpus]['corpus']
-    #         temp_titlekeys=septotallist[index_corpus]['titlekey']
-    #         temp_keywords=septotallist[index_corpus]['key']
-    #         #�����һ��nlp������ȥtxt��׺
-    #
-    #         #print("segtitle1: ",temp_segtitle)
-    #         temp_segtitle = septotallist[index_corpus]['title'] #�������title
-    #         temp_segtitle_list=septotallist[index_corpus]['title'].split('+') #ֻȡ��һ��
-    #         #print("segtitle2: ", temp_segtitle)
-    #         for i in range(len(temp_segtitle_list)):
-    #             temp_segtitle_list[i]=temp_segtitle_list[i].split('.')[0]
-    #         temp_segtitle='+'.join(temp_segtitle_list)
-    #
-    #         # temp_segtitle=temp_segtitle.split('.')[0] #ȥtxt��׺
-    #         #
-    #         #ȥ����ֻʣ��һ��������
-    #         # temp_segtitle_token=preprocess_text(temp_segtitle)
-    #         # temp_segtitle=' '.join(temp_segtitle_token)   #��title����nlp����
-    #
-    #         temp_lda = septotallist[index_corpus]['lda']
-    #         #url�������
-    #         temp_url = septotallist[index_corpus]['url']#.split(',')[0] #ֻȡ��һ��
-    #         temp_eventbasecode = septotallist[index_corpus]['eventbasecode']
-    #         temp_eventcode = septotallist[index_corpus]['eventcode']
-    #
-    #         #���䣡��
-    #         resouce_n=septotallist[index_corpus]['resource_n']
-    #         temp_resouce=str(resouce_n[0])
-    #         for i in range(len(resouce_n)-1):
-    #             temp_resouce=temp_resouce+','+str(resouce_n[i+1])
-    #         # print('resouce_n:',resouce_n)
-    #         # print(temp_resouce)
-    #
-    #         temp_avgTone_list = septotallist[index_corpus]['avgTone']
-    #         temp_avgTone = str(temp_avgTone_list[0])
-    #         for i in range(len(temp_avgTone_list) - 1):
-    #             temp_avgTone = temp_avgTone + ',' + str(temp_avgTone_list[i + 1])
-    #
-    #         temp_goldsteinscale_list = septotallist[index_corpus]['goldsteinscale']
-    #         temp_goldsteinscale = str(temp_goldsteinscale_list[0])
-    #         for i in range(len(temp_goldsteinscale_list) - 1):
-    #             temp_goldsteinscale = temp_goldsteinscale + ',' + str(temp_goldsteinscale_list[i + 1])
-    #
-    #         temp_nummentions_list = septotallist[index_corpus]['nummentions']
-    #         temp_nummentions = str(temp_nummentions_list[0])
-    #         for i in range(len(temp_nummentions_list) - 1):
-    #             temp_nummentions = temp_nummentions + ',' + str(temp_nummentions_list[i + 1])
-    #
-    #         temp_numarticles_list = septotallist[index_corpus]['numarticles']
-    #         temp_numarticles = str(temp_numarticles_list[0])
-    #         for i in range(len(temp_numarticles_list) - 1):
-    #             temp_numarticles = temp_numarticles + ',' + str(temp_numarticles_list[i + 1])
-    #
-    #         temp_numsources_list = septotallist[index_corpus]['numsources']
-    #         temp_numsources = str(temp_numsources_list[0])
-    #         for i in range(len(temp_numsources_list) - 1):
-    #             temp_numsources = temp_numsources + ',' + str(temp_numsources_list[i + 1])
-    #
-    #         # temp_avgTone = str(septotallist[index_corpus]['avgTone'])
-    #         # temp_goldsteinscale = str(septotallist[index_corpus]['goldsteinscale'])
-    #         # temp_nummentions = str(septotallist[index_corpus]['nummentions'])
-    #         # temp_numarticles = str(septotallist[index_corpus]['numarticles'])
-    #         # temp_numsources = str(septotallist[index_corpus]['numsources'])
-    #
-    #         temp_mSrc_list=mSrc_list[0]
-    #         for i in range(len(mSrc_list)-1):
-    #             temp_mSrc_list=temp_mSrc_list+','+mSrc_list[i+1]
-    #         temp_docn_list=str(docn_list[0])
-    #         for i in range(len(docn_list)-1):
-    #             temp_docn_list=temp_docn_list+','+str(docn_list[i+1])
-    #
-    #         for i in range(len(resouce_n)):
-    #             if resouce_n[i]!=0:
-    #                 # print('in mSrcName:')
-    #                 # print(resouce_n)
-    #                 # print(mSrc_list[i])
-    #                 temp_mSrcName=mSrc_list[i]
-    #                 break
-    #         # if temp_resouce =="tass.com":
-    #         #     print("goal!!!!!!!!!!!!!!!!!")
-    #         #temp_DF=DF_list[index_corpus]
-    #
-    #         str_corpus = "|".join([str(temp_id), temp_segtitle,temp_titlekeys, temp_keywords, temp_lda, time_stamp, temp_original,temp_url,temp_eventbasecode,temp_eventcode,temp_resouce,temp_avgTone,temp_goldsteinscale,temp_nummentions,temp_numarticles,temp_numsources,temp_mSrc_list,temp_docn_list,temp_mSrcName])
-    #         #str_corpus = "|".join([str(temp_id),temp_segtitle,temp_keywords,temp_DF,temp_lda,time_stamp,temp_original])
-    #         str_corpus=str_corpus+"\n"
-    #         f.write(str_corpus)
-    #     f.close()
-    # print("output done")
-    # #���ݼ�̫�󣬷�������

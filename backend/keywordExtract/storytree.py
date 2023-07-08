@@ -1,17 +1,18 @@
 import os
 import shutil
 import sys
-sys.path.append('./keywordExtract')
-import geninputbypath
-import treeVisual
-import test_jar
+from keywordExtract import geninputbypath
+from keywordExtract import geninputbypathMulti
+from keywordExtract import treeVisual
+from keywordExtract import test_jar
 
 def getStoryTreedata(time_scope,mSrc_list,classnum,country_list):
     if classnum=="0":
         print("classnum 0!!!!!!!!!!!!!")
         return "will not change"
     print(time_scope)
-    geninputbypath.genStoryForestInput(time_scope,mSrc_list,classnum,country_list)
+    # geninputbypath.genStoryForestInput(time_scope,mSrc_list,classnum,country_list)
+    geninputbypathMulti.genStoryForestInputMulti(time_scope,mSrc_list,classnum,country_list)
     test_jar.javaMain()
     treeVisual.GenJsonByTree()
     return treeVisual.GenJsonByTree()
