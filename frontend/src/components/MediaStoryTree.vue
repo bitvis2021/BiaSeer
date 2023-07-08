@@ -1,5 +1,8 @@
 <template>
-    <div class="media-storytree-container" ref="mediastorytree">
+    <div class="media-storytree-container"
+    v-loading="storytree__loading"
+    element-loading-text="Waiting Loading Story Tree"
+    ref="mediastorytree">
         <svg id="storytree__svg"></svg>
     </div>
 </template>
@@ -7,13 +10,13 @@
 <script>
 
 import { mapState, mapMutations } from 'vuex';
-import { getMediaStoryTreeData } from '@/communication/communicator.js'
 
 export default {
     name: 'MediaStoryTree',
     props: {
         msg: String,
         topic_code: String,
+        storytree__loading: Boolean,
     },
     data() {
         return {
@@ -25,49 +28,30 @@ export default {
     computed: {
         ...mapState([
             'currMedium',
-            'mediaMatrixSelectedSignal',
+            'storytree_finish',
         ])
     },
     watch: {
         currMedium: function () {
             let self = this;
         },
-        mediaMatrixSelectedSignal: function(){
+        storytree_finish:function(){
             let self = this;
-            console.log(self.mediaMatrixSelectedSignal);
-            if(self.isToGetStroytree()){
-                self.getStroyTree();
-                self.drawStoryTree(self.width, self.height);
-            }
-        }
+            // console.log("storytree_finish:", this.storytree_finish);
+            // console.log("sysDatasetObj.StoryTreeDataset",sysDatasetObj.StoryTreeDataset);
+            // this.width = this.$refs.storytree.clientWidth;
+            // this.height = this.$refs.storytree.clientHeight;
+            self.drawStoryTree(self.width, self.height);
+        },
+        
     },
     mounted: function () {
         let self = this;
         self.width = self.$refs.mediastorytree.clientWidth;
         self.height = self.$refs.mediastorytree.clientHeight;
-        // drawStoryTree(self.width, self.height);
+        self.drawStoryTree(self.width, self.height);
     },
     methods: {
-        isToGetStroytree(){
-            let data = sysDatasetObj.mediaMatrixSelected;
-            console.log(data);
-            console.log(data['date'].size);
-            if(data['date'].size > 0){
-                return true;
-            }
-            return false;
-        },
-        getStroyTree(){
-            let self = this;
-            let mediaMatrixSelectedDataDeferObj = $.Deferred();
-            $.when(mediaMatrixSelectedDataDeferObj).then(async() => {
-                // self.loadingData = false;
-            })
-            getMediaStoryTreeData(sysDatasetObj.mediaMatrixSelected, function(data){
-                sysDatasetObj.updateStoryTreeDataset(data);
-                mediaMatrixSelectedDataDeferObj.resolve();
-            });
-        },
         drawStoryTree(width, height) {
             let self = this;
             console.log(width, height);
