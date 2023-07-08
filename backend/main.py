@@ -35,11 +35,20 @@ def getMediaMatrixStoryTreeDataSet():
     date_index = args_dict.getlist('date_index[]')
     date = args_dict.getlist('date[]')
     print(topics)
+    print(date_index)
+    print(date)
 
-    mSrc_list = '["msn.com", "bbc.com"]'
-    time_scope = '["2022-02-01","2022-03-21"]'
-    country_list = '["ALL"]'
-    classnum = '["3","4"]'
+    date_index.sort()
+
+    binDict = readJsontoDict("binDict.json")
+    
+
+    mSrc_list = ["msn.com", "bbc.com"]
+    time_scope = ["2022-02-01","2022-02-21"]
+    country_list = ["ALL"]
+    # classnum = '["3","4"]'
+    classnum = topics
+    time_scope = [binDict[str(date_index[0])][0], binDict[str(date_index[-1])][-1]]
 
     testdata = getStoryTreedata(time_scope,mSrc_list,classnum,country_list)
     # testdata = readJsontoDict("./tree_pro.json")

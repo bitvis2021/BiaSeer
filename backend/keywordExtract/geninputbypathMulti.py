@@ -306,8 +306,8 @@ def gencorpus(mSrc_list,time_scope,country_list,totalSrcDict):
     septotallist=[]
     timedict_sep={}
 
-    time_scope=ast.literal_eval(time_scope)
-    country_list=ast.literal_eval(country_list)
+    # time_scope=ast.literal_eval(time_scope)
+    # country_list=ast.literal_eval(country_list)
 
     time_e = int(time_scope[0].replace('-', ''))
     time_l = int(time_scope[1].replace('-', ''))
@@ -772,8 +772,14 @@ def mergeTxt():
 def genStoryForestInputMulti(time_scope,mSrc_list,classnum,country_list):
     # 遍历testinput_basecode文件夹下的子文件夹，删除.txt文件
 
+    root_dir = "./testinput_basecode/"
+    sub_dirs = os.listdir(root_dir)
+    for ele in sub_dirs:
+        shutil.rmtree(root_dir + ele)  
+        os.mkdir(root_dir + ele)
 
-    class_list = ast.literal_eval(classnum)
+    # class_list = ast.literal_eval(classnum)
+    class_list = classnum
     for class_code in class_list:
         genStoryForestInput(time_scope,mSrc_list,class_code, country_list)
     mergeTxt()
@@ -791,14 +797,7 @@ def genStoryForestInput(time_scope,mSrc_list,classnum,country_list):
     grouppath = "../../preprocess/news_processing/results2/" + TOPIC +"/same_events_class_EventCode"
     
 
-    # o_path = "testinput_basecode"
-    # grouppath = "..//..//..//preprocess\\news_processing\\results\\same_events_class_EventCode"
-    # mSrc_list = '["www.msn.com", "www.dw.com", "tass.com", "menafn.com"]'
-    # time_scope = '["2021-06-01","2022-08-31"]'
-    # country_list = '["ALL"]'
-    # classnum = '18'  # ѡ����
-
-    mSrc_list=ast.literal_eval(mSrc_list)
+    # mSrc_list=ast.literal_eval(mSrc_list)
 
 
     class_num = int(classnum)

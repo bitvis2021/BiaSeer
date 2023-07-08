@@ -124,6 +124,10 @@ def gainTimeBins():
     timeBinsIndex = [list(range(i,i + TIME_STEP)) for i in range(0,len(date_list), TIME_STEP)]
     # print(timeBinsIndex)
     # print(len(timeBinsIndex))
+    binDict = {}
+    for i,ele in enumerate(timeBins):
+        binDict[i] = ele
+    saveDictoJson(binDict, 'binDict')
     return timeBins, timeBinsIndex
 
 

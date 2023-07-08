@@ -49,7 +49,7 @@ export default {
         let self = this;
         self.width = self.$refs.mediastorytree.clientWidth;
         self.height = self.$refs.mediastorytree.clientHeight;
-        self.drawStoryTree(self.width, self.height);
+        // self.drawStoryTree(self.width, self.height);
     },
     methods: {
         drawStoryTree(width, height) {
