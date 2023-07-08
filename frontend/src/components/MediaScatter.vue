@@ -181,7 +181,6 @@ export default {
                             .remove()
                     )
                     .on("mouseover", function(d) {
-                        console.log(d);
                         self.UPDATE_CURRENT_MEDIUM(d.domain);
                         self.mouse_this = d3.mouse(this);
                     })

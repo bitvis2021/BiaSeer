@@ -3,6 +3,7 @@
 /frontend/dist/
 
 /backend/**/__pycache__/
+/backend/**/**.jar
 
 
 # local env files
@@ -24,5 +25,6 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+/backend/testinput_basecode/**/*.txt
 
 /backend/mediaDataSet.json
