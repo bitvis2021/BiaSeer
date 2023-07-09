@@ -59,12 +59,12 @@ export default {
                 })
             });
 
-            let computeColorNeg = d3.interpolate('green', 'white');
+            let computeColorNeg = d3.interpolate('red', 'white');
             let linearVDataNeg = d3.scaleLinear()  
                 .domain([d3.min(vdata), 0])
                 .range([0, 1]);
             
-            let computeColorPos = d3.interpolate('white', 'red');
+            let computeColorPos = d3.interpolate('white', 'green');
             let linearVDataPos = d3.scaleLinear()  
                 .domain([0, d3.max(vdata)])
                 .range([0, 1]);

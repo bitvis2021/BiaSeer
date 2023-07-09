@@ -183,6 +183,11 @@ export default {
                     .on("mouseover", function(d) {
                         self.UPDATE_CURRENT_MEDIUM(d.domain);
                         self.mouse_this = d3.mouse(this);
+
+                        d3.select(this).classed("dot_mouseover", true);
+                    })
+                    .on("mouseout", function(d) {
+                        d3.select(this).classed("dot_mouseover", false);
                     })
             }
 
@@ -295,7 +300,7 @@ export default {
             self.innerHeight = height - self.margin.top - self.margin.bottom;
 
             self.step = (height - (self.margin.top + self.margin.bottom) ) /  self.draw_data.length - 1;
-            let colorArr = ["#4393c3", "#92c5de", "#fddbc7", "#f4a582", "#d6604d", "#b2182b", "#67001f"];
+            let colorArr = ["#fddbc7", "#f4a582", "#4393c3", "#92c5de", "#d6604d", "#b2182b", "#67001f"];
             self.color = i => colorArr[i + (i >= 0) + self.overlap];
             self.mirror = false;
             self.xValue = d => new Date(d.date);
@@ -424,6 +429,12 @@ export default {
 <style>
 .dot{
     fill: steelblue;
+    opacity: 0.5;
+}
+
+.dot_mouseover{
+    fill: red;
+    stroke-width: 1px;
     opacity: 0.5;
 }
 .media_horizon_chart_tooltip_div{
