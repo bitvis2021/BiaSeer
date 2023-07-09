@@ -60,7 +60,8 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'UPDATE_CURRENT_MEDIUM'
+            'UPDATE_CURRENT_MEDIUM',
+            'UPDATE_MEDIA_SCATTER_CLICK'
         ]),
 
         drawContour(width, height) {
@@ -189,6 +190,11 @@ export default {
                     .on("mouseout", function(d) {
                         d3.select(this).classed("dot_mouseover", false);
                     })
+                    .on("click", function(d) {
+                        self.UPDATE_MEDIA_SCATTER_CLICK();
+                        sysDatasetObj.updateMediaScatterSelected(d.domain);
+                    })
+
             }
 
             function transform(d) {

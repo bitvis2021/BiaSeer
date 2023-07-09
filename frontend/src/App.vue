@@ -9,16 +9,7 @@
         <!-- <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend> -->
         <!-- <MediaHorizonChart></MediaHorizonChart> -->
         <div class="media-concat-list">
-          <el-tag closable size="medium">
-            {{ currMedium }}
-          </el-tag>
-          <!-- <el-tag
-            v-for="tag in tags"
-            :key="tag.name"
-            closable
-            :type="tag.type">
-            {{tag.name}}
-          </el-tag> -->
+          <MediaTags></MediaTags>
         </div>
         <div class="media-concat-diffarea">
           <MediaMatrixTrend></MediaMatrixTrend>
@@ -48,7 +39,7 @@ import MediaTrend from './components/MediaTrend.vue';
 import MediaHorizonChart from './components/MediaHorizonChart.vue';
 import MediaMatrixTrend from './components/MediaMatrixTrend.vue';
 import MediaStoryTree from './components/MediaStoryTree.vue';
-
+import MediaTags from './views/MediaTags.vue';
 
 export default {
   name: 'App',
@@ -65,6 +56,7 @@ export default {
     MediaHorizonChart,
     MediaMatrixTrend,
     MediaStoryTree,
+    MediaTags
   },
   beforeMount: function () {
     let self = this;
@@ -181,8 +173,6 @@ export default {
         bottom: 90%;
         left: 0%;
         right: 0%;
-        border: 1px solid red;
-        align-items: center;
       }
       .media-concat-diffarea{
         position: absolute;

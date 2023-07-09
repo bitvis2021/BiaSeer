@@ -6,6 +6,7 @@
 <script>
 
 import { mapState, mapMutations } from 'vuex';
+import { getTopic } from '../assets/data/topicList';
 
 export default {
     name: 'MediaMatrixTrend',
@@ -69,7 +70,7 @@ export default {
                 .domain([0, d3.max(vdata)])
                 .range([0, 1]);
 
-            let m = ({ l: 30, r: 25, t: 10, b: 10 });            
+            let m = ({ l: 95, r: 25, t: 10, b: 10 });            
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
             let y = d3.scaleLinear()
                 .domain(d3.extent(ydata, d => +d))
@@ -100,6 +101,9 @@ export default {
                 .call(yAxis);
             
             xyG.select(".domain").remove();
+            xyG.selectAll("text")
+            .text((d,i)=> {
+                return getTopic((i + 1).toString())});
                 
             let charts = rectsG.selectAll('g')
                 .data(data1.values)

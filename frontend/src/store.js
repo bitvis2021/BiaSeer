@@ -12,6 +12,8 @@ export default new Vuex.Store({
     mediaMatrixSelectedSignal: 1, // signal media matrix selected
 
     storytree_finish: 0,
+
+    mediaScatterClick: 0,
   },
   mutations: {
     ['UPDATE_DISPLAY_MODE'] (state, displayMode) {
@@ -30,6 +32,10 @@ export default new Vuex.Store({
 
     ['UPDATE_STORYTREE_FINISH'](state){
       state.storytree_finish += 1;
+    },
+
+    ['UPDATE_MEDIA_SCATTER_CLICK'](state){
+      state.mediaScatterClick = (state.mediaScatterClick + 1 ) % 5;
     },
   },
   actions: {
