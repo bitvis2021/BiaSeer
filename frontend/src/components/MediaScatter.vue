@@ -183,6 +183,11 @@ export default {
                     .on("mouseover", function(d) {
                         self.UPDATE_CURRENT_MEDIUM(d.domain);
                         self.mouse_this = d3.mouse(this);
+
+                        d3.select(this).classed("dot_mouseover", true);
+                    })
+                    .on("mouseout", function(d) {
+                        d3.select(this).classed("dot_mouseover", false);
                     })
             }
 
@@ -269,7 +274,18 @@ export default {
                     return delta + self.mouse_this[0]+"px"
                 })
                 .style('width', width + "px")
-                .style('height', height + "px");
+                .style('height', height + 19 + "px");
+            
+            add_div.append("i")
+                .attr("class", "el-icon-close close-icon")
+                .on("click",function(){
+                    d3.select("body").select("#div1024").remove();
+                })
+
+            add_div.append("div")
+                .append("span")
+                .attr("class", "summary_container_title")
+                .text(domain)
             
             self.move("div1024");
             self.drawMediaHorizonChartII(width, height, self.horizon_chart_class);
@@ -284,7 +300,7 @@ export default {
             self.innerHeight = height - self.margin.top - self.margin.bottom;
 
             self.step = (height - (self.margin.top + self.margin.bottom) ) /  self.draw_data.length - 1;
-            let colorArr = ["#4393c3", "#92c5de", "#fddbc7", "#f4a582", "#d6604d", "#b2182b", "#67001f"];
+            let colorArr = ["#fddbc7", "#f4a582", "#4393c3", "#92c5de", "#d6604d", "#b2182b", "#67001f"];
             self.color = i => colorArr[i + (i >= 0) + self.overlap];
             self.mirror = false;
             self.xValue = d => new Date(d.date);
@@ -310,9 +326,7 @@ export default {
                 .attr("width", width)
                 .attr("height", height)
                 .attr("viewBox", [0, 0, width, height])
-                // .attr("viewBox", [0, height / 2, 2 * width, height])
                 .attr("style", "font: 6px sans-serif;");
-                // .attr("style", "max-width: 100%; height: auto; font: 6px sans-serif;");
             
             self.horizong = self.svg.append("g").attr("class", "horizon-graph");
 
@@ -417,8 +431,24 @@ export default {
     fill: steelblue;
     opacity: 0.5;
 }
+
+.dot_mouseover{
+    fill: red;
+    stroke-width: 1px;
+    opacity: 0.5;
+}
 .media_horizon_chart_tooltip_div{
     border: 1px solid black;
     background-color: white;
+}
+.summary_container_title{
+    text-align: center;
+    display: block;
+    font: sans-serif;
+    /* font-weight: bold; */
+}
+.close-icon {
+    float: right;
+    right: 12px;
 }
 </style>
