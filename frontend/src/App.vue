@@ -8,7 +8,22 @@
         <!-- <MediaTrend></MediaTrend> -->
         <!-- <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend> -->
         <!-- <MediaHorizonChart></MediaHorizonChart> -->
-        <MediaMatrixTrend></MediaMatrixTrend>
+        <div class="media-concat-list">
+          <el-tag closable size="medium">
+            {{ currMedium }}
+          </el-tag>
+          <!-- <el-tag
+            v-for="tag in tags"
+            :key="tag.name"
+            closable
+            :type="tag.type">
+            {{tag.name}}
+          </el-tag> -->
+        </div>
+        <div class="media-concat-diffarea">
+          <MediaMatrixTrend></MediaMatrixTrend>
+        </div>
+        
       </div>
     </div>
     <div class="event-evolution">
@@ -101,6 +116,7 @@ export default {
   },
   computed: {
     ...mapState([
+      'currMedium',
       'mediaMatrixSelectedSignal',
     ])
   },
@@ -159,6 +175,22 @@ export default {
       left: 50%;
       right: 0%;
       border: 1px solid steelblue;
+      .media-concat-list{
+        position: absolute;
+        top: 0%;
+        bottom: 90%;
+        left: 0%;
+        right: 0%;
+        border: 1px solid red;
+        align-items: center;
+      }
+      .media-concat-diffarea{
+        position: absolute;
+        top: 10%;
+        bottom: 0%;
+        left: 0%;
+        right: 0%;
+      }
     }
   }
 
