@@ -10,7 +10,7 @@ export function Dataset () {
     this.storyTreeDataset = null;
 
 
-    this.mediaScatterSelected = [];
+    this.mediaScatterSelected = ['msn.com'];
 }
 
 Dataset.prototype = {
