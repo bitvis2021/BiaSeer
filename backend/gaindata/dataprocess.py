@@ -2,10 +2,16 @@ import os
 import json
 import pandas as pd
 from utils.helper import create_date_range,saveDictoJson
+import itertools
+import operator
+import numpy as np
+
 
 TOPIC = 'RUS_UKR'
 ROOT_PATH = '../../preprocessv2/datasets/mergesets/' + TOPIC +'/'
 MEDIA_CONCAT = '../../preprocessv2/same_event/concat/'
+ALL_EVENTS = '../../preprocessv2/same_event/allevents.csv'
+
 
 MEDIA_XY = '../../preprocessv2/datasets/mediaxy/doctone_results.json'
 MEDIA_NUMS = '../../preprocessv2/datasets/mediaxy/media_nums.json'
@@ -23,7 +29,8 @@ def mediaDataSet():
         'media': media[0],
         'media_nums': media[1],
         'details': media[2],
-        'topicCodeList': [str(ele + 1) for ele in range(20)]
+        'topicCodeList': [str(ele + 1) for ele in range(20)],
+        'mediagraph': gainMediaGraph()
     }
     return result
 
@@ -121,13 +128,17 @@ def gainTimeBins():
 
     timeBins = [date_list[i : i + TIME_STEP] for i in range(0,len(date_list), TIME_STEP)]
 
-    timeBinsIndex = [list(range(i,i + TIME_STEP)) for i in range(0,len(date_list), TIME_STEP)]
+    timeBinsIndex = [list(range(i, i + len(date_list[i : i + TIME_STEP]))) for i in range(0,len(date_list), TIME_STEP)]
     # print(timeBinsIndex)
     # print(len(timeBinsIndex))
     binDict = {}
+    binsIndexDict = {}
     for i,ele in enumerate(timeBins):
         binDict[i] = ele
+        binsIndexDict[i] = timeBinsIndex[i]
     saveDictoJson(binDict, 'binDict')
+    saveDictoJson(binsIndexDict, 'binsIndexDict')
+
     return timeBins, timeBinsIndex
 
 
@@ -137,4 +148,64 @@ def gainMediaTopicTimeBinsData(mele, mtopic, timeBins, timeBinsIndex):
     for index, time in enumerate(timeBins):
         value = sum(tmp.loc[timeBinsIndex[index][0]:timeBinsIndex[index][-1], str(int(mtopic) - 1)]) / len(time)
         result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value , 'topic': mtopic})
+    return result
+
+
+# TOP 300媒体
+def gainMediaGraph():
+    result = {}
+    allEvents = pd.read_csv(ALL_EVENTS)
+    media = meidaList()
+    combinations = list(itertools.combinations(media[0], 2))
+    for ele in combinations:
+        el_key = ele[0] + "_" + ele[1]
+        result[el_key] = 0
+    
+
+    for key, value in allEvents.groupby('GlobalEventID'):
+        combinations = list(itertools.combinations(list(set(value['MentionSourceName'].to_list())), 2))
+        for ele in combinations:
+            el_key = ele[0] + "_" + ele[1]
+            el_key1 = ele[1] + "_" + ele[0]
+            if el_key in result.keys():
+                result[el_key] += 1
+            if el_key1 in result.keys():
+                result[el_key1] += 1
+    return result
+
+
+def concatMediaDiff(meidaList):
+    result = []
+    
+    timeBins, timeBinsIndex = gainTimeBins()
+
+    tmp = {'domain' : meidaList.join("_"), 'values': []}
+    for mtopic in [str(ele + 1) for ele in range(20)]:
+        tmp['values'].append({'topic':mtopic, 'details': concatMediaTopicTimeBinsDataDiff(meidaList, mtopic, timeBins, timeBinsIndex)})
+    
+    result.append(tmp)
+    return result
+
+def concatMediaTopicTimeBinsDataDiff(meidaList, mtopic, timeBins, timeBinsIndex):
+    result = []
+    tmp_dict = {}
+    for mele in meidaList:
+        tmp_dict[mele] = {}
+        tmp_dict[mele]['doctone'] = pd.read_csv(MEDIA_CONCAT + mele + '.' + 'doctone.csv')
+        tmp_dict[mele]['docnums'] = pd.read_csv(MEDIA_CONCAT + mele + '.' + 'docnums.csv')
+    
+    for index, time in enumerate(timeBins): # 计算每一个格子
+        X = []
+        for mele in meidaList:
+            tone_value = sum(tmp_dict[mele]['doctone'].loc[timeBinsIndex[index][0]:timeBinsIndex[index][-1], str(int(mtopic) - 1)]) / len(time)
+            nums_value = sum(tmp_dict[mele]['docnums'].loc[timeBinsIndex[index][0]:timeBinsIndex[index][-1], str(int(mtopic) - 1)]) / len(time)
+            X.append([tone_value, nums_value])
+        
+        # 计算方差
+        X = np.array(X)
+        avg = np.average(X, axis=0)
+        value = sum((X - avg) ** 2) / len(X)
+
+        result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value , 'topic': mtopic})
+    
     return result

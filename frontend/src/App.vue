@@ -8,7 +8,13 @@
         <!-- <MediaTrend></MediaTrend> -->
         <!-- <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend> -->
         <!-- <MediaHorizonChart></MediaHorizonChart> -->
-        <MediaMatrixTrend></MediaMatrixTrend>
+        <div class="media-concat-list">
+          <MediaTags></MediaTags>
+        </div>
+        <div class="media-concat-diffarea">
+          <MediaMatrixTrend></MediaMatrixTrend>
+        </div>
+        
       </div>
     </div>
     <div class="event-evolution">
@@ -33,7 +39,7 @@ import MediaTrend from './components/MediaTrend.vue';
 import MediaHorizonChart from './components/MediaHorizonChart.vue';
 import MediaMatrixTrend from './components/MediaMatrixTrend.vue';
 import MediaStoryTree from './components/MediaStoryTree.vue';
-
+import MediaTags from './views/MediaTags.vue';
 
 export default {
   name: 'App',
@@ -50,6 +56,7 @@ export default {
     MediaHorizonChart,
     MediaMatrixTrend,
     MediaStoryTree,
+    MediaTags
   },
   beforeMount: function () {
     let self = this;
@@ -92,7 +99,7 @@ export default {
       $.when(mediaMatrixSelectedDataDeferObj).then(async () => {
         self.storytree__loading = false;
       })
-      getMediaStoryTreeData(sysDatasetObj.mediaMatrixSelected, function (data) {
+      getMediaStoryTreeData(sysDatasetObj.mediaMatrixSelected,sysDatasetObj.mediaScatterSelected, function (data) {
         sysDatasetObj.updateStoryTreeDataset(data);
         self.UPDATE_STORYTREE_FINISH();
         mediaMatrixSelectedDataDeferObj.resolve();
@@ -101,6 +108,7 @@ export default {
   },
   computed: {
     ...mapState([
+      'currMedium',
       'mediaMatrixSelectedSignal',
     ])
   },
@@ -159,6 +167,20 @@ export default {
       left: 50%;
       right: 0%;
       border: 1px solid steelblue;
+      .media-concat-list{
+        position: absolute;
+        top: 0%;
+        bottom: 90%;
+        left: 0%;
+        right: 0%;
+      }
+      .media-concat-diffarea{
+        position: absolute;
+        top: 10%;
+        bottom: 0%;
+        left: 0%;
+        right: 0%;
+      }
     }
   }
 
