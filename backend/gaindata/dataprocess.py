@@ -3,6 +3,7 @@ import json
 import pandas as pd
 from utils.helper import create_date_range,saveDictoJson
 import itertools
+import operator
 
 
 TOPIC = 'RUS_UKR'
@@ -167,4 +168,5 @@ def gainMediaGraph():
                 result[el_key1] += 1
 
     # print(result)
+    # return dict(sorted(result.items(), key=operator.itemgetter(1), reverse=True))
     return result
