@@ -4,6 +4,7 @@ import pandas as pd
 from utils.helper import create_date_range,saveDictoJson
 import itertools
 import operator
+import numpy as np
 
 
 TOPIC = 'RUS_UKR'
@@ -127,13 +128,17 @@ def gainTimeBins():
 
     timeBins = [date_list[i : i + TIME_STEP] for i in range(0,len(date_list), TIME_STEP)]
 
-    timeBinsIndex = [list(range(i,i + TIME_STEP)) for i in range(0,len(date_list), TIME_STEP)]
+    timeBinsIndex = [list(range(i, i + len(date_list[i : i + TIME_STEP]))) for i in range(0,len(date_list), TIME_STEP)]
     # print(timeBinsIndex)
     # print(len(timeBinsIndex))
     binDict = {}
+    binsIndexDict = {}
     for i,ele in enumerate(timeBins):
         binDict[i] = ele
+        binsIndexDict[i] = timeBinsIndex[i]
     saveDictoJson(binDict, 'binDict')
+    saveDictoJson(binsIndexDict, 'binsIndexDict')
+
     return timeBins, timeBinsIndex
 
 
@@ -166,7 +171,41 @@ def gainMediaGraph():
                 result[el_key] += 1
             if el_key1 in result.keys():
                 result[el_key1] += 1
+    return result
 
-    # print(result)
-    # return dict(sorted(result.items(), key=operator.itemgetter(1), reverse=True))
+
+def concatMediaDiff(meidaList):
+    result = []
+    
+    timeBins, timeBinsIndex = gainTimeBins()
+
+    tmp = {'domain' : meidaList.join("_"), 'values': []}
+    for mtopic in [str(ele + 1) for ele in range(20)]:
+        tmp['values'].append({'topic':mtopic, 'details': concatMediaTopicTimeBinsDataDiff(meidaList, mtopic, timeBins, timeBinsIndex)})
+    
+    result.append(tmp)
+    return result
+
+def concatMediaTopicTimeBinsDataDiff(meidaList, mtopic, timeBins, timeBinsIndex):
+    result = []
+    tmp_dict = {}
+    for mele in meidaList:
+        tmp_dict[mele] = {}
+        tmp_dict[mele]['doctone'] = pd.read_csv(MEDIA_CONCAT + mele + '.' + 'doctone.csv')
+        tmp_dict[mele]['docnums'] = pd.read_csv(MEDIA_CONCAT + mele + '.' + 'docnums.csv')
+    
+    for index, time in enumerate(timeBins): # 计算每一个格子
+        X = []
+        for mele in meidaList:
+            tone_value = sum(tmp_dict[mele]['doctone'].loc[timeBinsIndex[index][0]:timeBinsIndex[index][-1], str(int(mtopic) - 1)]) / len(time)
+            nums_value = sum(tmp_dict[mele]['docnums'].loc[timeBinsIndex[index][0]:timeBinsIndex[index][-1], str(int(mtopic) - 1)]) / len(time)
+            X.append([tone_value, nums_value])
+        
+        # 计算方差
+        X = np.array(X)
+        avg = np.average(X, axis=0)
+        value = sum((X - avg) ** 2) / len(X)
+
+        result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value , 'topic': mtopic})
+    
     return result

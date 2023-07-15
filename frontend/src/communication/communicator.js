@@ -31,7 +31,7 @@ export function getMediaMatrixData(callback) {
     })
 }
 
-export function getMediaStoryTreeData(tree_param, callback) {
+export function getMediaStoryTreeData(tree_param, meidaList, callback) {
     console.log("tree_param: ", tree_param);
     let topics = Array.from(tree_param['topics']);
     let date_index = Array.from(tree_param['date_index']);
@@ -42,7 +42,8 @@ export function getMediaStoryTreeData(tree_param, callback) {
     let formData = {
         "topics": topics,
         "date_index": date_index,
-        "date": date
+        "date": date,
+        "mSrc_list": meidaList
     }
     axios({
         methods: 'get',

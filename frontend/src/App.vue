@@ -99,7 +99,7 @@ export default {
       $.when(mediaMatrixSelectedDataDeferObj).then(async () => {
         self.storytree__loading = false;
       })
-      getMediaStoryTreeData(sysDatasetObj.mediaMatrixSelected, function (data) {
+      getMediaStoryTreeData(sysDatasetObj.mediaMatrixSelected,sysDatasetObj.mediaScatterSelected, function (data) {
         sysDatasetObj.updateStoryTreeDataset(data);
         self.UPDATE_STORYTREE_FINISH();
         mediaMatrixSelectedDataDeferObj.resolve();
