@@ -115,17 +115,17 @@ export default {
                 .join('rect')
                 .attr('class', 'media_matrix_rect')
                 .attr("x", d=> x(new Date(d.date0)))
-                .attr("rx",2)
-                .attr("ry",2)
-                .attr("width",8)
-                .attr("height",8)
+                // .attr("rx",2)
+                // .attr("ry",2)
+                .attr("width",10)
+                .attr("height",10)
                 .attr('fill', d=> {
                     if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                     else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
-                    else return 'none';
+                    else return '#f9f9f9';
                 })
                 // .attr("fill", d=> d.value != 0 ? 'steelblue' : 'none')
-                .attr("stroke", 'steelblue')
+                // .attr("stroke", 'steelblue')
             
             charts.append('title')
                 .text(d=>`from ${d.date0} to ${d.date1}, avgtone: ${d.value}`)
