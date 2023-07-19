@@ -9,8 +9,9 @@ export function Dataset () {
 
     this.storyTreeDataset = null;
 
-
     this.mediaScatterSelected = ['msn.com'];
+
+    this.mediaGraphList = [];
 }
 
 Dataset.prototype = {
@@ -40,6 +41,16 @@ Dataset.prototype = {
         if(this.mediaScatterSelected.indexOf(data)==-1){
             console.log(data + "不存在");
             this.mediaScatterSelected.push(data);
+        }
+        else{
+            console.log(data + "已经存在");
+        }
+    },
+
+    updateMediaGraphList: function(data) {
+        if(this.mediaGraphList.indexOf(data)==-1){
+            console.log(data + "不存在");
+            this.mediaGraphList.push(data);
         }
         else{
             console.log(data + "已经存在");

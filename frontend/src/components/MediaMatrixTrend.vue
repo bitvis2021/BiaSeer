@@ -69,15 +69,16 @@ export default {
             let linearVDataPos = d3.scaleLinear()  
                 .domain([0, d3.max(vdata)])
                 .range([0, 1]);
-
-            let m = ({ l: 95, r: 25, t: 10, b: 10 });            
+            
+            let rectWH = 10;
+            let m = ({ l: 95, r: 25, t: 10, b: 30 });            
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
             let y = d3.scaleLinear()
                 .domain(d3.extent(ydata, d => +d))
                 .range([m.t, height - m.b]);
             
             let xAxis = g => g.append('g')
-                .attr('transform', `translate(0, ${height - m.b})`)
+                .attr('transform', `translate(0, ${height - m.b + rectWH})`)
                 .call(d3.axisBottom(x))
 
             let yAxis = g => g.append('g')
@@ -95,15 +96,19 @@ export default {
             let rectsG = svg.append('g')
                 .attr('class', 'rectsG');
             
-            let xyG = svg.append('g')
+            let yG = svg.append('g')
                 .attr('class', 'xyG')
-                // .call(xAxis)
                 .call(yAxis);
             
-            xyG.select(".domain").remove();
-            xyG.selectAll("text")
-            .text((d,i)=> {
-                return getTopic((i + 1).toString())});
+            let xG = svg.append('g')
+                .attr('class', 'xyG')
+                .call(xAxis);
+            
+            xG.select(".domain").remove();
+            yG.select(".domain").remove();
+            yG.selectAll("text")
+                .text((d,i)=> {
+                    return getTopic((i + 1).toString())});
                 
             let charts = rectsG.selectAll('g')
                 .data(data1.values)
@@ -115,17 +120,17 @@ export default {
                 .join('rect')
                 .attr('class', 'media_matrix_rect')
                 .attr("x", d=> x(new Date(d.date0)))
-                .attr("rx",2)
-                .attr("ry",2)
-                .attr("width",8)
-                .attr("height",8)
+                // .attr("rx",2)
+                // .attr("ry",2)
+                .attr("width", rectWH)
+                .attr("height", rectWH)
                 .attr('fill', d=> {
                     if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                     else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
-                    else return 'none';
+                    else return '#f9f9f9';
                 })
                 // .attr("fill", d=> d.value != 0 ? 'steelblue' : 'none')
-                .attr("stroke", 'steelblue')
+                // .attr("stroke", 'steelblue')
             
             charts.append('title')
                 .text(d=>`from ${d.date0} to ${d.date1}, avgtone: ${d.value}`)
@@ -145,7 +150,7 @@ export default {
                     charts.attr('fill', d=> {
                         if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                         else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
-                        else return 'none';
+                        else return '#f9f9f9';
                     })
                     self.selected = {'topics': new Set(), 'date_index': new Set(), 'date': new Set()};
                 }
@@ -167,7 +172,8 @@ export default {
                             return 'red';
                         }
                         else{
-                            return 'steelblue';
+                            // return 'steelblue';
+                            return '';
                         }
                     })                    
                 }
