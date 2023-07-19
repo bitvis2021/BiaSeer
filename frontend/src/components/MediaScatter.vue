@@ -1,5 +1,13 @@
 <template>
     <div class="media-scatter-container" ref="mediascatter">
+        <div class="flow-node-menu" id="nodeMenu" v-show="nodeMenuFlag">
+            <div class="prop-menu-item">
+                <el-button size="mini" @click="keepFunc">keep</el-button>
+            </div>
+            <div class="prop-menu-item">
+                <el-button size="mini" @click="addFunc">add</el-button>
+            </div>
+        </div>
     </div>
 </template>
   
@@ -39,7 +47,11 @@ export default {
             clipPath: null,
             mouse_this: null,
             horizon_chart_class: null,
+            right_click_div_class: null,
             lineGenerator: null,
+            nodeMenuFlag: false,
+            graph_g: null,
+            label_g: null,
         }
     },
     mounted: function () {
@@ -50,21 +62,40 @@ export default {
     computed: {
         ...mapState([
             'currMedium',
+            'mediaGraphLabel'
         ]),
     },
     watch: {
         currMedium: function () {
             let self = this;
-            self.gainMediaHorizonChartData(self.currMedium);
-            self.drawMediaHorizonChart(self.currMedium);
+            // drawMediaHorizonChart
+            // self.gainMediaHorizonChartData(self.currMedium);
+            // self.drawMediaHorizonChart(self.currMedium);
         },
+        mediaGraphLabel: function() {
+            let self = this;
+            self.drawMediaGraph(sysDatasetObj.mediaGraphList);
+        }
     },
     methods: {
         ...mapMutations([
             'UPDATE_CURRENT_MEDIUM',
-            'UPDATE_MEDIA_SCATTER_CLICK'
+            'UPDATE_MEDIA_SCATTER_CLICK',
+            'UPDATE_MEDIA_GRAPH_LABEL'
         ]),
-
+        keepFunc(){
+            // console.log("keepFunc...");
+            let self = this;
+            self.UPDATE_MEDIA_GRAPH_LABEL();
+            sysDatasetObj.updateMediaGraphList(self.currMedium);
+            self.nodeMenuFlag = false;
+        },
+        addFunc(){
+            // console.log("addFunc...");
+            this.UPDATE_MEDIA_SCATTER_CLICK();
+            sysDatasetObj.updateMediaScatterSelected(this.currMedium);
+            self.nodeMenuFlag = false;
+        },
         drawContour(width, height) {
             // https://vizhub.com/curran/65a26f760f5b4d3f976d1cd7cb43a221
 
@@ -78,7 +109,7 @@ export default {
             const yValue = d => d.x2;
             const rValue = d => d.nums;
 
-            const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+            const margin = { top: 40, right: 90, bottom: 40, left: 40 };
             const innerWidth = width - margin.left - margin.right;
             const innerHeight = height - margin.top - margin.bottom;
 
@@ -91,8 +122,14 @@ export default {
             let contour_g = svg.append("g")
                 .attr("class", "media-point-contour-g");
             
-            let graph_g = svg.append("g")
+            self.graph_g = svg.append("g")
                 .attr("class", "media-point-graph-g")
+                .attr("width", innerWidth)
+                .attr("height", innerHeight)
+                .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            
+            self.label_g = svg.append("g")
+                .attr("class", "media-point-label-g")
                 .attr("width", innerWidth)
                 .attr("height", innerHeight)
                 .attr("transform", `translate(${margin.left}, ${margin.top})`)
@@ -190,18 +227,41 @@ export default {
                     )
                     .on("mouseover", function (d) {
                         self.UPDATE_CURRENT_MEDIUM(d.domain);
+                        
+                        // update mouseLocation
                         self.mouse_this = d3.mouse(this);
+
                         // hover highlight
                         d3.select(this).classed("dot_mouseover", true);
+                        
                         // draw mediagraph
-                        self.drawMediaGraph(d.domain);
+                        // 更改要画的媒体列表
+                        sysDatasetObj.updateMediaGraphList(d.domain);
+                        // 更改一个标记
+                        self.UPDATE_MEDIA_GRAPH_LABEL();
+                        // 画出这个graph
+                        // 监听画出这个graph
+                        // self.drawMediaGraph([d.domain]);
+
+                        // hidden nodeMenu
+                        self.nodeMenuFlag = false;
                     })
                     .on("mouseout", function (d) {
                         // d3.select(this).classed("dot_mouseover", false);
+                        sysDatasetObj.mediaGraphList.splice(sysDatasetObj.mediaGraphList.indexOf(d.domain), 1);
                     })
                     .on("click", function (d) {
-                        self.UPDATE_MEDIA_SCATTER_CLICK();
-                        sysDatasetObj.updateMediaScatterSelected(d.domain);
+                        // self.UPDATE_MEDIA_SCATTER_CLICK();
+                        // sysDatasetObj.updateMediaScatterSelected(d.domain);
+                    })
+                    .on("contextmenu", d => {
+                        console.log(d);
+                        d3.event.preventDefault();
+                        self.nodeMenuFlag = true;
+
+                        // right click
+                        // add a div
+                        self.rightClickDiv();
                     })
 
             }
@@ -222,50 +282,7 @@ export default {
 
             xyScale(data);
             let tdata = data;
-            // let tdata = data.filter(d=> +d.zoom_0 == 1);
             renderCircles(tdata);
-            // renderContours(tdata, 55);
-            // d3.select(this.$el).select(".media-point-contour-g").on('mousemove', () => {
-            //     renderContours(tdata, (d3.event.x / 10) );
-            // });
-            // self.zoomOperator = d3.zoom()
-            //     .extent([[0, 0], [innerWidth, innerHeight]])
-            //     .scaleExtent([self.zoomMinRatio, self.zoomMaxRatio])
-            //     .duration(1000)
-            //     .on("zoom", zoomed);
-            // svg.call(self.zoomOperator);
-
-            // function zoomed() {
-            //     // 1. clear media circle tooltip.
-            //     circle_g
-            //         .select(".circlr_g__contour_tooltip")
-            //         .remove();
-            //     // 2. rescale x y.
-            //     xScale = d3.event.transform.rescaleX(xScaleCopy);
-            //     yScale = d3.event.transform.rescaleY(yScaleCopy);
-
-            //     // 3. get zoom scale.
-            //     let zoomScale_k = d3.event.transform.k;
-            //     tdata = data.filter(d=> +d["zoom_"+Math.floor(zoomScale_k-1)] == 1);
-            //     // 4. transform media circle.
-            //     d3.select(self.$el).selectAll(".dot").attr("transform", transform);                 
-            //     // 5. 
-            //     renderCircles(tdata);
-            //     // 6. filter media which can be viewed.
-            //     let dots = d3.select(self.$el).selectAll(".dot").filter(function() {
-            //         return d3.select(this).attr("cx") > margin.left &&
-            //         d3.select(this).attr("cx") < innerWidth &&
-            //         d3.select(this).attr("cy") > margin.top &&
-            //         d3.select(this).attr("cy") < innerHeight;
-            //     });
-            //     // console.log("dots: ", dots);
-            //     tdata = []
-            //     dots.filter(d=>{
-            //         tdata.push(d);
-            //     });
-            //     renderCircles(tdata);
-            //     renderContours(tdata, 25);
-            // }
         },
         drawMediaHorizonChart(domain) {
             console.log(domain);
@@ -425,57 +442,76 @@ export default {
                 $(div_id).fadeTo("fast", 1);
             });
         },
+        rightClickDiv(){
+            let self = this;
+            console.log(self.mouse_this);
+            let width = 70;
+            let height = 30;
+
+            let delta = 20;
+
+            let rightDiv = d3.select('.media-scatter-container')
+                .select('.flow-node-menu');
+            rightDiv.style('top', d => {
+                    return delta + self.mouse_this[1] + "px";
+                })
+                .style('left', function () {
+                    return delta + self.mouse_this[0] + "px"
+                })
+                .style('width', width + "px")
+                .style('height', height + "px")
+        },
         clearHorizonGraphTooltip() {
             let self = this;
             d3.select("body").selectAll("." + self.horizon_chart_class).remove();
         },
-        drawMediaGraph(domain) {
+        drawMediaGraph(domains) {
             let self = this;
             // console.log(sysDatasetObj.mediaDataSet);
             // console.log(tmpdata);
             let mediagraph = sysDatasetObj.mediaDataSet['mediagraph'];
             // console.log(mediagraph);
-            let mediagraphValues = Object.values(mediagraph);
-
-            let domainLinks = {}
-            Object.entries(mediagraph).forEach(([key, value]) => {
-                if (key.split("_").includes(domain)) {
-                    domainLinks[key] = value
-                }
-            });
-            let items = Object.keys(domainLinks).map(
-                (key) => { return [key, domainLinks[key]] });
-            items.sort(
-                (first, second) => { return second[1] - first[1] }
-            );
-            let keys = items.map(e=>e[0]);
+            // let mediagraphValues = Object.values(mediagraph);
+            // let edgeScale = d3.scaleLog().domain(d3.extent(mediagraphValues)).range([1,4]);
+            // console.log(d3.max(mediagraphValues));
+            
             let domainOneStep = {}
+            domains.forEach(domain => {
+                let domainLinks = {}
+                Object.entries(mediagraph).forEach(([key, value]) => {
+                    if (key.split("_").includes(domain)) {
+                        domainLinks[key] = value
+                    }
+                });
+                let items = Object.keys(domainLinks).map(
+                (key) => { return [key, domainLinks[key]] });
+                items.sort(
+                    (first, second) => { return second[1] - first[1] }
+                );
+                let keys = items.map(e=>e[0]);
+                
 
-            let circles = d3.select(self.$el).select(".media__contour__svg").select(".media-point-circle-g").selectAll('circle')
-            let circlesLocation = {}
-            circles.each(function () {
-                const thisD3 = d3.select(this)
-                d3.select(this).classed("dot_mouseover", false);
-                circlesLocation[thisD3.attr('id').split('media_id_')[1]] = [+thisD3.attr('cx'), +thisD3.attr('cy')]
+                let circles = d3.select(self.$el).select(".media__contour__svg").select(".media-point-circle-g").selectAll('circle')
+                let circlesLocation = {}
+                circles.each(function () {
+                    const thisD3 = d3.select(this)
+                    d3.select(this).classed("dot_mouseover", false);
+                    circlesLocation[thisD3.attr('id').split('media_id_')[1]] = [+thisD3.attr('cx'), +thisD3.attr('cy')]
+                })
+
+                for(let i = 0; i < 5; i++){
+                    let link_domain = keys[i].split("_");
+                    let path = [];
+                    path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
+                    path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
+                    domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                }
             })
-            // console.log(circlesLocation)
-
-            for(let i = 0; i < 5; i++){
-                let link_domain = keys[i].split("_");
-                let path = [];
-                path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
-                path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
-                domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
-            }
-            // console.log(keys);
             console.log(domainOneStep);
-            // console.log(domaingraphValues);
 
-            // circles.each(function () {
-            //     if(Object.keys(domainOneStep).includes(d3.select(this).attr('id').split('media_id_')[1])){
-            //         d3.select(this).classed("dot_mouseover", true);   
-            //     }
-            // })
+            let mediagraphValues = Object.values(domainOneStep).map(ele=>ele.value);
+            let edgeScale = d3.scaleLinear().domain(d3.extent(mediagraphValues)).range([1,4]);
+            console.log(d3.max(mediagraphValues));
 
             Object.keys(domainOneStep).forEach(ele=>{
                 let link_domain = ele.split("_");
@@ -493,7 +529,8 @@ export default {
 
             const t = d3.select(self.$el).select(".media__contour__svg").select(".media-point-graph-g").transition()
                 .duration(300);
-            d3.select(self.$el).select(".media__contour__svg").select(".media-point-graph-g")
+            // d3.select(self.$el).select(".media__contour__svg").select(".media-point-graph-g")
+            self.graph_g
                 .selectAll("path")
                 .data(Object.keys(domainOneStep))
                 .join(
@@ -504,6 +541,7 @@ export default {
                             console.log("enter");
                             return self.lineGenerator(domainOneStep[d]['location']);
                         })
+                        .attr('stroke-width', d=> edgeScale(domainOneStep[d]['value'] + 1))
                         ,
                     update => update
                         .call(update => update.transition(t)
@@ -512,6 +550,39 @@ export default {
                                 console.log("update");
                                 return self.lineGenerator(domainOneStep[d]['location']);
                             })
+                            .attr('stroke-width', d=> edgeScale(domainOneStep[d]['value'] + 1))
+                        ),
+                    exit => exit
+                        .remove()
+                )
+
+            // draw labels
+            let doaminText = {}
+            for (var key in domainOneStep) {
+                let eles = key.split("_");
+                doaminText[eles[0]] = domainOneStep[key]['location'][0]
+                doaminText[eles[1]] = domainOneStep[key]['location'][1]
+            }
+            console.log(doaminText);
+            self.label_g
+                .selectAll("text")
+                .data(Object.keys(doaminText))
+                .join(
+                    enter => enter.append("text")
+                        .attr("class", "text_label")
+                        .attr("x", d=> doaminText[d][0])
+                        .attr("y", d=> doaminText[d][1])
+                        .attr("dy", "-0.71em")
+                        .attr('text-anchor',"start")
+                        .text(d=>d)
+                        ,
+                    update => update
+                        .call(update => update.transition(t)
+                        .attr("x", d=> doaminText[d][0])
+                        .attr("y", d=> doaminText[d][1])
+                        .attr("dy", "-0.71em")
+                        .attr('text-anchor',"start")
+                        .text(d=>d)
                         ),
                     exit => exit
                         .remove()
@@ -526,6 +597,14 @@ export default {
 .media-scatter-container {
     width: 100%;
     height: 100%;
+    .flow-node-menu{
+        position: absolute;
+        width: 50px;
+        // height: 60px;      
+        .el-button--mini {
+            width: 100%;
+        }
+    }
 }
 </style>
 
@@ -561,6 +640,12 @@ export default {
 
 .link{
     stroke: red;
-    stroke-opacity: 0.5;
+    stroke-opacity: 0.3;
+}
+
+.text_label{
+    /* font-weight: 400; */
+    /* font-family: 'Arial'; */
+    fill: red;
 }
 </style>

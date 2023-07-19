@@ -14,6 +14,8 @@ export default new Vuex.Store({
     storytree_finish: 0,
 
     mediaScatterClick: 0,
+
+    mediaGraphLabel: 0,
   },
   mutations: {
     ['UPDATE_DISPLAY_MODE'] (state, displayMode) {
@@ -36,6 +38,10 @@ export default new Vuex.Store({
 
     ['UPDATE_MEDIA_SCATTER_CLICK'](state){
       state.mediaScatterClick = (state.mediaScatterClick + 1 ) % 5;
+    },
+
+    ['UPDATE_MEDIA_GRAPH_LABEL'](state){
+      state.mediaGraphLabel = (state.mediaGraphLabel + 1 ) % 5;
     },
   },
   actions: {
