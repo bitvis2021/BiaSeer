@@ -10,7 +10,7 @@
         </div>
     </div>
 </template>
-  
+
 <script>
 
 import { mapState, mapMutations } from 'vuex';
@@ -84,16 +84,15 @@ export default {
             'UPDATE_MEDIA_GRAPH_LABEL'
         ]),
         keepFunc(){
-            // console.log("keepFunc...");
             let self = this;
             self.UPDATE_MEDIA_GRAPH_LABEL();
             sysDatasetObj.updateMediaGraphList(self.currMedium);
             self.nodeMenuFlag = false;
         },
         addFunc(){
-            // console.log("addFunc...");
-            this.UPDATE_MEDIA_SCATTER_CLICK();
-            sysDatasetObj.updateMediaScatterSelected(this.currMedium);
+            let self = this;
+            self.UPDATE_MEDIA_SCATTER_CLICK();
+            sysDatasetObj.updateMediaScatterSelected(self.currMedium);
             self.nodeMenuFlag = false;
         },
         drawContour(width, height) {
