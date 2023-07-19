@@ -2,10 +2,10 @@
     <div class="media-scatter-container" ref="mediascatter">
         <div class="flow-node-menu" id="nodeMenu" v-show="nodeMenuFlag">
             <div class="prop-menu-item">
-                <el-button size="mini" @click="keepFunc">keep</el-button>
+                <el-button size="mini" @click="addFunc">add</el-button>
             </div>
             <div class="prop-menu-item">
-                <el-button size="mini" @click="addFunc">add</el-button>
+                <el-button size="mini" @click="keepFunc">keep</el-button>
             </div>
         </div>
     </div>

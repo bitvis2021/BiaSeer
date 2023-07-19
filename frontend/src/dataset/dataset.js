@@ -5,6 +5,8 @@ export function Dataset () {
 
     this.mediaMatrixDataSet = null;
 
+    this.mediaConcatDiffDataSet = null;
+
     this.mediaMatrixSelected = null;
 
     this.storyTreeDataset = null;
@@ -27,6 +29,10 @@ Dataset.prototype = {
 
     updateMediaMatrixDataSet: function(data) {
         this.mediaMatrixDataSet = data;
+    },
+
+    updateMediaConcatDiffDataSet: function(data){
+        this.mediaConcatDiffDataSet = data;
     },
 
     updateMediaMatrixSelected: function(data) {

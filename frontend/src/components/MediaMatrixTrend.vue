@@ -25,31 +25,42 @@ export default {
     computed: {
         ...mapState([
             'currMedium',
+            'concatdiff_finish',
         ])
     },
     watch: {
         currMedium: function () {
             let self = this;
-            self.drawExample(self.width, self.height, self.currMedium);
+            self.drawExample(self.width, self.height, self.currMedium, 'single');
+        },
+        concatdiff_finish: function() {
+            let self = this;
+            self.drawExample(self.width, self.height, self.currMedium, 'concat');
         }
     },
     mounted: function () {
         let self = this;
         self.width = self.$refs.mediamatrixtrend.clientWidth;
         self.height = self.$refs.mediamatrixtrend.clientHeight;
-        self.drawExample(self.width, self.height, self.currMedium);
+        self.drawExample(self.width, self.height, self.currMedium, 'single');
 
     },
     methods: {
         ...mapMutations([
             'UPDATE_MATRIX_SELECTED_SIGNAL'
         ]),
-        drawExample(width, height, domain) {
+        drawExample(width, height, domain, flag) {
             // https://observablehq.com/d/8d37e6aa05ce1b9a
             let self = this;
-
-            let data1 = sysDatasetObj.mediaMatrixDataSet.filter(ele => ele['domain'] == domain)[0];
-            // console.log(data1);
+            let data1 = null;
+            if(flag === 'single'){
+                data1 = sysDatasetObj.mediaMatrixDataSet.filter(ele => ele['domain'] == domain)[0];
+            }
+            else if(flag === 'concat'){
+                data1 = sysDatasetObj.mediaConcatDiffDataSet[0];
+            }
+            console.log(data1);
+            
             let xdata = data1['values'][0]['details'].map(ele=>ele['date0']);
             // console.log(xdata);
             let ydata = data1.values.map(ele => ele.topic);

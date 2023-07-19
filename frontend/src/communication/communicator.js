@@ -57,3 +57,22 @@ export function getMediaStoryTreeData(tree_param, meidaList, callback) {
         callback(mediaMatrixStoryTreeData);
     })
 }
+
+
+
+export function getMediaDiffConcatData(meidaList, callback) {
+    let formData = {
+        "mSrc_list": meidaList
+    }
+    axios({
+        methods: 'get',
+        url: server_address + '/media_concat_diff',
+        params: formData,
+        timeout: 1000000,
+    })
+    .then((res) => {
+        let mediaDiffConcatData = res["data"]["data"];
+        console.log('mediaDiffConcatData:', mediaDiffConcatData);
+        callback(mediaDiffConcatData);
+    })
+}

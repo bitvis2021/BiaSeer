@@ -31,7 +31,7 @@
 // Structors
 import { mapState, mapMutations } from 'vuex';
 import { getMediaData, getMediaMatrixData } from '@/communication/communicator.js'
-import { getMediaStoryTreeData } from '@/communication/communicator.js'
+import { getMediaStoryTreeData, getMediaDiffConcatData } from '@/communication/communicator.js'
 import { Dataset } from '@/dataset/dataset.js'
 // Components
 import MediaScatter from './components/MediaScatter.vue';
@@ -82,6 +82,7 @@ export default {
   methods: {
     ...mapMutations([
       'UPDATE_STORYTREE_FINISH',
+      'UPDATE_CONCATDIFF_FINISH',
     ]),
     isToGetStroytree() {
       let data = sysDatasetObj.mediaMatrixSelected;
@@ -110,6 +111,7 @@ export default {
     ...mapState([
       'currMedium',
       'mediaMatrixSelectedSignal',
+      'mediaDiffConcatSignal',
     ])
   },
   watch: {
@@ -119,6 +121,18 @@ export default {
       if (self.isToGetStroytree()) {
         self.getStroyTree();
       }
+    },
+    mediaDiffConcatSignal: function(){
+      let self = this;
+      console.log("listening mediaDiffConcatSignal");
+      let mediaDiffConcatDataDeferObj = $.Deferred();
+      $.when(mediaDiffConcatDataDeferObj).then(async () => {
+        self.UPDATE_CONCATDIFF_FINISH();
+      })
+      getMediaDiffConcatData(sysDatasetObj.mediaScatterSelected, function (data) {
+        sysDatasetObj.updateMediaConcatDiffDataSet(data);
+        mediaDiffConcatDataDeferObj.resolve();
+      });
     }
   }
 }
