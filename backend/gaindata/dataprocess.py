@@ -179,7 +179,7 @@ def concatMediaDiff(meidaList):
     
     timeBins, timeBinsIndex = gainTimeBins()
 
-    tmp = {'domain' : meidaList.join("_"), 'values': []}
+    tmp = {'domain' : "_".join(meidaList), 'values': []}
     for mtopic in [str(ele + 1) for ele in range(20)]:
         tmp['values'].append({'topic':mtopic, 'details': concatMediaTopicTimeBinsDataDiff(meidaList, mtopic, timeBins, timeBinsIndex)})
     
@@ -204,8 +204,7 @@ def concatMediaTopicTimeBinsDataDiff(meidaList, mtopic, timeBins, timeBinsIndex)
         # 计算方差
         X = np.array(X)
         avg = np.average(X, axis=0)
-        value = sum((X - avg) ** 2) / len(X)
-
+        value = ((X - avg) ** 2).sum() / len(X)
         result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value , 'topic': mtopic})
     
     return result

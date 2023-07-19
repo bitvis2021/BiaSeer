@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-from gaindata.dataprocess import mediaDataSet, mediaMatrixDataSet
+from gaindata.dataprocess import mediaDataSet, mediaMatrixDataSet, concatMediaDiff
 import json
 from utils.helper import readJsontoDict
 from keywordExtract.test import test
@@ -25,6 +25,17 @@ def getMediaDataSet():
 @cross_origin()
 def getMediaMatrixDataSet():
     data = mediaMatrixDataSet()
+    return {'data': data}
+
+@app.route('/media_concat_diff', methods=['GET'])
+@cross_origin()
+def getMediaConcatDiffDataSet():
+    args_dict = request.args
+    mSrc_list = args_dict.getlist('mSrc_list[]')
+    # print(mSrc_list)
+    data = None
+    if len(mSrc_list) > 1:
+        data = concatMediaDiff(mSrc_list)
     return {'data': data}
 
 @app.route('/media_matrix_stroytree', methods=['GET'])

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mediatags">
         <el-tag 
             size="medium"
             :key="tag" 
@@ -9,6 +9,7 @@
             @close="handleClose(tag)">
             {{ tag }}
         </el-tag>
+        <el-button type="primary" size="mini" @click="gainConcatDiff">Concat</el-button>
     </div>
 </template>
   
@@ -30,16 +31,20 @@ export default {
     methods: {
         ...mapMutations([
             // 'UPDATE_STORYTREE_FINISH',
+            'UPDATE_MEDIA_DIFF_CONCAT_SIGNAL'
         ]),
         handleClose(tag) {
             this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
         },
+        gainConcatDiff(){
+            console.log("gain diff data...");
+            let self = this;
+            self.UPDATE_MEDIA_DIFF_CONCAT_SIGNAL();
+        }
     },
     computed: {
         ...mapState([
             'mediaScatterClick'
-            // 'currMedium',
-            // 'mediaMatrixSelectedSignal',
         ])
     },
     watch: {
@@ -51,10 +56,10 @@ export default {
 </script>
   
 <style lang="less" scoped>
-</style>
-<style>
-.el-tag + .el-tag {
-    margin-left: 10px;
-    margin-top: 3px;
+.mediatags{
+    height: 100%;
+    display: flex;
+    justify-items: center;
+    flex-direction: row;
 }
 </style>

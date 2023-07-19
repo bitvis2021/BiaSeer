@@ -16,6 +16,9 @@ export default new Vuex.Store({
     mediaScatterClick: 0,
 
     mediaGraphLabel: 0,
+
+    mediaDiffConcatSignal: 0,
+    concatdiff_finish: 0,
   },
   mutations: {
     ['UPDATE_DISPLAY_MODE'] (state, displayMode) {
@@ -42,6 +45,14 @@ export default new Vuex.Store({
 
     ['UPDATE_MEDIA_GRAPH_LABEL'](state){
       state.mediaGraphLabel = (state.mediaGraphLabel + 1 ) % 5;
+    },
+
+    ['UPDATE_MEDIA_DIFF_CONCAT_SIGNAL'](state){
+      state.mediaDiffConcatSignal = (state.mediaDiffConcatSignal + 1 ) % 5;
+    },
+
+    ['UPDATE_CONCATDIFF_FINISH'](state){
+      state.concatdiff_finish = (state.concatdiff_finish + 1 ) % 5;
     },
   },
   actions: {
