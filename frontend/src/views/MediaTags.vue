@@ -18,7 +18,7 @@
 import { mapState, mapMutations } from 'vuex';
 
 export default {
-    name: 'App',
+    name: 'MediaTags',
     data() {
         return {
             dynamicTags:['msn.com'],
@@ -31,7 +31,8 @@ export default {
     methods: {
         ...mapMutations([
             // 'UPDATE_STORYTREE_FINISH',
-            'UPDATE_MEDIA_DIFF_CONCAT_SIGNAL'
+            'UPDATE_MEDIA_DIFF_CONCAT_SIGNAL',
+            'UPDATE_MEDIA_SCATTER_CLICK'
         ]),
         handleClose(tag) {
             this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
@@ -40,6 +41,8 @@ export default {
             console.log("gain diff data...");
             let self = this;
             self.UPDATE_MEDIA_DIFF_CONCAT_SIGNAL();
+            self.UPDATE_MEDIA_SCATTER_CLICK();
+            sysDatasetObj.mediaScatterSelected = self.dynamicTags;
         }
     },
     computed: {
