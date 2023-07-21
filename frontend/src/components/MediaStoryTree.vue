@@ -1,5 +1,6 @@
 <template>
     <div class="media-storytree-container"
+    id="div_id_storytree"
     v-loading="storytree__loading"
     element-loading-text="Waiting Loading Story Tree"
     ref="mediastorytree">
@@ -23,12 +24,24 @@ export default {
             width: null,
             height: null,
             domain: 'msn.com',
+            pie_r: 1,
+            mediasources: null,
+            drawer: false,
+            gridData: [],
+            piecolorScale: null,
+            ego_path: null,
+            ego_path__node: null,
+            tree_node_circle_click_id: null,
+            treeNodeDetailTooltipDivHidden: false,
+            divPos: {top: 0, left: 0, width: 0, height: 0},
+            tree_timescope: null,
         }
     },
     computed: {
         ...mapState([
             'currMedium',
             'storytree_finish',
+            'tree_node_click'
         ])
     },
     watch: {
@@ -43,7 +56,159 @@ export default {
             // this.height = this.$refs.storytree.clientHeight;
             self.drawStoryTree(self.width, self.height);
         },
-        
+        tree_node_click: function () {
+            let self = this;
+            let click_node_id = self.tree_node_click.split("+").slice(0,1);
+            console.log("self.tree_node_click", self.tree_node_click);
+            console.log("self.ego_path__node", self.ego_path__node);
+
+            let curr_click_node = self.ego_path__node.filter(ele => ele.index == click_node_id)[0];
+            console.log("curr_click_node", curr_click_node);
+            // alert(self.tree_node_click);
+
+            let m_width = 300;
+            let m_height = 150;
+            let m_margin = { top: 10, right: 5, bottom: 15, left: 25 };
+            let m_innerWidth = m_width - m_margin.left - m_margin.right;
+            let m_innerHeight = m_height - m_margin.top - m_margin.bottom;
+
+            let div_top = self.divPos.top;
+            let div_left = self.divPos.left;
+            let div_height = self.divPos.height;
+            let div_width = self.divPos.width;
+
+            d3.select("body").select("#div"+curr_click_node.index).remove();
+
+            let detail_div = d3.select("body").append("div")
+                .attr("class", "tree_node_detail_tooltip_div")
+                .attr("id", "div"+curr_click_node.index)
+                .style('position', 'absolute')
+                .style('top', d => {
+                    // if (div_top + curr_click_node.m1 > div_top + div_height - 2 * m_height) {
+                    //     return (div_top + div_height - 2 * m_height) + "px"
+                    // }
+                    // else {
+                    //     return div_top + curr_click_node.m1 + 20 + "px"
+                    // }
+                    return div_top + curr_click_node.m1 + 20 + "px"
+                })
+                .style('left', function () {
+                    // if (div_left + curr_click_node.m0 > div_left + div_width - 2 * m_width) {
+                    //     return (div_left + div_width - 1.5 * m_width) + "px"
+                    // }
+                    // else {
+                    //     return div_left + curr_click_node.m0 + 50 + "px"
+                    // }
+                    return div_left + curr_click_node.m0 + 50 + "px"
+                })
+                .style('width', m_width + "px")
+                .style('height', m_height + 30 + "px")
+                // .style('background-color', "gray")
+                // .style("overflow", "auto")
+            
+            
+            detail_div.append("i")
+                .attr("class", "el-icon-close close-icon")
+                .on("click",function(){
+                    d3.select("body").select("#div" + curr_click_node.index).remove();
+                })
+            let detail_div_link_container = detail_div.append("div")
+                .attr("class", "detail_div_link_container");
+            
+            self.move("div" + curr_click_node.index);
+            
+            let tree_nodeSrcN = curr_click_node.data.tree_nodeSrcN.map(Number);
+            
+            let totalresource_n = curr_click_node.data.totalresource_n.map(Number);
+            let avg_avgTone = curr_click_node.data.avg_avgTone.map(Number);
+            let avg_goldsteinscale = curr_click_node.data.avg_goldsteinscale.map(Number);
+            let avg_nummentions = curr_click_node.data.avg_nummentions.map(Number);
+            let avg_numarticles = curr_click_node.data.avg_numarticles.map(Number);
+            let avg_numresources = curr_click_node.data.avg_numresources.map(Number);
+
+            let tree_nodeSrcN_lable = [];
+            tree_nodeSrcN.forEach((ele,ie)=>{
+                if(ele > 0){
+                    tree_nodeSrcN_lable.push(ie);
+                }
+            })
+
+            curr_click_node.data.node_detail_info.forEach((ele,ie)=>{
+                let index = ie + 1;
+                let link_ele = detail_div_link_container.append("div");
+                link_ele.append("span")
+                    .attr("class", "node_detail_span_1")
+                    .append("a")
+                    .style("text-decoration", "none")
+                    .style("color", self.piecolorScale(tree_nodeSrcN_lable[ie]))
+                    .attr("href", ele.url.split(",")[0])
+                    .attr("target", "_blank")
+                    .html("["+ index + "]" + ele.title+ ". " + ele.time + "." + " {Related: " + (ele.related_infos.length + 1) + "}.");
+                
+                link_ele.append("div").append("span")
+                    .attr("class", "node_detail_span")
+                    // .text(ele.lines.split(" ").slice(0,20).join(" ") + "...")
+                    .text(ele.lines)
+                
+                let attrs_values = [
+                    avg_avgTone[tree_nodeSrcN_lable[ie]],
+                    avg_goldsteinscale[tree_nodeSrcN_lable[ie]],
+                    // avg_nummentions[tree_nodeSrcN_lable[ie]],
+                    // avg_numarticles[tree_nodeSrcN_lable[ie]],
+                    // avg_numresources[tree_nodeSrcN_lable[ie]],
+                    // totalresource_n[tree_nodeSrcN_lable[ie]]
+                ]
+
+                var table = link_ele.append("div").append("table").attr("id","ver-zebra");
+
+                var thead = table.append("thead")
+                    .append("tr");
+                thead.selectAll("th")
+                    .data(["tone:",attrs_values[0].toFixed(4), "impact:", attrs_values[1].toFixed(4)])
+                    .enter()
+                    .append("th")
+                    .attr("id", d=>"ver-zebra-"+d)
+                    .text(function (column) { return column; });
+            })
+
+            // let summary_div = detail_div.append("div")
+            //     .attr("class", "summary_container")
+            //     .style('width', m_width + "px")
+            //     .style('height', m_height + "px")
+            // summary_div.append("div")
+            //     .append("span")
+            //     .attr("class", "summary_container_title")
+            //     .text("ChatGPT Summarized Result")
+
+            // summary_div.append("div")
+            //     .append("span")
+            //     .attr("class", "node_detail_span")
+            //     .text("Summary....")
+
+            // let nodeSummaryDeferObj = $.Deferred()
+            // $.when(nodeSummaryDeferObj).then(async() => {
+            // })
+
+            // let tree_filePath_1D = curr_click_node.data.tree_filePath.reduce(function(prev, next) {
+            //     return prev.concat(next);
+            // });
+            // let summary_file_path_list = [];
+            // curr_click_node.data.node_detail_info.forEach(ele=>{
+            //     tree_filePath_1D.forEach(ele_1d=>{
+            //         if(ele_1d.includes(ele.title)){
+            //             summary_file_path_list.push(ele_1d);
+            //         }
+            //     })
+            // })
+
+            // getNodeClickSummary(summary_file_path_list.join("+"), function (data) {
+            //     // self.UPDATE_TREE_NODE_CLICK_PATH_LIST(data.slice(1,5))
+            //     self.UPDATE_TREE_NODE_CLICK_PATH_LIST(self.randomString(6))
+            //     console.log("summary: ", data);
+            //     sysDatasetObj.updateNodeClickSummary(data)
+            //     nodeSummaryDeferObj.resolve()
+            // });
+        },
     },
     mounted: function () {
         let self = this;
@@ -52,6 +217,50 @@ export default {
         // self.drawStoryTree(self.width, self.height);
     },
     methods: {
+        ...mapMutations([
+            'UPDATE_TREE_NODE_CIRCLE_CLICK',
+            'UPDATE_TREE_NODE_CLICK',
+            'UPDATE_TREE_NODE_CLICK_PATH_LIST'
+        ]),
+        initLeftTopPos: function() {
+            let odiv=document.getElementById('div_id_storytree');
+            this.divPos.left = odiv.getBoundingClientRect().left;
+            this.divPos.top = odiv.getBoundingClientRect().top;
+            this.divPos.width = odiv.getBoundingClientRect().width;
+            this.divPos.height = odiv.getBoundingClientRect().height;
+        },
+        randomString(e) {
+            e = e || 32;
+            let t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
+                a = t.length,
+                n = "";
+            for(let i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+            return n;
+        },
+        move(div_id) {
+            console.log('div_id', div_id);
+            var _move = false;
+            div_id = '#'+div_id
+            var _x, _y;
+            $(div_id).click(function () {
+                // alert("click")
+            }).mousedown(function (e) {
+                _move = true;
+                _x = e.pageX - parseInt($(div_id).css("left"));
+                _y = e.pageY - parseInt($(div_id).css("top"));
+                $(div_id).fadeTo(20, 0.5);
+            });
+            $(document).mousemove(function (e) {
+                if (_move) {
+                    var x = e.pageX - _x;
+                    var y = e.pageY - _y;
+                    $(div_id).css({ top: y, left: x }); 
+                }
+            }).mouseup(function () {
+                _move = false;
+                $(div_id).fadeTo("fast", 1);
+            });
+        },
         drawStoryTree(width, height) {
             let self = this;
             console.log(width, height);
@@ -547,5 +756,61 @@ export default {
     height: 100%;
 }
 </style>
-<style>
+<style lang="less">
+.tree_node_hover_tooltip_div {
+    border: 1px solid black;
+    word-wrap: break-word;
+    // font-family: sans-serif;
+    font-size: 12px;
+    padding: 5px;
+    .tree_node_hover_tooltip_div_sub{
+        border-bottom: 1px solid black;
+        // display: block;
+        word-wrap: break-word;
+    }
+}
+.tree_node_detail_tooltip_div {
+    border: 1px dashed black;
+    word-wrap: break-word;
+    // z-index: 9999;
+    background-color: white;
+    padding: 5px;
+    line-height: 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    .close-icon {
+        float: right;
+        right: 10px;
+    }
+    .node_detail_span{
+        font-size: 13px;
+    }
+    .node_detail_span_1{
+        font-size: 13px;
+        font-weight: bold;
+    }
+    .summary_container {
+        margin-top: 5px;
+        margin-top: 2%;
+        // position: absolute;
+        // overflow-y: auto;
+        // top: 50%;
+        // height: 50%;
+        // left: 0%;
+        // width: 100%;
+        .summary_container_title{
+            text-align: center;
+            display: block;
+            font-weight: bold;
+        }
+    }
+    .detail_div_link_container{
+        // position: absolute;
+        // overflow-y: auto;
+        // top: 0%;
+        // height: 48%;
+        // left: 0%;
+        // width: 100%;
+    }
+}
 </style>

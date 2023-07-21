@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="event-evolution">
-      <div class="union-event-evolution">
+      <div class="union-event-evolution" id="story_tree_div">
         <!-- <MediaHorizonChart></MediaHorizonChart> -->
         <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
       </div>
