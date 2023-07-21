@@ -20,9 +20,20 @@
     <div class="event-evolution">
       <div class="union-event-evolution">
         <!-- <MediaHorizonChart></MediaHorizonChart> -->
-        <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
+        <div class="event-evolution-storytree" id="story_tree_div">
+          <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
+        </div>
+        <div class="event-iframeview">
+          <iframe :src="iframeSrc" class="iframe-class"></iframe>
+        </div>
+        
       </div>
-      <div class="single-event-evolution"></div>
+      <div class="single-event-evolution">
+        <div class="single-domain-tree" v-for="item in currentSelectedMedia" :key="item.domain" :id="item.domain.replaceAll('.','_')">
+          <!-- {{ item.domain }}           -->
+          <SingleTree :storytree__loading="storytree__loading" :domain="item.domain"></SingleTree>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -40,6 +51,7 @@ import MediaHorizonChart from './components/MediaHorizonChart.vue';
 import MediaMatrixTrend from './components/MediaMatrixTrend.vue';
 import MediaStoryTree from './components/MediaStoryTree.vue';
 import MediaTags from './views/MediaTags.vue';
+import SingleTree from './views/SingleTree.vue';
 
 export default {
   name: 'App',
@@ -47,7 +59,10 @@ export default {
     return {
       loadingData: true,
       topicCodeList: null,
-      storytree__loading: true,
+      storytree__loading: false,
+      drawer: true,
+      currentSelectedMedia: null,
+      iframeSrc: 'https://www.baidu.com'
     }
   },
   components: {
@@ -56,7 +71,8 @@ export default {
     MediaHorizonChart,
     MediaMatrixTrend,
     MediaStoryTree,
-    MediaTags
+    MediaTags,
+    SingleTree
   },
   beforeMount: function () {
     let self = this;
@@ -77,13 +93,23 @@ export default {
       sysDatasetObj.updateMediaMatrixDataSet(data);
       mediaMatrixDataDeferObj.resolve();
     });
-
+  },
+  mounted() {
+    this.currentSelectedMedia = this.gainCurrentSelectedMedia();
   },
   methods: {
     ...mapMutations([
       'UPDATE_STORYTREE_FINISH',
       'UPDATE_CONCATDIFF_FINISH',
     ]),
+    gainCurrentSelectedMedia(){
+      let result = []
+      sysDatasetObj.mediaScatterSelected.forEach(element => {
+        result.push({domain: element})
+      });
+      console.log(result);
+      return result;
+    },
     isToGetStroytree() {
       let data = sysDatasetObj.mediaMatrixSelected;
       console.log(data);
@@ -112,6 +138,7 @@ export default {
       'currMedium',
       'mediaMatrixSelectedSignal',
       'mediaDiffConcatSignal',
+      'mediaScatterClick'
     ])
   },
   watch: {
@@ -133,6 +160,9 @@ export default {
         sysDatasetObj.updateMediaConcatDiffDataSet(data);
         mediaDiffConcatDataDeferObj.resolve();
       });
+    },
+    mediaScatterClick: function(){
+      this.currentSelectedMedia = this.gainCurrentSelectedMedia();
     }
   }
 }
@@ -212,8 +242,27 @@ export default {
       bottom: 30%;
       left: 0%;
       right: 0%;
-
       border: 1px solid steelblue;
+      .event-evolution-storytree{
+        position: absolute;
+        top: 0%;
+        bottom: 0%;
+        left: 0%;
+        right: 30%;
+        border: 1px solid steelblue;
+      }
+      .event-iframeview{
+        position: absolute;
+        top: 0%;
+        bottom: 0%;
+        left: 70%;
+        right: 0%;
+        border: 1px solid steelblue;
+        .iframe-class{
+          width: 100%;
+          height: 100%;
+        }
+      }
     }
 
     .single-event-evolution {
@@ -222,6 +271,12 @@ export default {
       bottom: 0%;
       left: 0%;
       right: 0%;
+      display: flex;
+      .single-domain-tree{
+        flex: 1;
+        border: 1px solid red;
+        margin: 4px;
+      }
 
       border: 1px solid steelblue;
     }

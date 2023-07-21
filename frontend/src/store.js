@@ -19,6 +19,10 @@ export default new Vuex.Store({
 
     mediaDiffConcatSignal: 0,
     concatdiff_finish: 0,
+    
+    tree_node_click: null,
+    tree_node_circle_click: -1,
+    tree_node_circle_click_path_list: null,
   },
   mutations: {
     ['UPDATE_DISPLAY_MODE'] (state, displayMode) {
@@ -53,6 +57,15 @@ export default new Vuex.Store({
 
     ['UPDATE_CONCATDIFF_FINISH'](state){
       state.concatdiff_finish = (state.concatdiff_finish + 1 ) % 5;
+    },
+
+    ['UPDATE_TREE_NODE_CLICK_PATH_LIST'] (state, tree_node_circle_click_path_list) {
+      console.log("tree_node_circle_click_path_list",tree_node_circle_click_path_list)
+      state.tree_node_circle_click_path_list = tree_node_circle_click_path_list
+    },
+
+    ['UPDATE_TREE_NODE_CLICK'] (state, tree_node_click) {
+      state.tree_node_click = tree_node_click
     },
   },
   actions: {
