@@ -137,11 +137,11 @@ export default {
                     });
                 
                 // ===================circle=================//
-                // node
-                //     .append("circle")
-                //     .attr("fill", "steelblue")
-                //     // .attr("r", 8);
-                //     .attr("r", d=> d.data.totalbias !="null" ? reScaleCircleRadia(+d.data.totalbias) : 1);
+                node
+                    .append("circle")
+                    .attr("fill", "steelblue")
+                    // .attr("r", 8);
+                    .attr("r", d=> d.data.totalbias !="null" ? reScaleCircleRadia(+d.data.totalbias) : 1);
                 
 
             }

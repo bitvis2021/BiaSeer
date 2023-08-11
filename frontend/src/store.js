@@ -40,7 +40,7 @@ export default new Vuex.Store({
     },
 
     ['UPDATE_STORYTREE_FINISH'](state){
-      state.storytree_finish += 1;
+      state.storytree_finish = (state.storytree_finish + 1 ) % 5;
     },
 
     ['UPDATE_MEDIA_SCATTER_CLICK'](state){

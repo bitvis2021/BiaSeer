@@ -160,7 +160,7 @@ export default {
                 console.log(rMaxMin);
                 rScale = (nums) => {
                     if (data.topic == "RUS_UKR") {
-                        return d3.scaleLinear().domain(rMaxMin).range([5, 13])(nums);
+                        return d3.scaleLinear().domain(rMaxMin).range([3, 13])(nums);
                     }
                 }
                 self.xScale = xScale;
@@ -571,7 +571,7 @@ export default {
                         .attr("class", "text_label")
                         .attr("x", d=> doaminText[d][0])
                         .attr("y", d=> doaminText[d][1])
-                        .attr("dy", "-0.71em")
+                        .attr("dy", "-0.31em")
                         .attr('text-anchor',"start")
                         .text(d=>d)
                         ,
@@ -609,8 +609,11 @@ export default {
 
 <style>
 .dot {
-    fill: steelblue;
-    opacity: 0.5;
+    fill: gray;
+    stroke: white;
+    stroke-width: 0.4px;
+    /* fill: steelblue; */
+    /* opacity: 0.5; */
 }
 
 .dot_mouseover {
@@ -645,6 +648,7 @@ export default {
 .text_label{
     /* font-weight: 400; */
     /* font-family: 'Arial'; */
+    font-size: 10px;
     fill: red;
 }
 </style>

@@ -62,7 +62,7 @@ export default {
       storytree__loading: false,
       drawer: true,
       currentSelectedMedia: null,
-      iframeSrc: 'https://www.baidu.com'
+      iframeSrc: 'https://www.runoob.com'
     }
   },
   components: {
@@ -183,7 +183,7 @@ export default {
   bottom: 0%;
   left: 0%;
   right: 0%;
-  overflow-x: hidden;
+  // overflow-x: hidden;
   overflow-y: hidden;
 
   .media-topic {
@@ -274,7 +274,7 @@ export default {
       display: flex;
       .single-domain-tree{
         flex: 1;
-        border: 1px solid red;
+        // border: 1px solid red;
         margin: 4px;
       }
 

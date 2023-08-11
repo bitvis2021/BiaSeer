@@ -65,4 +65,19 @@ export default {
     justify-items: center;
     flex-direction: row;
 }
+.el-tag {
+    // background-color: #ecf5ff;
+    // border-color: #d9ecff;
+    height: 20px;
+    padding: 0 3px;
+    line-height: 20px;
+    // font-size: 12px;
+    // color: #409EFF;
+    // border-width: 1px;
+    // border-style: solid;
+    // border-radius: 4px;
+    // box-sizing: border-box;
+    // white-space: nowrap;
+    margin-right: 5px;
+}
 </style>
