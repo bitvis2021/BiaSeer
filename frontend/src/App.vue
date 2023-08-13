@@ -5,9 +5,6 @@
         <MediaScatter></MediaScatter>
       </div>
       <div class="media-topic-difference-concat-view">
-        <!-- <MediaTrend></MediaTrend> -->
-        <!-- <MediaTrend v-for="item in topicCodeList" :topic_code='item'></MediaTrend> -->
-        <!-- <MediaHorizonChart></MediaHorizonChart> -->
         <div class="media-concat-list">
           <MediaTags></MediaTags>
         </div>
@@ -19,18 +16,16 @@
     </div>
     <div class="event-evolution">
       <div class="union-event-evolution">
-        <!-- <MediaHorizonChart></MediaHorizonChart> -->
         <div class="event-evolution-storytree" id="story_tree_div">
           <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
         </div>
         <div class="event-iframeview">
-          <iframe :src="iframeSrc" class="iframe-class"></iframe>
+          <!-- <iframe :src="iframeSrc" class="iframe-class"></iframe> -->
         </div>
         
       </div>
       <div class="single-event-evolution">
         <div class="single-domain-tree" v-for="item in currentSelectedMedia" :key="item.domain" :id="item.domain.replaceAll('.','_')">
-          <!-- {{ item.domain }}           -->
           <SingleTree :storytree__loading="storytree__loading" :domain="item.domain"></SingleTree>
         </div>
       </div>
@@ -214,13 +209,13 @@ export default {
       .media-concat-list{
         position: absolute;
         top: 0%;
-        bottom: 90%;
+        bottom: 92%;
         left: 0%;
         right: 0%;
       }
       .media-concat-diffarea{
         position: absolute;
-        top: 10%;
+        top: 8%;
         bottom: 0%;
         left: 0%;
         right: 0%;
