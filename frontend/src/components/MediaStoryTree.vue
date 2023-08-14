@@ -351,7 +351,7 @@ export default {
                     .join("path")
                     .attr("d", d=>{
                         if(d.source.data.time_e == d.target.data.time_e){
-                            alert("duplicate time [parent, child]")
+                            // alert("duplicate time [parent, child]")
                             let PosData = []
                             PosData.push([reScale(d.source.data.time_e), d.source.x])
                             PosData.push([reScale(d.target.data.time_e) + reScale.bandwidth()/2, d.target.x])
@@ -360,9 +360,16 @@ export default {
                             return lineData;
                         }
                         else{
-                            return d3.linkHorizontal()
-                                .x(d => reScale(d.data.time_e))
-                                .y(d => d.x)(d)
+                            let PosData = []
+                            PosData.push([reScale(d.source.data.time_e), d.source.x])
+                            PosData.push([reScale(d.target.data.time_e), d.target.x])
+                            let lineGenerator = d3.line().curve(d3.curveStepBefore)
+                            let lineData = lineGenerator(PosData)
+                            return lineData;
+                            
+                            // return d3.linkHorizontal()
+                            //     .x(d => reScale(d.data.time_e))
+                            //     .y(d => d.x)(d)
                         }
                     })
                     .attr("stroke-width", d=>{

@@ -40,8 +40,8 @@ export default {
         ]),
         drawStoryTree(width, height) {
             let self = this;
-            console.log(width, height);
-            let margin = { top:15, bottom:55, left:10, right:20 };
+            // console.log(width, height);
+            let margin = { top: 5, bottom: 15, left: 1, right: 2 };
             let innerWidth = width - margin.left - margin.right;
             let innerHeight = height - margin.top - margin.bottom;
             
@@ -96,17 +96,23 @@ export default {
                             return lineData;
                         }
                         else{
-                            return d3.linkHorizontal()
-                                .x(d => reScale(d.data.time_e))
-                                .y(d => d.x)(d)
+                            let PosData = []
+                            PosData.push([reScale(d.source.data.time_e), d.source.x])
+                            PosData.push([reScale(d.target.data.time_e), d.target.x])
+                            let lineGenerator = d3.line().curve(d3.curveStepBefore)
+                            let lineData = lineGenerator(PosData)
+                            return lineData;
+                            // return d3.linkHorizontal()
+                            //     .x(d => reScale(d.data.time_e))
+                            //     .y(d => d.x)(d)
                         }
                     })
-                    .attr("stroke-width", d=>{
-                        return lineWidthScale(+d.target.data.tree_maxCompatibility)
-                    })
-                    .attr("stroke-opacity", d=>{
-                        return lineFillScale(+d.target.data.tree_maxCompatibility)
-                    })
+                    // .attr("stroke-width", d=>{
+                    //     return lineWidthScale(+d.target.data.tree_maxCompatibility)
+                    // })
+                    // .attr("stroke-opacity", d=>{
+                    //     return lineFillScale(+d.target.data.tree_maxCompatibility)
+                    // })
                     .on("mouseover", function(d) {
                         d3.select(this).classed("line-hover", true);
                     })
@@ -139,11 +145,18 @@ export default {
                 // ===================circle=================//
                 node
                     .append("circle")
-                    .attr("fill", "steelblue")
-                    // .attr("r", 8);
-                    .attr("r", d=> d.data.totalbias !="null" ? reScaleCircleRadia(+d.data.totalbias) : 1);
-                
-
+                    .attr("fill", d=> d.data.tree_mSrcName.indexOf(self.domain) === -1 ? "white" : "steelblue")
+                    .attr("stroke", "steelblue")
+                    .attr("stroke-width", "1px")
+                    .attr("r", d=> {
+                        if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
+                            return 5;
+                        }
+                        else{
+                            let index = d.data.mSrc_list.indexOf(self.domain)
+                            return reScaleCircleRadia(+d.data.tree_nodeSrcN[index])
+                        }
+                    });
             }
 
 
@@ -172,6 +185,7 @@ export default {
             // console.log("biasMaxMin: ", biasMaxMin);
 
             let attrsMaxMin = []
+            let numsMaxMin = []
             let tree_maxCompatibilityMaxMin = []
             nodes.filter(ele=> ele.data.totalbias != "null")
                 .map(ele=>{
@@ -182,17 +196,14 @@ export default {
                     attrsMaxMin.push(+ele.data.tree_vari_numresouce)
                     attrsMaxMin.push(+ele.data.tree_vari_mSrcN)
                     tree_maxCompatibilityMaxMin.push(+ele.data.tree_maxCompatibility)
+                    numsMaxMin.push(...ele.data.tree_nodeSrcN.map(Number))
                 })
-
-            // let lineWidthScale = d3.scaleLinear().domain([0, 0.5]).range([1, 10]);
-            // let lineFillScale = d3.scaleLinear().domain([0, 0.5]).range([0.4, 1]);
             
             let lineWidthScale = d3.scaleLinear().domain(d3.extent(tree_maxCompatibilityMaxMin)).range([2, 5]);
             let lineFillScale = d3.scaleLinear().domain(d3.extent(tree_maxCompatibilityMaxMin)).range([0.4, 1]);
 
-            let reScaleCircleRadia = d3.scaleLinear().domain(d3.extent(biasMaxMin)).range([5,10]);
-            // console.log(timescope);
-            // console.log(reScale("time"));
+            // let reScaleCircleRadia = d3.scaleLinear().domain(d3.extent(biasMaxMin)).range([5,10]);
+            let reScaleCircleRadia = d3.scaleLinear().domain(d3.extent(numsMaxMin)).range([5, 10]);
             let tree = data => {
                 let i = 0;
                 const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++;});
