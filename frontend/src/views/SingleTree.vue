@@ -143,10 +143,41 @@ export default {
                     });
                 
                 // ===================circle=================//
+                let computeColorNeg = d3.interpolate('red', 'white');
+                let linearVDataNeg = d3.scaleLinear()  
+                    .domain([0.3, 0.5])
+                    .range([0, 1]);
+                
+                let computeColorPos = d3.interpolate('white', 'green');
+                let linearVDataPos = d3.scaleLinear()  
+                    .domain([0.5, 0.8])
+                    .range([0, 1]);
                 node
                     .append("circle")
-                    .attr("fill", d=> d.data.tree_mSrcName.indexOf(self.domain) === -1 ? "white" : "steelblue")
+                    .attr("fill", d=> {
+                        if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
+                            return "white";
+                        }else{
+                            let index = d.data.mSrc_list.indexOf(self.domain)
+                            let tone = +d.data.avg_avgTone[index]
+                            if( tone < 0.5){
+                                return computeColorNeg(linearVDataNeg(tone))
+                            }else if( tone > 0.5){
+                                return computeColorPos(linearVDataPos(tone))
+                            }else{
+                                return '#f9f9f9';
+                            }                            
+                        }
+                    })
                     .attr("stroke", "steelblue")
+                    .attr("stroke-dasharray", d=>{
+                        if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
+                            return "2"
+                        }
+                        else{
+                            return "0"
+                        }
+                    })
                     .attr("stroke-width", "1px")
                     .attr("r", d=> {
                         if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
