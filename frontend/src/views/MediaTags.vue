@@ -19,7 +19,7 @@ export default {
     data() {
         return {
             dynamicTags: ['msn.com'],
-            isConcated: false
+            isConcated: true
         }
     },
     components: {
@@ -32,15 +32,23 @@ export default {
             'UPDATE_MEDIA_SCATTER_CLICK',
             'UPDATE_CONCAT_STATUS'
         ]),
+        /************* v-model, update the concat state *************/
         changeConcatStatus(){
             this.UPDATE_CONCAT_STATUS(this.isConcated);
+            // check the concat is or is not opened, if true to compute concat diff
             if(this.isConcated){
                 this.gainConcatDiff();
             }
         },
+        /************* when delete a media tag *************/
         handleClose(tag) {
             this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+            // check the concat is or is not opened, if true to compute concat diff
+            if(this.isConcated){
+                this.gainConcatDiff();
+            }
         },
+        /************* change the concat diff signal *************/
         gainConcatDiff() {
             let self = this;
             self.UPDATE_MEDIA_DIFF_CONCAT_SIGNAL();
@@ -54,8 +62,10 @@ export default {
         ])
     },
     watch: {
+        /************* listening the adding-media action *************/
         mediaScatterClick: function () {
             this.dynamicTags = sysDatasetObj.mediaScatterSelected;
+            // check the concat is or is not opened, if true to compute concat diff
             if(this.isConcated){
                 this.gainConcatDiff();
             }
@@ -66,7 +76,7 @@ export default {
   
 <style lang="less" scoped>
 .mediatags {
-    height: 100%;
+    // height: 100%;
     display: flex;
     justify-items: center;
     flex-direction: row;

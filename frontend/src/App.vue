@@ -187,16 +187,14 @@ export default {
     bottom: 65%;
     left: 0%;
     right: 0%;
-
-    // background-color: steelblue;
-    // margin: 5px;
     .media-topic-vector-reduction-view {
       position: absolute;
       top: 0%;
       bottom: 0%;
       left: 0%;
       right: 50%;
-      border: 1px solid steelblue;
+      border-left: 1px solid steelblue;
+      border-top: 1px solid steelblue;
     }
 
     .media-topic-difference-concat-view {
@@ -205,13 +203,16 @@ export default {
       bottom: 0%;
       left: 50%;
       right: 0%;
-      border: 1px solid steelblue;
+      // border: 1px solid steelblue;
       .media-concat-list{
         position: absolute;
         top: 0%;
         bottom: 92%;
         left: 0%;
         right: 0%;
+        border: 1px solid steelblue;
+        display: flex;
+        align-items: center;
       }
       .media-concat-diffarea{
         position: absolute;
@@ -219,6 +220,7 @@ export default {
         bottom: 0%;
         left: 0%;
         right: 0%;
+        border-left: 1px solid steelblue;
       }
     }
   }
@@ -237,7 +239,7 @@ export default {
       bottom: 30%;
       left: 0%;
       right: 0%;
-      border: 1px solid steelblue;
+      // border: 1px solid steelblue;
       .event-evolution-storytree{
         position: absolute;
         top: 0%;
@@ -252,7 +254,9 @@ export default {
         bottom: 0%;
         left: 70%;
         right: 0%;
-        border: 1px solid steelblue;
+        border-top: 1px solid steelblue;
+        border-bottom: 1px solid steelblue;
+        border-right: 1px solid steelblue;
         .iframe-class{
           width: 100%;
           height: 100%;
@@ -269,11 +273,8 @@ export default {
       display: flex;
       .single-domain-tree{
         flex: 1;
-        // border: 1px solid red;
         margin: 4px;
       }
-
-      border: 1px solid steelblue;
     }
   }
 }</style>
