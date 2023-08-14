@@ -23,6 +23,8 @@ export default new Vuex.Store({
     tree_node_click: null,
     tree_node_circle_click: -1,
     tree_node_circle_click_path_list: null,
+
+    isConcated: false,
   },
   mutations: {
     ['UPDATE_DISPLAY_MODE'] (state, displayMode) {
@@ -40,7 +42,7 @@ export default new Vuex.Store({
     },
 
     ['UPDATE_STORYTREE_FINISH'](state){
-      state.storytree_finish += 1;
+      state.storytree_finish = (state.storytree_finish + 1 ) % 5;
     },
 
     ['UPDATE_MEDIA_SCATTER_CLICK'](state){
@@ -66,6 +68,10 @@ export default new Vuex.Store({
 
     ['UPDATE_TREE_NODE_CLICK'] (state, tree_node_click) {
       state.tree_node_click = tree_node_click
+    },
+
+    ['UPDATE_CONCAT_STATUS'] (state, isConcated) {
+      state.isConcated = isConcated;
     },
   },
   actions: {

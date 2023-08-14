@@ -82,7 +82,7 @@ export default {
                 .range([0, 1]);
             
             let rectWH = 10;
-            let m = ({ l: 95, r: 25, t: 10, b: 30 });            
+            let m = ({ l: 95, r: 25, t: 6, b: 35 });            
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
             let y = d3.scaleLinear()
                 .domain(d3.extent(ydata, d => +d))
