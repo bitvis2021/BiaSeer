@@ -87,7 +87,7 @@ export default {
                     .join("path")
                     .attr("d", d=>{
                         if(d.source.data.time_e == d.target.data.time_e){
-                            alert("duplicate time [parent, child]")
+                            // alert("duplicate time [parent, child]")
                             let PosData = []
                             PosData.push([reScale(d.source.data.time_e), d.source.x])
                             PosData.push([reScale(d.target.data.time_e) + reScale.bandwidth()/2, d.target.x])
@@ -181,7 +181,7 @@ export default {
                     .attr("stroke-width", "1px")
                     .attr("r", d=> {
                         if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
-                            return 5;
+                            return 4;
                         }
                         else{
                             let index = d.data.mSrc_list.indexOf(self.domain)

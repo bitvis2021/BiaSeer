@@ -360,23 +360,24 @@ export default {
                             return lineData;
                         }
                         else{
-                            let PosData = []
-                            PosData.push([reScale(d.source.data.time_e), d.source.x])
-                            PosData.push([reScale(d.target.data.time_e), d.target.x])
-                            let lineGenerator = d3.line().curve(d3.curveStepBefore)
-                            let lineData = lineGenerator(PosData)
-                            return lineData;
+                            // let PosData = []
+                            // PosData.push([reScale(d.source.data.time_e), d.source.x])
+                            // PosData.push([reScale(d.target.data.time_e), d.target.x])
+                            // let lineGenerator = d3.line().curve(d3.curveStepBefore)
+                            // let lineData = lineGenerator(PosData)
+                            // return lineData;
                             
-                            // return d3.linkHorizontal()
-                            //     .x(d => reScale(d.data.time_e))
-                            //     .y(d => d.x)(d)
+                            return d3.linkHorizontal()
+                                .x(d => reScale(d.data.time_e))
+                                .y(d => d.x)(d)
                         }
                     })
                     .attr("stroke-width", d=>{
-                        return lineWidthScale(+d.target.data.tree_maxCompatibility)
+                        return lineWidthScale(+d.target.data.tree_maxCompatibility) * 10
                     })
                     .attr("stroke-opacity", d=>{
-                        return lineFillScale(+d.target.data.tree_maxCompatibility)
+                        // return lineFillScale(+d.target.data.tree_maxCompatibility)
+                        return 0.4
                     })
                     .on("mouseover", function(d) {
                         d3.select(this).classed("line-hover", true);

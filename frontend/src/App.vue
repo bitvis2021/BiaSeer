@@ -19,9 +19,9 @@
         <div class="event-evolution-storytree" id="story_tree_div">
           <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
         </div>
-        <div class="event-iframeview">
+        <!-- <div class="event-iframeview"> -->
           <!-- <iframe :src="iframeSrc" class="iframe-class"></iframe> -->
-        </div>
+        <!-- </div> -->
         
       </div>
       <div class="single-event-evolution">
@@ -245,23 +245,23 @@ export default {
         top: 0%;
         bottom: 0%;
         left: 0%;
-        right: 30%;
+        right: 0%;
         border: 1px solid steelblue;
       }
-      .event-iframeview{
-        position: absolute;
-        top: 0%;
-        bottom: 0%;
-        left: 70%;
-        right: 0%;
-        border-top: 1px solid steelblue;
-        border-bottom: 1px solid steelblue;
-        border-right: 1px solid steelblue;
-        .iframe-class{
-          width: 100%;
-          height: 100%;
-        }
-      }
+      // .event-iframeview{
+      //   position: absolute;
+      //   top: 0%;
+      //   bottom: 0%;
+      //   left: 70%;
+      //   right: 0%;
+      //   border-top: 1px solid steelblue;
+      //   border-bottom: 1px solid steelblue;
+      //   border-right: 1px solid steelblue;
+      //   .iframe-class{
+      //     width: 100%;
+      //     height: 100%;
+      //   }
+      // }
     }
 
     .single-event-evolution {
