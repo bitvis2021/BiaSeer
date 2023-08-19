@@ -7,6 +7,7 @@
 
 import { mapState, mapMutations } from 'vuex';
 import { getTopic } from '../assets/data/topicList';
+let reorder = require('@/assets/js/reorder');
 
 export default {
     name: 'MediaMatrixTrend',
@@ -31,25 +32,25 @@ export default {
     watch: {
         currMedium: function () {
             let self = this;
-            self.drawExample(self.width, self.height, self.currMedium, 'single');
+            self.drawMediaMatrixTrend(self.width, self.height, self.currMedium, 'single');
         },
         concatdiff_finish: function() {
             let self = this;
-            self.drawExample(self.width, self.height, self.currMedium, 'concat');
+            self.drawMediaMatrixTrend(self.width, self.height, self.currMedium, 'concat');
         }
     },
     mounted: function () {
         let self = this;
         self.width = self.$refs.mediamatrixtrend.clientWidth;
         self.height = self.$refs.mediamatrixtrend.clientHeight;
-        self.drawExample(self.width, self.height, self.currMedium, 'single');
+        self.drawMediaMatrixTrend(self.width, self.height, self.currMedium, 'single');
 
     },
     methods: {
         ...mapMutations([
             'UPDATE_MATRIX_SELECTED_SIGNAL'
         ]),
-        drawExample(width, height, domain, flag) {
+        drawMediaMatrixTrend(width, height, domain, flag) {
             // https://observablehq.com/d/8d37e6aa05ce1b9a
             let self = this;
             let data1 = null;
@@ -59,25 +60,53 @@ export default {
             else if(flag === 'concat'){
                 data1 = sysDatasetObj.mediaConcatDiffDataSet[0];
             }
-            console.log(data1);
-            
+            // console.log(data1);
+
             let xdata = data1['values'][0]['details'].map(ele=>ele['date0']);
-            // console.log(xdata);
             let ydata = data1.values.map(ele => ele.topic);
+            let matrix = []; // for reordering
             let vdata = [];
             data1.values.forEach(element => {
+                matrix.push(element.details.map(ele=>ele.value));
                 element.details.forEach(ele=>{
                     vdata.push(ele.value);
                 })
             });
 
-            let computeColorNeg = d3.interpolate('red', 'white');
+            let row_labels = [];
+            let col_labels = [];
+            for(let i = 0; i < matrix.length; i++){
+                row_labels.push("" + (i + 1));
+            }
+            for(let i = 0; i < matrix[0].length; i++){
+                col_labels.push("" + (i + 1));
+            }
+
+            console.log(row_labels);
+            console.log(col_labels);
+
+            var transpose = reorder.transpose(matrix),
+                dist_rows = reorder.dist()(matrix),
+                dist_cols = reorder.dist()(transpose),
+                order = reorder.optimal_leaf_order(),
+                row_perm = order.distanceMatrix(dist_rows)(matrix),
+                col_perm = order.distanceMatrix(dist_cols)(transpose);
+            
+
+            let row_inv = reorder.inverse_permutation(row_perm);
+            // let col_inv = reorder.inverse_permutation(col_perm);
+            console.log(row_inv);
+            // console.log(col_inv);
+            // console.log(matrix);
+            // console.log(vdata);
+
+            let computeColorNeg = d3.interpolate('red', '#f9f9f9');
             let linearVDataNeg = d3.scaleLinear()  
                 .domain([d3.min(vdata), 0])
                 .range([0, 1]);
             
-            let computeColorPos = d3.interpolate('white', 'green');
-            let linearVDataPos = d3.scaleLinear()  
+            let computeColorPos = d3.interpolate('#f9f9f9', 'green');
+            let linearVDataPos = d3.scaleLinear()
                 .domain([0, d3.max(vdata)])
                 .range([0, 1]);
             
@@ -108,18 +137,19 @@ export default {
                 .attr('class', 'rectsG');
             
             let yG = svg.append('g')
-                .attr('class', 'xyG')
+                .attr('class', 'yG')
                 .call(yAxis);
             
             let xG = svg.append('g')
-                .attr('class', 'xyG')
+                .attr('class', 'xG')
                 .call(xAxis);
             
             xG.select(".domain").remove();
             yG.select(".domain").remove();
             yG.selectAll("text")
                 .text((d,i)=> {
-                    return getTopic((i + 1).toString())});
+                    return getTopic((i + 1).toString())
+                });
                 
             let charts = rectsG.selectAll('g')
                 .data(data1.values)
@@ -131,20 +161,29 @@ export default {
                 .join('rect')
                 .attr('class', 'media_matrix_rect')
                 .attr("x", d=> x(new Date(d.date0)))
-                // .attr("rx",2)
-                // .attr("ry",2)
                 .attr("width", rectWH)
                 .attr("height", rectWH)
                 .attr('fill', d=> {
                     if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                     else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
-                    else return '#f9f9f9';
+                    else return 'white';
                 })
                 // .attr("fill", d=> d.value != 0 ? 'steelblue' : 'none')
                 // .attr("stroke", 'steelblue')
             
             charts.append('title')
-                .text(d=>`from ${d.date0} to ${d.date1}, avgtone: ${d.value}`)
+                .text(d=>`from ${d.date0} to ${d.date1}, avgtone: ${d.value}`);
+            
+
+            var t = svg.transition().duration(1000);
+            t.selectAll(".ggg")
+                .attr("transform", function(d, i) {
+                    return "translate(0," + (y((row_inv[i] + 1).toString()) - 5/2) + ")"; 
+                })
+            
+            t.selectAll(".yG").selectAll("text")
+                .text((d,i)=> {
+                    return getTopic((row_inv[i] + 1).toString())});
 
             let brush = d3.brush()
                 .extent([[0, 0], [width, height]])
@@ -161,7 +200,7 @@ export default {
                     charts.attr('fill', d=> {
                         if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                         else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
-                        else return '#f9f9f9';
+                        else return white;
                     })
                     self.selected = {'topics': new Set(), 'date_index': new Set(), 'date': new Set()};
                 }
