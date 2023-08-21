@@ -17,7 +17,8 @@
     <div class="event-evolution">
       <div class="union-event-evolution">
         <div class="event-evolution-storytree" id="story_tree_div">
-          <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
+          <!-- <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree> -->
+          <MediaSankeyTree :storytree__loading="storytree__loading"></MediaSankeyTree>
         </div>
         <!-- <div class="event-iframeview"> -->
           <!-- <iframe :src="iframeSrc" class="iframe-class"></iframe> -->
@@ -45,6 +46,7 @@ import MediaTrend from './components/MediaTrend.vue';
 import MediaHorizonChart from './components/MediaHorizonChart.vue';
 import MediaMatrixTrend from './components/MediaMatrixTrend.vue';
 import MediaStoryTree from './components/MediaStoryTree.vue';
+import MediaSankeyTree from './components/MediaSankeyTree.vue';
 import MediaTags from './views/MediaTags.vue';
 import SingleTree from './views/SingleTree.vue';
 
@@ -66,6 +68,7 @@ export default {
     MediaHorizonChart,
     MediaMatrixTrend,
     MediaStoryTree,
+    MediaSankeyTree,
     MediaTags,
     SingleTree
   },
