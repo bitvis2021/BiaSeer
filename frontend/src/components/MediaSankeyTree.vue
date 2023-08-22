@@ -790,12 +790,16 @@ export default {
             // console.log(reScale("time"));
             let tree = data => {
                 let i = 0;
-                const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.size = d.descendants().length == 1 ? 1 : d.descendants().length - 1});
+                // const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.value = 1})
+                //                 .sum(d=>d.value)
+                const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.size = d.leaves().length});
+                // const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.size = d.descendants().length <= 2 ? 1 : d.descendants().length - 1});
                 // return d3.tree().size([innerHeight,innerWidth])(root);
                 return d3.cluster().size([innerHeight,innerWidth])(root);
             }
             let root = tree(data);
             console.log(root);
+
 
             let sankeyData = {nodes: root.descendants(), links: root.links()};
             console.log(sankeyData);
