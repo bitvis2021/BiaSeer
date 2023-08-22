@@ -1,9 +1,9 @@
 <template>
-    <div class="media-storytree-container"
-    id="div_id_storytree"
+    <div class="media-sankeytree-container"
+    id="div_id_sankeytree"
     v-loading="storytree__loading"
     element-loading-text="Waiting Loading Story Tree"
-    ref="mediastorytree">
+    ref="mediasankeytree">
         <svg id="storytree__svg"></svg>
     </div>
 </template>
@@ -11,9 +11,9 @@
 <script>
 
 import { mapState, mapMutations } from 'vuex';
-
+import { sankey as sankeyGraph, sankeyLinkHorizontal } from "d3-sankey";
 export default {
-    name: 'MediaStoryTree',
+    name: 'MediaSankeyTree',
     props: {
         msg: String,
         topic_code: String,
@@ -54,7 +54,7 @@ export default {
             // console.log("sysDatasetObj.StoryTreeDataset",sysDatasetObj.StoryTreeDataset);
             // this.width = this.$refs.storytree.clientWidth;
             // this.height = this.$refs.storytree.clientHeight;
-            self.drawStoryTree(self.width, self.height);
+            self.drawSankeyTree(self.width, self.height);
         },
         tree_node_click: function () {
             let self = this;
@@ -212,9 +212,9 @@ export default {
     },
     mounted: function () {
         let self = this;
-        self.width = self.$refs.mediastorytree.clientWidth;
-        self.height = self.$refs.mediastorytree.clientHeight;
-        // self.drawStoryTree(self.width, self.height);
+        self.width = self.$refs.mediasankeytree.clientWidth;
+        self.height = self.$refs.mediasankeytree.clientHeight;
+        // self.drawSankeyTree(self.width, self.height);
     },
     methods: {
         ...mapMutations([
@@ -223,7 +223,7 @@ export default {
             'UPDATE_TREE_NODE_CLICK_PATH_LIST'
         ]),
         initLeftTopPos: function() {
-            let odiv=document.getElementById('div_id_storytree');
+            let odiv=document.getElementById('div_id_sankeytree');
             this.divPos.left = odiv.getBoundingClientRect().left;
             this.divPos.top = odiv.getBoundingClientRect().top;
             this.divPos.width = odiv.getBoundingClientRect().width;
@@ -261,152 +261,200 @@ export default {
                 $(div_id).fadeTo("fast", 1);
             });
         },
-        drawStoryTree(width, height) {
+        drawSankeyTree(width, height) {
             let self = this;
-            console.log(width, height);
+
             let margin = { top:15, bottom:55, left:10, right:20 };
             let innerWidth = width - margin.left - margin.right;
             let innerHeight = height - margin.top - margin.bottom;
             
 
-            let renderStoryTree = (root, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope) => {
+            let renderSankeyTree = (root, sankeyData, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope) => {
                 let x0 = Infinity;
                 let x1 = -x0;
                 root.each(d => {
                     if (d.x > x1) x1 = d.x;
                     if (d.x < x0) x0 = d.x;
                 });
+                // clear before
                 d3.select(self.$el).select("#storytree__svg").selectAll('g').remove();
                 
                 const svg = d3.select(self.$el).select("#storytree__svg")
-                    .attr("width", width - 10)
-                    .attr("height", height - 10);
-
-                svg.append("defs").html(`
-                    <style>
-                    .highlight circle { fill:black }
-                    .highlight circle { fill:black }
-                    .highlight text { fill:black }
-                    .leaf circle { fill:black }
-                    .leaf circle { fill:black }
-                    .leaf text { fill:black }
-                    path.highlight { stroke:black }
-                    <style>`);
-
-                const g = svg
-                    .append("g")
-                    .attr("font-family", "sans-serif")
-                    .attr("font-size", 10)
-                    .attr("transform", `translate(${margin.left},${margin.top})`);
+                    .attr("width", width)
+                    .attr("height", height)
+                    .attr("viewBox", [0, 0, width, height])
+                    .attr("style", "max-width: 100%; height: auto; font: 10px sans-serif;");
                 
-                const timeAxis = d3.axisBottom(reScale);
-                const xAxisG = g.append('g').call(timeAxis)
-                    .attr('transform', `translate(${0},${innerHeight})`);
-                xAxisG.selectAll("text")
-                    .attr("transform", "translate(-0,0)rotate(-30)")
-                    .style("text-anchor", "end")
-                    .on("mouseover", function(d) {
-                        d3.select(this).classed("line-hover", true);
-                    })
-                    .on("mouseout", function(d) {
-                        d3.select(this)
-                            .classed("line-hover", false);
-                    });
-                xAxisG.selectAll('.domain').remove();
+                const sankey = sankeyGraph()
+                    .nodeWidth(15)
+                    .nodePadding(10)
+                    .extent([[1, 5], [width - 1, height - 5]]);
 
-                let delta_time_space = 3
-                const delta_time_g = g
-                    .append("g")
-                    .attr('transform', `translate(${0},${innerHeight})`)
-                    .attr("class", "delta_time_g")
-                    .selectAll('.delta_time_rect')
-                    .data(delta_time)
-                    .enter()
-                    .append('rect')
-                    .attr('class', 'delta_time_rect')
-                    .attr('x', (d,i)=>reScale(uni_delta_timescope[i + 1]) - reScale.bandwidth() / 2 + delta_time_space)
-                    .attr('y', d => delta_time_space - delta_timeScale(d) / 2)
-                    .attr('rx', d=> delta_timeScale(d) / 2)
-                    .attr('width', reScale.bandwidth() - 2 * delta_time_space)
-                    .attr('height', d=> delta_timeScale(d))
-                    .on("mouseover", function(d) {
-                        d3.select(this).classed("line-hover", true);
-                    })
-                    .on("mouseout", function(d) {
-                        d3.select(this)
-                            .classed("line-hover", false);
-                    });
+                const {nodes, links} = sankey({
+                    nodes: sankeyData.nodes.map(d => Object.assign({}, {name: d.index})),
+                    links: sankeyData.links.map(d => Object.assign({}, {source: d.source.index, target: d.target.index, value: d.target.size}))
+                });
+
+                console.log(nodes);
+                console.log(links);
+
+
+                // Defines a color scale.
+                const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                // Creates the rects that represent the nodes.
+                const rect = svg.append("g")
+                    .attr("stroke", "#000")
+                    .selectAll()
+                    .data(nodes)
+                    .join("rect")
+                    .attr("x", d => d.x0)
+                    .attr("y", d => d.y0)
+                    .attr("height", d => d.y1 - d.y0)
+                    .attr("width", d => d.x1 - d.x0)
+                    .attr("fill", d => color(d.index));
+                
+                // Creates the paths that represent the links.
+                const link = svg.append("g")
+                    .attr("fill", "none")
+                    .attr("stroke-opacity", 0.5)
+                    .selectAll()
+                    .data(links)
+                    .join("g")
+                        .style("mix-blend-mode", "multiply");
+
+                link.append("path")
+                    .attr("d", sankeyLinkHorizontal())
+                    .attr("stroke", d => color(d.target.index))
+                    .attr("stroke-opacity", "0.3")
+                    .attr("stroke-width", d => Math.max(1, d.width));
+
+
+                // svg.append("defs").html(`
+                //     <style>
+                //     .highlight circle { fill:black }
+                //     .highlight circle { fill:black }
+                //     .highlight text { fill:black }
+                //     .leaf circle { fill:black }
+                //     .leaf circle { fill:black }
+                //     .leaf text { fill:black }
+                //     path.highlight { stroke:black }
+                //     <style>`);
+
+                // const g = svg
+                //     .append("g")
+                //     .attr("font-family", "sans-serif")
+                //     .attr("font-size", 10)
+                //     .attr("transform", `translate(${margin.left},${margin.top})`);
+                
+                // const timeAxis = d3.axisBottom(reScale);
+                // const xAxisG = g.append('g').call(timeAxis)
+                //     .attr('transform', `translate(${0},${innerHeight})`);
+                // xAxisG.selectAll("text")
+                //     .attr("transform", "translate(-0,0)rotate(-30)")
+                //     .style("text-anchor", "end")
+                //     .on("mouseover", function(d) {
+                //         d3.select(this).classed("line-hover", true);
+                //     })
+                //     .on("mouseout", function(d) {
+                //         d3.select(this)
+                //             .classed("line-hover", false);
+                //     });
+                // xAxisG.selectAll('.domain').remove();
+
+                // let delta_time_space = 3
+                // const delta_time_g = g
+                //     .append("g")
+                //     .attr('transform', `translate(${0},${innerHeight})`)
+                //     .attr("class", "delta_time_g")
+                //     .selectAll('.delta_time_rect')
+                //     .data(delta_time)
+                //     .enter()
+                //     .append('rect')
+                //     .attr('class', 'delta_time_rect')
+                //     .attr('x', (d,i)=>reScale(uni_delta_timescope[i + 1]) - reScale.bandwidth() / 2 + delta_time_space)
+                //     .attr('y', d => delta_time_space - delta_timeScale(d) / 2)
+                //     .attr('rx', d=> delta_timeScale(d) / 2)
+                //     .attr('width', reScale.bandwidth() - 2 * delta_time_space)
+                //     .attr('height', d=> delta_timeScale(d))
+                //     .on("mouseover", function(d) {
+                //         d3.select(this).classed("line-hover", true);
+                //     })
+                //     .on("mouseout", function(d) {
+                //         d3.select(this)
+                //             .classed("line-hover", false);
+                //     });
                     
 
 
 
-                const link = g
-                    .append("g")
-                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
-                    .attr("fill", "none")
-                    .attr("stroke", "steelblue")
-                    .attr("stroke-opacity", 0.4)
-                    .selectAll("path")
-                    .data(root.links())
-                    .join("path")
-                    .attr("d", d=>{
-                        if(d.source.data.time_e == d.target.data.time_e){
-                            // alert("duplicate time [parent, child]")
-                            let PosData = []
-                            PosData.push([reScale(d.source.data.time_e), d.source.x])
-                            PosData.push([reScale(d.target.data.time_e) + reScale.bandwidth()/2, d.target.x])
-                            let lineGenerator = d3.line().curve(d3.curveStepBefore)
-                            let lineData = lineGenerator(PosData)
-                            return lineData;
-                        }
-                        else{
-                            // let PosData = []
-                            // PosData.push([reScale(d.source.data.time_e), d.source.x])
-                            // PosData.push([reScale(d.target.data.time_e), d.target.x])
-                            // let lineGenerator = d3.line().curve(d3.curveStepBefore)
-                            // let lineData = lineGenerator(PosData)
-                            // return lineData;
+                // const link = g
+                //     .append("g")
+                //     .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
+                //     .attr("fill", "none")
+                //     .attr("stroke", "steelblue")
+                //     .attr("stroke-opacity", 0.4)
+                //     .selectAll("path")
+                //     .data(root.links())
+                //     .join("path")
+                //     .attr("d", d=>{
+                //         if(d.source.data.time_e == d.target.data.time_e){
+                //             // alert("duplicate time [parent, child]")
+                //             let PosData = []
+                //             PosData.push([reScale(d.source.data.time_e), d.source.x])
+                //             PosData.push([reScale(d.target.data.time_e) + reScale.bandwidth()/2, d.target.x])
+                //             let lineGenerator = d3.line().curve(d3.curveStepBefore)
+                //             let lineData = lineGenerator(PosData)
+                //             return lineData;
+                //         }
+                //         else{
+                //             // let PosData = []
+                //             // PosData.push([reScale(d.source.data.time_e), d.source.x])
+                //             // PosData.push([reScale(d.target.data.time_e), d.target.x])
+                //             // let lineGenerator = d3.line().curve(d3.curveStepBefore)
+                //             // let lineData = lineGenerator(PosData)
+                //             // return lineData;
                             
-                            return d3.linkHorizontal()
-                                .x(d => reScale(d.data.time_e))
-                                .y(d => d.x)(d)
-                        }
-                    })
-                    .attr("stroke-width", d=>{
-                        return lineWidthScale(+d.target.data.tree_maxCompatibility)
-                    })
-                    .attr("stroke-opacity", d=>{
-                        return lineFillScale(+d.target.data.tree_maxCompatibility)
-                        // return 0.4
-                    })
-                    .on("mouseover", function(d) {
-                        d3.select(this).classed("line-hover", true);
-                    })
-                    .on("mouseout", function(d) {
-                        d3.select(this)
-                            .classed("line-hover", false);
-                    });
+                //             return d3.linkHorizontal()
+                //                 .x(d => reScale(d.data.time_e))
+                //                 .y(d => d.x)(d)
+                //         }
+                //     })
+                //     .attr("stroke-width", d=>{
+                //         return lineWidthScale(+d.target.data.tree_maxCompatibility)
+                //     })
+                //     .attr("stroke-opacity", d=>{
+                //         return lineFillScale(+d.target.data.tree_maxCompatibility)
+                //         // return 0.4
+                //     })
+                //     .on("mouseover", function(d) {
+                //         d3.select(this).classed("line-hover", true);
+                //     })
+                //     .on("mouseout", function(d) {
+                //         d3.select(this)
+                //             .classed("line-hover", false);
+                //     });
 
-                let node = g
-                    .append("g")
-                    .attr("class", "storytree__node")
-                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
-                    .attr("stroke-linejoin", "round")
-                    .attr("stroke-width", 3)
-                    .selectAll(".story_tree_node")
-                    .data(root.descendants())
-                    .join("g")
-                    .attr("class", "story_tree_node")
-                    .attr("id",d=>{
-                        return "story_tree_node_" + d.index;
-                    })
-                    .attr("transform", d => {
-                        if(d.depth > 1 && d.parent.data.time_e == d.data.time_e){
-                            d.y = reScale(d.data.time_e) + reScale.bandwidth() / 2;
-                            return `translate(${reScale(d.data.time_e) + reScale.bandwidth() / 2},${d.x})`;
-                        }
-                        return `translate(${reScale(d.data.time_e)},${d.x})`;                        
-                    });
+                // let node = g
+                //     .append("g")
+                //     .attr("class", "storytree__node")
+                //     .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
+                //     .attr("stroke-linejoin", "round")
+                //     .attr("stroke-width", 3)
+                //     .selectAll(".story_tree_node")
+                //     .data(root.descendants())
+                //     .join("g")
+                //     .attr("class", "story_tree_node")
+                //     .attr("id",d=>{
+                //         return "story_tree_node_" + d.index;
+                //     })
+                //     .attr("transform", d => {
+                //         if(d.depth > 1 && d.parent.data.time_e == d.data.time_e){
+                //             d.y = reScale(d.data.time_e) + reScale.bandwidth() / 2;
+                //             return `translate(${reScale(d.data.time_e) + reScale.bandwidth() / 2},${d.x})`;
+                //         }
+                //         return `translate(${reScale(d.data.time_e)},${d.x})`;                        
+                //     });
                 
                 // ===================circle=================//
                 // node
@@ -416,60 +464,60 @@ export default {
                 //     .attr("r", d=> d.data.totalbias !="null" ? reScaleCircleRadia(+d.data.totalbias) : 1);
                 
                 // ===================pie=================//
-                let piecolorScale = d3.scaleOrdinal()
-                        .domain(d3.range(4))
-                        .range(d3.schemeCategory10);
+                // let piecolorScale = d3.scaleOrdinal()
+                //         .domain(d3.range(4))
+                //         .range(d3.schemeCategory10);
                 
-                let piecolorScale_1 = (i)=>{
-                    let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
-                    return colorArray[i%4];
-                }
+                // let piecolorScale_1 = (i)=>{
+                //     let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+                //     return colorArray[i%4];
+                // }
                 
                 
-                self.piecolorScale = piecolorScale_1;
+                // self.piecolorScale = piecolorScale_1;
                 
-                let pie = d3.pie();
+                // let pie = d3.pie();
 
-                node.each(ele=>{
-                    self.mediasources = ele.data.mSrc_list;
-                    // console.log("mediasources", self.mediasources);
-                    let ele_g = d3.select(this.$el).select("#story_tree_node_" + ele.index).append("g")
-                        .attr("class", "ele-g");
+                // node.each(ele=>{
+                //     self.mediasources = ele.data.mSrc_list;
+                //     // console.log("mediasources", self.mediasources);
+                //     let ele_g = d3.select(this.$el).select("#story_tree_node_" + ele.index).append("g")
+                //         .attr("class", "ele-g");
                     
-                    let pie_r = ele.data.totalbias !="null" ? reScaleCircleRadia(+ele.data.totalbias) : 1;
+                //     let pie_r = ele.data.totalbias !="null" ? reScaleCircleRadia(+ele.data.totalbias) : 1;
                     
-                    ele_g.selectAll(".story_tree_node_pie")
-                        .data(d=>{
-                            let dataset = d.data.tree_nodeSrcN.map(Number);
-                            return pie(dataset);
-                        })
-                        .enter()
-                        .append("g")
-                        .attr("class", "story_tree_node_pie")
-                            .append("path")
-                            .attr("d",function(d,i){
-                                return d3.arc()
-                                    .innerRadius(0)
-                                    .outerRadius(pie_r)(d);
-                            })
-                            .attr("fill",function(d,i){
-                                return self.piecolorScale(i);
-                            });
-                });
+                //     ele_g.selectAll(".story_tree_node_pie")
+                //         .data(d=>{
+                //             let dataset = d.data.tree_nodeSrcN.map(Number);
+                //             return pie(dataset);
+                //         })
+                //         .enter()
+                //         .append("g")
+                //         .attr("class", "story_tree_node_pie")
+                //             .append("path")
+                //             .attr("d",function(d,i){
+                //                 return d3.arc()
+                //                     .innerRadius(0)
+                //                     .outerRadius(pie_r)(d);
+                //             })
+                //             .attr("fill",function(d,i){
+                //                 return self.piecolorScale(i);
+                //             });
+                // });
                 
 
-                node
-                    .append("text")
-                    .attr("dy", "1.5em")
-                    .attr("text-anchor", "middle")
-                    .attr("fill", "steelblue")
-                    .text(d=>{
-                        let show_str = d.data.tree_topickey.slice(0,3).toString().replaceAll(",","; ")
-                        return show_str == 'null' ? 'Story' : show_str;
-                    })
-                    .clone(true)
-                    .lower()
-                    .attr("stroke", "white");
+                // node
+                //     .append("text")
+                //     .attr("dy", "1.5em")
+                //     .attr("text-anchor", "middle")
+                //     .attr("fill", "steelblue")
+                //     .text(d=>{
+                //         let show_str = d.data.tree_topickey.slice(0,3).toString().replaceAll(",","; ")
+                //         return show_str == 'null' ? 'Story' : show_str;
+                //     })
+                //     .clone(true)
+                //     .lower()
+                //     .attr("stroke", "white");
                 
                 
             
@@ -742,15 +790,24 @@ export default {
             // console.log(reScale("time"));
             let tree = data => {
                 let i = 0;
-                const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++;});
-                // root.dx = innerHeight / (root.children.length + 3);
-                // root.dy = innerWidth / (root.height + 3);
-                // return d3.tree().nodeSize([root.dx, root.dy])(root);
+                // const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.value = 1})
+                //                 .sum(d=>d.value)
+                const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.size = d.leaves().length});
+                // const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.size = d.descendants().length <= 2 ? 1 : d.descendants().length - 1});
                 // return d3.tree().size([innerHeight,innerWidth])(root);
                 return d3.cluster().size([innerHeight,innerWidth])(root);
             }
             let root = tree(data);
-            renderStoryTree(root, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope);
+            console.log(root);
+
+
+            let sankeyData = {nodes: root.descendants(), links: root.links()};
+            console.log(sankeyData);
+
+            renderSankeyTree(root, sankeyData, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope);
+
+
+
 
         },
     }
@@ -759,7 +816,7 @@ export default {
   
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
-.media-storytree-container {
+.media-sankeytree-container {
     width: 100%;
     height: 100%;
 }
@@ -768,19 +825,16 @@ export default {
 .tree_node_hover_tooltip_div {
     border: 1px solid black;
     word-wrap: break-word;
-    // font-family: sans-serif;
     font-size: 12px;
     padding: 5px;
     .tree_node_hover_tooltip_div_sub{
         border-bottom: 1px solid black;
-        // display: block;
         word-wrap: break-word;
     }
 }
 .tree_node_detail_tooltip_div {
     border: 1px dashed black;
     word-wrap: break-word;
-    // z-index: 9999;
     background-color: white;
     padding: 5px;
     line-height: 16px;
@@ -800,25 +854,11 @@ export default {
     .summary_container {
         margin-top: 5px;
         margin-top: 2%;
-        // position: absolute;
-        // overflow-y: auto;
-        // top: 50%;
-        // height: 50%;
-        // left: 0%;
-        // width: 100%;
         .summary_container_title{
             text-align: center;
             display: block;
             font-weight: bold;
         }
-    }
-    .detail_div_link_container{
-        // position: absolute;
-        // overflow-y: auto;
-        // top: 0%;
-        // height: 48%;
-        // left: 0%;
-        // width: 100%;
     }
 }
 </style>

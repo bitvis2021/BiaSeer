@@ -45,6 +45,6 @@ let topic_ID_TOPIC = {
 }
 
 export function getTopic(id){
-    if (id in topic_ID_TOPIC) return topic_ID_TOPIC[id];
+    if (id in topic_ID_TOPIC) return id + "-" + topic_ID_TOPIC[id];
     else return "CONF"; // without key , waiting conform
 }

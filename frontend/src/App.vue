@@ -17,11 +17,12 @@
     <div class="event-evolution">
       <div class="union-event-evolution">
         <div class="event-evolution-storytree" id="story_tree_div">
-          <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
+          <!-- <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree> -->
+          <MediaSankeyTree :storytree__loading="storytree__loading"></MediaSankeyTree>
         </div>
-        <div class="event-iframeview">
+        <!-- <div class="event-iframeview"> -->
           <!-- <iframe :src="iframeSrc" class="iframe-class"></iframe> -->
-        </div>
+        <!-- </div> -->
         
       </div>
       <div class="single-event-evolution">
@@ -45,6 +46,7 @@ import MediaTrend from './components/MediaTrend.vue';
 import MediaHorizonChart from './components/MediaHorizonChart.vue';
 import MediaMatrixTrend from './components/MediaMatrixTrend.vue';
 import MediaStoryTree from './components/MediaStoryTree.vue';
+import MediaSankeyTree from './components/MediaSankeyTree.vue';
 import MediaTags from './views/MediaTags.vue';
 import SingleTree from './views/SingleTree.vue';
 
@@ -66,6 +68,7 @@ export default {
     MediaHorizonChart,
     MediaMatrixTrend,
     MediaStoryTree,
+    MediaSankeyTree,
     MediaTags,
     SingleTree
   },
@@ -245,23 +248,23 @@ export default {
         top: 0%;
         bottom: 0%;
         left: 0%;
-        right: 30%;
+        right: 0%;
         border: 1px solid steelblue;
       }
-      .event-iframeview{
-        position: absolute;
-        top: 0%;
-        bottom: 0%;
-        left: 70%;
-        right: 0%;
-        border-top: 1px solid steelblue;
-        border-bottom: 1px solid steelblue;
-        border-right: 1px solid steelblue;
-        .iframe-class{
-          width: 100%;
-          height: 100%;
-        }
-      }
+      // .event-iframeview{
+      //   position: absolute;
+      //   top: 0%;
+      //   bottom: 0%;
+      //   left: 70%;
+      //   right: 0%;
+      //   border-top: 1px solid steelblue;
+      //   border-bottom: 1px solid steelblue;
+      //   border-right: 1px solid steelblue;
+      //   .iframe-class{
+      //     width: 100%;
+      //     height: 100%;
+      //   }
+      // }
     }
 
     .single-event-evolution {
