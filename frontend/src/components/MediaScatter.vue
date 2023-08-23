@@ -52,6 +52,10 @@ export default {
             nodeMenuFlag: false,
             graph_g: null,
             label_g: null,
+            zoomOperator: null,
+            zoomMaxRatio: 16,
+            zoomMinRatio: 1,
+            rightDiv: null
         }
     },
     mounted: function () {
@@ -119,25 +123,34 @@ export default {
                 .attr('viewBox', [0, 0, width, height])
 
             let contour_g = svg.append("g")
-                .attr("class", "media-point-contour-g");
+                .attr("class", "media-point-contour-g")
+                // .attr("width", innerWidth)
+                // .attr("height", innerHeight)
+                .attr("transform", `translate(${margin.left}, ${margin.top})`)
             
-            self.graph_g = svg.append("g")
+            let graph_g = svg.append("g")
                 .attr("class", "media-point-graph-g")
                 .attr("width", innerWidth)
                 .attr("height", innerHeight)
                 .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            self.graph_g = graph_g;
             
-            self.label_g = svg.append("g")
+            let label_g = svg.append("g")
                 .attr("class", "media-point-label-g")
                 .attr("width", innerWidth)
                 .attr("height", innerHeight)
                 .attr("transform", `translate(${margin.left}, ${margin.top})`)
-
+            self.label_g = label_g;
+            
             let circle_g = svg.append("g")
                 .attr("class", "media-point-circle-g")
                 .attr("width", innerWidth)
                 .attr("height", innerHeight)
                 .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            
+            let rightDiv = d3.select('.media-scatter-container')
+                .select('.flow-node-menu');
+            self.rightDiv = rightDiv;
 
             let xScale = d3.scaleLinear().range([0, innerWidth]);
             let yScale = d3.scaleLinear().range([innerHeight, 0]);
@@ -211,15 +224,15 @@ export default {
                             .attr("class", "dot")
                             .attr("transform", transform)
                             .attr("id", d => "media_id_" + d.domain.replaceAll(".", "_"))
-                            .attr("cx", function (d) { return xScale(d.x1); })
-                            .attr("cy", function (d) { return yScale(d.x2); })
+                            .attr("cx", function (d) { return self.xScale(d.x1); })
+                            .attr("cy", function (d) { return self.yScale(d.x2); })
                             .attr("r", d => rScale(d.nums)),
                         update => update
                             .call(update => update
                                 .attr("transform", transform)
                                 .attr("id", d => "media_id_" + d.domain.replaceAll(".", "_"))
-                                .attr("cx", function (d) { return xScale(d.x1); })
-                                .attr("cy", function (d) { return yScale(d.x2); })
+                                .attr("cx", function (d) { return self.xScale(d.x1); })
+                                .attr("cy", function (d) { return self.yScale(d.x2); })
                                 .attr("r", d => rScale(d.nums))),
                         exit => exit
                             .remove()
@@ -254,7 +267,7 @@ export default {
                         // sysDatasetObj.updateMediaScatterSelected(d.domain);
                     })
                     .on("contextmenu", d => {
-                        console.log(d);
+                        // console.log(d);
                         d3.event.preventDefault();
                         self.nodeMenuFlag = true;
 
@@ -282,6 +295,31 @@ export default {
             xyScale(data);
             let tdata = data;
             renderCircles(tdata);
+            renderContours(tdata, 10);
+
+            // d3.select(this.$el).select(".media-point-contour-g").on('mousemove', () => {
+            //     renderContours(tdata, (d3.event.x / 20) );
+            // });
+            
+            function zooming(){
+                let circle_g = d3.select(self.$el).select('.media-point-circle-g');
+                let contour_g = d3.select(self.$el).select('.media-point-contour-g');
+                svg.call(d3.zoom()
+                    .extent([[0, 0], [innerWidth, innerHeight]])
+                    .scaleExtent([1, 18])
+                    .on("zoom", zoomed));
+                function zoomed() {
+                    self.xScale = d3.event.transform.rescaleX(xScaleCopy);
+                    self.yScale = d3.event.transform.rescaleY(yScaleCopy);
+                    // console.log("d3.zoomTransform(this): ", d3.zoomTransform(this));
+                    circle_g.attr("transform", d3.zoomTransform(this));
+                    contour_g.attr("transform", d3.zoomTransform(this));
+                    graph_g.attr("transform", d3.zoomTransform(this));
+                    label_g.attr("transform", d3.zoomTransform(this));
+                    rightDiv.attr("transform", d3.zoomTransform(this));
+                }
+            }
+            zooming();
         },
         drawMediaHorizonChart(domain) {
             console.log(domain);
@@ -449,9 +487,9 @@ export default {
 
             let delta = 20;
 
-            let rightDiv = d3.select('.media-scatter-container')
-                .select('.flow-node-menu');
-            rightDiv.style('top', d => {
+            // let rightDiv = d3.select('.media-scatter-container')
+            //     .select('.flow-node-menu');
+            self.rightDiv.style('top', d => {
                     return delta + self.mouse_this[1] + "px";
                 })
                 .style('left', function () {
@@ -620,7 +658,7 @@ export default {
     fill: red;
     stroke-width: 1.5px;
     stroke: red;
-    opacity: 0.5;
+    /* opacity: 0.5; */
 }
 
 .media_horizon_chart_tooltip_div {
