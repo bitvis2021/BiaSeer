@@ -4,14 +4,17 @@
     v-loading="storytree__loading"
     element-loading-text="Waiting Loading Story Tree"
     ref="mediasankeytree">
-        <svg id="storytree__svg"></svg>
+        <svg id="sankeytree__svg"></svg>
     </div>
 </template>
   
 <script>
 
 import { mapState, mapMutations } from 'vuex';
-import { sankey as sankeyGraph, sankeyLinkHorizontal } from "d3-sankey";
+// import { sankey as sankeyGraph, sankeyLinkHorizontal } from "d3-sankey";
+import { sankey } from '../assets/js/sankey';
+
+
 export default {
     name: 'MediaSankeyTree',
     props: {
@@ -277,57 +280,152 @@ export default {
                     if (d.x < x0) x0 = d.x;
                 });
                 // clear before
-                d3.select(self.$el).select("#storytree__svg").selectAll('g').remove();
+                d3.select(self.$el).select("#sankeytree__svg").selectAll('g').remove();
                 
-                const svg = d3.select(self.$el).select("#storytree__svg")
+                const svg = d3.select(self.$el).select("#sankeytree__svg")
                     .attr("width", width)
                     .attr("height", height)
                     .attr("viewBox", [0, 0, width, height])
                     .attr("style", "max-width: 100%; height: auto; font: 10px sans-serif;");
                 
-                const sankey = sankeyGraph()
+                const sankey = d3.sankey()
                     .nodeWidth(15)
                     .nodePadding(10)
-                    .extent([[1, 5], [width - 1, height - 5]]);
+                    .size([innerWidth, innerHeight]);
+                
+                let path = sankey.link();
 
-                const {nodes, links} = sankey({
-                    nodes: sankeyData.nodes.map(d => Object.assign({}, {name: d.index})),
-                    links: sankeyData.links.map(d => Object.assign({}, {source: d.source.index, target: d.target.index, value: d.target.size}))
-                });
-
-                console.log(nodes);
-                console.log(links);
-
-
+                sankey
+                    .nodes(sankeyData.nodes)
+                    .links(sankeyData.links)
+                    .nodeWidth(15)
+                    .nodePadding(10)
+                    .layout(32);
+                
                 // Defines a color scale.
                 const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-                // Creates the rects that represent the nodes.
-                const rect = svg.append("g")
-                    .attr("stroke", "#000")
-                    .selectAll()
-                    .data(nodes)
-                    .join("rect")
-                    .attr("x", d => d.x0)
-                    .attr("y", d => d.y0)
-                    .attr("height", d => d.y1 - d.y0)
-                    .attr("width", d => d.x1 - d.x0)
-                    .attr("fill", d => color(d.index));
-                
-                // Creates the paths that represent the links.
-                const link = svg.append("g")
+                // add in the links
+                var link = svg.append("g")
+                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
+                    .selectAll(".link")
+                    .data(sankeyData.links)
+                    .enter().append("path")
+                    .attr("d", path)
                     .attr("fill", "none")
-                    .attr("stroke-opacity", 0.5)
-                    .selectAll()
-                    .data(links)
-                    .join("g")
-                        .style("mix-blend-mode", "multiply");
-
-                link.append("path")
-                    .attr("d", sankeyLinkHorizontal())
-                    .attr("stroke", d => color(d.target.index))
+                    .attr("stroke-width", function (d) { return Math.max(1, d.dy); })
+                    .attr("stroke", d => color(d.target.name))
+                    // .attr("stroke", "gray")
                     .attr("stroke-opacity", "0.3")
-                    .attr("stroke-width", d => Math.max(1, d.width));
+                    .sort(function (a, b) { return b.dy - a.dy; });
+
+                // add the link titles
+                link.append("title")
+                    .text(function (d) {
+                        return d.source.name + " → " +
+                            d.target.name + "\n" + d.value;
+                    });
+
+                // add in the nodes
+                var node = svg.append("g")
+                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
+                    .selectAll(".node")
+                    .data(sankeyData.nodes)
+                    .enter().append("g")
+                    .attr("class", "node")
+                    .attr("transform", function (d) {
+                        return "translate(" + d.xPos + "," + d.y + ")";
+                    })
+                    .call(d3.drag()
+                        .subject(function (d) {
+                            return d;
+                        })
+                        .on("start", function () {
+                            this.parentNode.appendChild(this);
+                        })
+                        .on("drag", dragmove));
+
+                // add the rectangles for the nodes
+                node.append("rect")
+                    .attr("height", function (d) { return d.dy; })
+                    .attr("width", sankey.nodeWidth())
+                    // .attr("fill", "gray");
+                    .attr("fill", d => color(d.name));
+
+                // add in the title for the nodes
+                node.append("text")
+                    .attr("x", -6)
+                    .attr("y", function (d) { return d.dy / 2; })
+                    .attr("dy", ".35em")
+                    .attr("text-anchor", "end")
+                    .attr("transform", null)
+                    .text(function (d) { return d.name; })
+                    .filter(function (d) { return d.x < width / 2; })
+                    .attr("x", 6 + sankey.nodeWidth())
+                    .attr("text-anchor", "start");
+
+                // the function for moving the nodes
+                function dragmove(d) {
+                    d3.select(this).attr("transform",
+                        "translate(" + (
+                            d.xPos
+                            // d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+                        )
+                        + "," + (
+                            d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
+                        ) + ")");
+                    sankey.relayout();
+                    link.attr("d", path);
+                }
+
+                // const {nodes, links} = sankey({
+                //     nodes: sankeyData.nodes.map(d => Object.assign({}, {name: d.index, time_e: d.data.time_e})),
+                //     links: sankeyData.links.map(d => Object.assign({}, {source: d.source.index, target: d.target.index, value: d.target.size}))
+                // });
+                
+                // nodes.forEach(ele=>{
+                //     ele.x0 = reScale(ele.time_e)
+                //     ele.x1 = ele.x0 + 15
+                // })
+                // links.forEach(ele=>{
+                //     ele.source.x0 = reScale(ele.source.time_e)
+                //     ele.source.x1 = ele.x0 + 15
+                //     ele.target.x0 = reScale(ele.target.time_e)
+                //     ele.target.x1 = ele.x0 + 15
+                // })
+                // console.log(nodes);
+                // console.log(links);
+
+
+                // // Defines a color scale.
+                // const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                // // Creates the rects that represent the nodes.
+                // const rect = svg.append("g")
+                //     .attr("stroke", "#000")
+                //     .selectAll()
+                //     .data(nodes)
+                //     .join("rect")
+                //     .attr("x", d => d.x0)
+                //     .attr("y", d => d.y0)
+                //     .attr("height", d => d.y1 - d.y0)
+                //     .attr("width", d => d.x1 - d.x0)
+                //     .attr("fill", d => color(d.index));
+                
+                // // Creates the paths that represent the links.
+                // const link = svg.append("g")
+                //     .attr("fill", "none")
+                //     .attr("stroke-opacity", 0.5)
+                //     .selectAll()
+                //     .data(links)
+                //     .join("g")
+                //         .style("mix-blend-mode", "multiply");
+
+                // link.append("path")
+                //     .attr("d", sankeyLinkHorizontal())
+                //     .attr("stroke", d => color(d.target.index))
+                //     .attr("stroke-opacity", "0.3")
+                //     .attr("stroke-width", d => Math.max(1, d.width));
 
 
                 // svg.append("defs").html(`
@@ -341,26 +439,26 @@ export default {
                 //     path.highlight { stroke:black }
                 //     <style>`);
 
-                // const g = svg
-                //     .append("g")
-                //     .attr("font-family", "sans-serif")
-                //     .attr("font-size", 10)
-                //     .attr("transform", `translate(${margin.left},${margin.top})`);
+                const g = svg
+                    .append("g")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", 10)
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
                 
-                // const timeAxis = d3.axisBottom(reScale);
-                // const xAxisG = g.append('g').call(timeAxis)
-                //     .attr('transform', `translate(${0},${innerHeight})`);
-                // xAxisG.selectAll("text")
-                //     .attr("transform", "translate(-0,0)rotate(-30)")
-                //     .style("text-anchor", "end")
-                //     .on("mouseover", function(d) {
-                //         d3.select(this).classed("line-hover", true);
-                //     })
-                //     .on("mouseout", function(d) {
-                //         d3.select(this)
-                //             .classed("line-hover", false);
-                //     });
-                // xAxisG.selectAll('.domain').remove();
+                const timeAxis = d3.axisBottom(reScale);
+                const xAxisG = g.append('g').call(timeAxis)
+                    .attr('transform', `translate(${0},${innerHeight})`);
+                xAxisG.selectAll("text")
+                    .attr("transform", "translate(-0,0)rotate(-30)")
+                    .style("text-anchor", "end")
+                    .on("mouseover", function(d) {
+                        d3.select(this).classed("line-hover", true);
+                    })
+                    .on("mouseout", function(d) {
+                        d3.select(this)
+                            .classed("line-hover", false);
+                    });
+                xAxisG.selectAll('.domain').remove();
 
                 // let delta_time_space = 3
                 // const delta_time_g = g
@@ -748,9 +846,11 @@ export default {
             let dx = innerHeight / (rootnode.children.length + 3);
             let dy = innerWidth / (rootnode.height + 3);
             let nodes = rootnode.descendants().filter(ele => ele.data.time_e);
+            
             let timescope = nodes.map(ele => ele.data.time_e.replaceAll("-", "")).sort((a, b) => a - b)
                 .map(ele=>ele=="time" ? "time" : ele.slice(0,4)+"-"+ele.slice(4,6)+"-"+ele.slice(6,8));
             self.tree_timescope = timescope;
+            
             let delta_timescope = timescope.filter(ele=>ele != "time");
             let uni_delta_timescope = [...new Set(delta_timescope)];
             let delta_time = [];
@@ -758,11 +858,15 @@ export default {
                 delta_time.push(
                     Date.parse(uni_delta_timescope[i + 1]) - Date.parse(uni_delta_timescope[i])
                 );
-            }
-            
+            }            
             let delta_timeScale = d3.scaleLinear().domain(d3.extent(delta_time)).range([1,4]);
 
-            let reScale = d3.scaleBand().domain(timescope).range([0, innerWidth]);
+            // let reScale = d3.scaleBand().domain(timescope).range([0, innerWidth]);
+            let reScale = d3.scaleBand().domain(timescope).range([0, width]);
+            // console.log(timescope);
+            // console.log(reScale("time"));
+
+
             let biasMaxMin = nodes.filter(ele=> ele.data.totalbias != "null").map(ele=>+ele.data.totalbias);
             // console.log("biasMaxMin: ", biasMaxMin);
 
@@ -779,35 +883,39 @@ export default {
                     tree_maxCompatibilityMaxMin.push(+ele.data.tree_maxCompatibility)
                 })
 
-            // let lineWidthScale = d3.scaleLinear().domain([0, 0.5]).range([1, 10]);
-            // let lineFillScale = d3.scaleLinear().domain([0, 0.5]).range([0.4, 1]);
-            
             let lineWidthScale = d3.scaleLinear().domain(d3.extent(tree_maxCompatibilityMaxMin)).range([2, 5]);
             let lineFillScale = d3.scaleLinear().domain(d3.extent(tree_maxCompatibilityMaxMin)).range([0.4, 1]);
 
             let reScaleCircleRadia = d3.scaleLinear().domain(d3.extent(biasMaxMin)).range([5,10]);
-            // console.log(timescope);
-            // console.log(reScale("time"));
+            
+            let sankeyData = {nodes: [], links: []};
+
             let tree = data => {
                 let i = 0;
-                // const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.value = 1})
-                //                 .sum(d=>d.value)
-                const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.size = d.leaves().length});
+                const root = d3.hierarchy(data).eachBefore(d=>{
+                    d.index = i++;
+                    d.size = d.leaves().length;
+                    sankeyData.nodes.push({name: d.index, xPos: reScale(d.data.time_e), node: "node" + d.index, title: d.data.name, time_e: d.data.time_e});
+                });
+                root.each(d=>{
+                    if(d.children){
+                        d.children.forEach(eleChild=>{
+                            sankeyData.links.push({source: d.index, target: eleChild.index, value: eleChild.size});
+                        })
+                    }
+                })
                 // const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++; d.size = d.descendants().length <= 2 ? 1 : d.descendants().length - 1});
                 // return d3.tree().size([innerHeight,innerWidth])(root);
                 return d3.cluster().size([innerHeight,innerWidth])(root);
             }
             let root = tree(data);
-            console.log(root);
+            // console.log(root);
 
 
-            let sankeyData = {nodes: root.descendants(), links: root.links()};
+            // sankeyData = {nodes: root.descendants(), links: root.links()};
             console.log(sankeyData);
 
             renderSankeyTree(root, sankeyData, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope);
-
-
-
 
         },
     }
