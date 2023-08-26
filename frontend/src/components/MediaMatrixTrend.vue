@@ -106,6 +106,9 @@ export default {
                 .range([0, 1]);
             
             let computeColorPos = d3.interpolate('#f9f9f9', 'green');
+            if(flag === 'concat'){
+                computeColorPos = d3.interpolate('#f9f9f9', 'gray');
+            }
             let linearVDataPos = d3.scaleLinear()
                 .domain([0, d3.max(vdata)])
                 .range([0, 1]);

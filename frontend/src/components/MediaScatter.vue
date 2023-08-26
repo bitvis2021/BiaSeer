@@ -369,7 +369,7 @@ export default {
             self.innerHeight = height - self.margin.top - self.margin.bottom;
 
             self.step = (height - (self.margin.top + self.margin.bottom)) / self.draw_data.length - 1;
-            let colorArr = ["#fddbc7", "#f4a582", "#4393c3", "#92c5de", "#d6604d", "#b2182b", "#67001f"];
+            let colorArr = ["#c73b3b", "#f06565", "#4393c3", "#92c5de", "#d6604d", "#fddbc7", "#f4a582"];
             self.color = i => colorArr[i + (i >= 0) + self.overlap];
             self.mirror = false;
             self.xValue = d => new Date(d.date);
@@ -689,5 +689,15 @@ export default {
     /* font-family: 'Arial'; */
     font-size: 10px;
     fill: red;
+}
+
+.testcss{
+    fill : #fddbc7;
+    fill : #f4a582;
+    fill : #4393c3;
+    fill : #92c5de;
+    fill : #d6604d;
+    fill : #c73b3b;
+    fill : #f06565;
 }
 </style>
