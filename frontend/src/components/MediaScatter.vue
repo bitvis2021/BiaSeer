@@ -316,7 +316,7 @@ export default {
                     contour_g.attr("transform", d3.zoomTransform(this));
                     graph_g.attr("transform", d3.zoomTransform(this));
                     label_g.attr("transform", d3.zoomTransform(this));
-                    rightDiv.attr("transform", d3.zoomTransform(this));
+                    // self.rightDiv.attr("transform", d3.zoomTransform(this));
                 }
             }
             zooming();
@@ -489,6 +489,7 @@ export default {
 
             // let rightDiv = d3.select('.media-scatter-container')
             //     .select('.flow-node-menu');
+            self.rightDiv.attr("transform", d3.zoomTransform(this));
             self.rightDiv.style('top', d => {
                     return delta + self.mouse_this[1] + "px";
                 })
