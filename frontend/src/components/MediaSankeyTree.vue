@@ -334,9 +334,9 @@ export default {
                 link.append('text')
                     .append('textPath')
                     .attr('xlink:href', function (d,i) { return '#link' + i; })
-                    .attr('startOffset','25%')
-                    // .text(function (d) { return d.target.tree_topickey.join(" "); })
-                    .text(function (d) { return d.target.title.split("+")[0]; })
+                    // .attr('startOffset','25%')
+                    .text(function (d) { return d.target.tree_topickey.join(" "); })
+                    // .text(function (d) { return d.target.title.split("+")[0]; })
 
                 // add in the nodes
                 var node = svg.append("g")
