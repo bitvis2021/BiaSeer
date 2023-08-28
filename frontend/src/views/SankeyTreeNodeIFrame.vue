@@ -65,11 +65,17 @@ export default {
     },
     computed: {
         ...mapState([
-            'storytree_finish'
+            'storytree_finish',
+            'clickSankeyTreeNode'
         ])
     },
     watch: {
-        storytree_finish:function(){
+        clickSankeyTreeNode: function(){
+            // 更新新闻列表
+            console.log("更新新闻列表...")
+            // 那全局数据
+        },
+        storytree_finish: function(){
             let self = this;
             let data = sysDatasetObj.storyTreeDataset;
             let root = d3.hierarchy(data);
