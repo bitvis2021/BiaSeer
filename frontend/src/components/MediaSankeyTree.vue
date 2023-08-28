@@ -223,7 +223,8 @@ export default {
         ...mapMutations([
             'UPDATE_TREE_NODE_CIRCLE_CLICK',
             'UPDATE_TREE_NODE_CLICK',
-            'UPDATE_TREE_NODE_CLICK_PATH_LIST'
+            'UPDATE_TREE_NODE_CLICK_PATH_LIST',
+            'UPDATE_CLICK_SANKEY_TREE_NODE_MODE'
         ]),
         initLeftTopPos: function() {
             let odiv=document.getElementById('story_tree_div');
@@ -382,6 +383,14 @@ export default {
 
                 // the function for moving the nodes
                 function dragmove(d) {
+                    // 更新状态
+                    console.log(d);
+                    self.UPDATE_CLICK_SANKEY_TREE_NODE_MODE();
+                    // 传给全局一个数据
+                    // 。。。。
+
+
+
                     d3.select(this).attr("transform",
                         "translate(" + (
                             d.xPos
