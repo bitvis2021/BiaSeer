@@ -26,6 +26,9 @@ export default {
     },
     beforeMount: function () {
     },
+    mounted() {
+        this.dynamicTags = sysDatasetObj.mediaScatterSelected;
+    },
     methods: {
         ...mapMutations([
             'UPDATE_MEDIA_DIFF_CONCAT_SIGNAL',
