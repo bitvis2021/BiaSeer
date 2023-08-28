@@ -38,13 +38,17 @@ export default {
             treeNodeDetailTooltipDivHidden: false,
             divPos: {top: 0, left: 0, width: 0, height: 0},
             tree_timescope: null,
+            cuurent_root_path: null,
+            cuurent_root_path_node: null,
+            node_template: 0,
+            cuurent_root_path_node2: null,
         }
     },
     computed: {
         ...mapState([
             'currMedium',
             'storytree_finish',
-            'tree_node_click'
+            'tree_node_click',
         ])
     },
     watch: {
@@ -383,14 +387,8 @@ export default {
 
                 // the function for moving the nodes
                 function dragmove(d) {
-                    // 更新状态
                     console.log(d);
-                    self.UPDATE_CLICK_SANKEY_TREE_NODE_MODE();
-                    // 传给全局一个数据
-                    // 。。。。
-
-
-
+                    // self.UPDATE_CLICK_SANKEY_TREE_NODE_MODE();
                     d3.select(this).attr("transform",
                         "translate(" + (
                             d.xPos
@@ -411,6 +409,8 @@ export default {
                 }
                 svg.selectAll(".sankeytree__node")
                     .on("mouseover", function () {
+                        self.UPDATE_CLICK_SANKEY_TREE_NODE_MODE();
+
                         const m = d3.mouse(this);
                         console.log("m:", m);
                         console.log("node.data():", node.data());
@@ -433,6 +433,45 @@ export default {
                         d.m0 = m[0];
                         d.m1 = m[1];
                         console.log("d:", d);
+
+                        //obtain the path from this node
+                        self.mediasources = d.data.mSrc_list;
+
+                        self.node_template = d;
+
+                        const path__node = [];
+                        const path = [];
+                        do {
+                            path__node.push(self.node_template);
+                            path.push(self.node_template.data);
+                        } while ((self.node_template = self.node_template.parent));
+
+
+                        console.log("path:", path);
+                        self.gridData = []
+                        
+                        path.reverse();
+                        path.forEach(ele=>{
+                    
+                            if(ele.time_e != "time"){
+                                let dic = new Array();
+                                dic['date'] = ele.time_e;
+                                dic['name'] = ele.tree_topickey.toString();
+                                let medias = ele.tree_nodeSrcN;
+                                for(let i=0;i<self.mediasources.length;i++){
+                                    console.log(medias[i]);
+                                    console.log(self.mediasources[i]);
+                                    dic[self.mediasources[i].replaceAll(".","")] = medias[i];
+                                }
+                                self.gridData.push(dic);
+                            }
+                        })
+                        self.cuurent_root_path = path;
+                        self.cuurent_root_path_node = path__node;
+                        console.log('cuurent_root_path', self.cuurent_root_path)
+                        sysDatasetObj.updateSankeyTreePathNode(self.cuurent_root_path);
+                        console.log(sysDatasetObj.SankeyTreePathNode)
+                        
 
                         d3.select("body").select("#div"+d.index).classed("hover_tree_node_click_div_highlight", true);
                         // add tree node hover tooltip
