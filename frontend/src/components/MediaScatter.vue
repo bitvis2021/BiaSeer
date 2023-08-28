@@ -680,7 +680,6 @@ export default {
 
             const t = d3.select(self.$el).select(".media__contour__svg").select(".media-point-graph-g").transition()
                 .duration(300);
-            // d3.select(self.$el).select(".media__contour__svg").select(".media-point-graph-g")
             self.graph_g
                 .selectAll("path")
                 .data(Object.keys(domainOneStep))
@@ -724,7 +723,7 @@ export default {
                         .attr("x", d=> doaminText[d][0])
                         .attr("y", d=> doaminText[d][1])
                         .attr("dy", "-0.31em")
-                        .attr('text-anchor',"start")
+                        .attr('text-anchor',"middle")
                         .attr("paint-order", "stroke")
                         .text(d=>d)
                         ,
@@ -733,7 +732,7 @@ export default {
                         .attr("x", d=> doaminText[d][0])
                         .attr("y", d=> doaminText[d][1])
                         .attr("dy", "-0.31em")
-                        .attr('text-anchor',"start")
+                        .attr('text-anchor',"middle")
                         .attr("paint-order", "stroke")
                         .text(d=>d)
                         ),
@@ -773,8 +772,8 @@ export default {
 
 .dot_mouseover {
     fill: steelblue;
-    stroke-width: 1.5px;
-    stroke: steelblue;
+    stroke-width: 1px;
+    stroke: white;
     /* opacity: 0.5; */
 }
 
