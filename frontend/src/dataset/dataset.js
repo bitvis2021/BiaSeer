@@ -11,7 +11,7 @@ export function Dataset () {
 
     this.storyTreeDataset = null;
 
-    this.mediaScatterSelected = ['msn.com'];
+    this.mediaScatterSelected = ['msn.com', 'menafn.com','yahoo.com'];
 
     this.mediaGraphList = [];
 }
