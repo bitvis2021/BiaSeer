@@ -1,5 +1,28 @@
 <template>
   <div id="app" v-if="!loadingData">
+    <el-menu
+      class="el-menu-demo"
+      mode="horizontal"
+      background-color="#676767"
+      text-color="#fff"
+      :default-active="activeIndex"
+      active-text-color="#ffd04b">
+      <el-menu-item class='labelIcon' id="title">
+        {{appName}}
+      </el-menu-item>
+      <!-- <el-tooltip class='labelIcon' v-for="operation in operationArray" :key="operation" :content="operation" effect="light">
+        <el-menu-item :index="operation">
+          <div type="text" v-if="operation==='submit selection'" @click="submitSelect" :loading="loadingSelect">
+            {{loadingSelectInfo}}<i class="el-icon-upload el-icon--right"></i>
+          </div>
+          <div type="text" v-if="operation==='counter'">
+            {{counter}}/100
+          </div>
+        </el-menu-item>
+      </el-tooltip> -->
+    </el-menu>
+
+
     <div class="media-topic">
       <div class="media-topic-vector-reduction-view">
         <MediaScatter></MediaScatter>
@@ -56,6 +79,7 @@ export default {
   name: 'App',
   data() {
     return {
+      appName: "BiaSeer",
       loadingData: true,
       topicCodeList: null,
       storytree__loading: false,
@@ -174,6 +198,9 @@ export default {
 //   border-radius: 5px;
 //   margin: .5px;
 // }
+
+@menu-height: 2.5rem;
+@title-container-height: 160px;
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -187,9 +214,30 @@ export default {
   overflow-x: hidden;
   overflow-y: hidden;
 
+  .el-menu.el-menu--horizontal {
+    .el-menu-item {
+      height: @menu-height;
+      line-height: @menu-height;
+    }
+    .el-menu-item {
+      border-bottom-color: rgb(84, 92, 100) !important;
+      font-weight: bolder;
+      font-size: 1rem;
+      color: #dadada !important;
+      padding: 0 10px;
+      .icon {
+        color: #dadada !important;
+      }
+    }
+  }
+  .labelIcon {
+    font-size: 1rem;
+  }
+
   .media-topic {
     position: absolute;
-    top: 0%;
+    // top: 0%;
+    top: @menu-height;
     bottom: 65%;
     left: 0%;
     right: 0%;
@@ -199,24 +247,24 @@ export default {
       bottom: 0%;
       left: 0%;
       right: 50%;
-      border-left: 1px solid steelblue;
-      border-top: 1px solid steelblue;
+      border-left: 1px solid gray;
+      border-top: 1px solid gray;
     }
 
     .media-topic-difference-concat-view {
       position: absolute;
-      top: 0%;
+      top: 0%;     
       bottom: 0%;
       left: 50%;
       right: 0%;
-      // border: 1px solid steelblue;
+      // border: 1px solid gray;
       .media-concat-list{
         position: absolute;
         top: 0%;
         bottom: 92%;
         left: 0%;
         right: 0%;
-        border: 1px solid steelblue;
+        border: 1px solid gray;
         display: flex;
         align-items: center;
       }
@@ -226,7 +274,7 @@ export default {
         bottom: 0%;
         left: 0%;
         right: 0%;
-        border-left: 1px solid steelblue;
+        border-left: 1px solid gray;
       }
     }
   }
@@ -245,14 +293,14 @@ export default {
       bottom: 30%;
       left: 0%;
       right: 0%;
-      // border: 1px solid steelblue;
+      // border: 1px solid gray;
       .event-evolution-storytree{
         position: absolute;
         top: 0%;
         bottom: 0%;
         left: 0%;
         right: 30%;
-        border: 1px solid steelblue;
+        border: 1px solid gray;
       }
       .event-iframeview{
         position: absolute;
@@ -260,9 +308,9 @@ export default {
         bottom: 0%;
         left: 70%;
         right: 0%;
-        border-top: 1px solid steelblue;
-        border-bottom: 1px solid steelblue;
-        border-right: 1px solid steelblue;
+        border-top: 1px solid gray;
+        border-bottom: 1px solid gray;
+        border-right: 1px solid gray;
         .iframe-class{
           width: 100%;
           height: 100%;

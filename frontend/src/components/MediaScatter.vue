@@ -656,9 +656,9 @@ export default {
 }
 
 .dot_mouseover {
-    fill: red;
+    fill: steelblue;
     stroke-width: 1.5px;
-    stroke: red;
+    stroke: steelblue;
     /* opacity: 0.5; */
 }
 
@@ -680,15 +680,15 @@ export default {
 }
 
 .link{
-    stroke: red;
-    stroke-opacity: 0.3;
+    stroke: steelblue;
+    /* stroke-opacity: 0.3; */
 }
 
 .text_label{
     /* font-weight: 400; */
     /* font-family: 'Arial'; */
     font-size: 10px;
-    fill: red;
+    fill: black;
 }
 
 .testcss{

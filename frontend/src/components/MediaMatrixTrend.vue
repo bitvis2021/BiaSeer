@@ -113,9 +113,12 @@ export default {
                 .domain([0, d3.max(vdata)])
                 .range([0, 1]);
             
-            let rectWH = 10;
-            let m = ({ l: 95, r: 25, t: 6, b: 35 });            
+            let rectWH = 9;
+            let m = ({ l: 97, r: 20, t: 6, b: 20 });
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
+            // let innerHeight = height - m.t - m.b;
+            // let innerWidth = width - m.l;
+  
             // let y = d3.scaleLinear()
             //     .domain(d3.extent(ydata, d => +d))
             //     .range([m.t, height - m.b]);
@@ -124,7 +127,7 @@ export default {
                 .range([m.t, height - m.b]);
             
             let xAxis = g => g.append('g')
-                .attr('transform', `translate(0, ${height - m.b + rectWH})`)
+                .attr('transform', `translate(0, ${height - m.b})`)
                 .call(d3.axisBottom(x))
 
             let yAxis = g => g.append('g')
