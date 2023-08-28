@@ -55,7 +55,8 @@ export default {
             zoomOperator: null,
             zoomMaxRatio: 16,
             zoomMinRatio: 1,
-            rightDiv: null
+            rightDiv: null,
+            currentViewedMediaList: null, // when zooming, can be viewed media
         }
     },
     mounted: function () {
@@ -78,7 +79,8 @@ export default {
         },
         mediaGraphLabel: function() {
             let self = this;
-            self.drawMediaGraph(sysDatasetObj.mediaGraphList);
+            self.drawMediaGraph([ ...sysDatasetObj.mediaGraphList, ...sysDatasetObj.mediaScatterSelected]);
+            // self.drawMediaGraph();
         }
     },
     methods: {
@@ -314,7 +316,12 @@ export default {
                 .extent([[0, 0], [innerWidth, innerHeight]])
                 .scaleExtent([self.zoomMinRatio, self.zoomMaxRatio])
                 .duration(1000)
-                .on("zoom", zoomed);
+                .on("zoom", zoomed)
+                .on("end", d=>{
+                    // zoom end, to redraw graph
+                    // self.UPDATE_MEDIA_GRAPH_LABEL();
+                    console.log("zoom end...");
+                });
             svg.call(self.zoomOperator);
             
             function zoomed() {
@@ -332,7 +339,7 @@ export default {
                 tdata = data["details"];
                 // 4. transform media circle.
                 d3.select(self.$el).selectAll(".dot").attr("transform", transform);
-                // 5. 
+                // 5. render circles.
                 renderCircles(tdata);
                 // 6. filter media which can be viewed.
                 let dots = d3.select(self.$el).selectAll(".dot").filter(function() {
@@ -343,13 +350,18 @@ export default {
                 });
                 console.log("dots: ", dots);
 
-                tdata = []
+                tdata = [];
+                self.currentViewedMediaList = [];
                 dots.filter(d=>{
-                    console.log(d);
+                    // console.log(d);
                     tdata.push(d);
+                    // after zooming, update the viewed media list.
+                    self.currentViewedMediaList.push(d.domain);
                 });
                 renderCircles(tdata);
                 renderContours(tdata, 10);
+
+                self.UPDATE_MEDIA_GRAPH_LABEL();
             }
             
             // function zooming(){
@@ -591,9 +603,15 @@ export default {
                 for(let i = 0; i < 5; i++){
                     let link_domain = keys[i].split("_");
                     let path = [];
-                    path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
-                    path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
-                    domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                    if(self.currentViewedMediaList.includes(link_domain[0])
+                     && self.currentViewedMediaList.includes(link_domain[1]) ){
+                        path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
+                        path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
+                        domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                    }
+                    // path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
+                    // path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
+                    // domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
                 }
             })
             console.log(domainOneStep);
@@ -606,10 +624,10 @@ export default {
                 let link_domain = ele.split("_");
                 d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
                     .select('#media_id_' + link_domain[0].replaceAll(".","_"))
-                    .classed("dot_mouseover", true)            
+                    .classed("dot_mouseover", true)
                 d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
                     .select('#media_id_' + link_domain[1].replaceAll(".","_"))
-                    .classed("dot_mouseover", true)            
+                    .classed("dot_mouseover", true)
             })
 
             self.lineGenerator = d3.line()
@@ -689,6 +707,7 @@ export default {
     .flow-node-menu{
         position: absolute;
         width: 50px;
+        z-index:999;
         // height: 60px;      
         .el-button--mini {
             width: 100%;
