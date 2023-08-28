@@ -27,10 +27,16 @@ export default new Vuex.Store({
     isConcated: false,
 
     clickSankeyTreeNode: 0,
+
+    contour_search_domain: '',
   },
   mutations: {
+    ['UPDATE_CONTOUR_SEARCH_DOMAIN'] (state, contour_search_domain) {
+      // console.log("contour_search_domain",contour_search_domain)
+      state.contour_search_domain = contour_search_domain
+    },
     ['UPDATE_CLICK_SANKEY_TREE_NODE_MODE'] (state) {
-      console.log("点击了一个节点")
+      // console.log("点击了一个节点")
       state.clickSankeyTreeNode = (state.clickSankeyTreeNode + 1 ) % 5;
     },
     ['UPDATE_DISPLAY_MODE'] (state, displayMode) {

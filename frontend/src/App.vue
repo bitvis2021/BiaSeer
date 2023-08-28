@@ -27,6 +27,23 @@
       <div class="media-topic-vector-reduction-view">
         <MediaScatter></MediaScatter>
       </div>
+      <div class="search-input">
+          <el-select
+            v-model="select_domain"
+            filterable
+            remote
+            clearable
+            placeholder="Searching domain"
+            :remote-method="remoteMethod"
+            :loading="option_loading">
+            <el-option
+              v-for="item in option_domains"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
       <div class="media-topic-difference-concat-view">
         <div class="media-concat-list">
           <MediaTags></MediaTags>
@@ -64,6 +81,8 @@ import { mapState, mapMutations } from 'vuex';
 import { getMediaData, getMediaMatrixData } from '@/communication/communicator.js'
 import { getMediaStoryTreeData, getMediaDiffConcatData } from '@/communication/communicator.js'
 import { Dataset } from '@/dataset/dataset.js'
+import { getDomains } from './assets/js/country_code'
+
 // Components
 import MediaScatter from './components/MediaScatter.vue';
 import MediaTrend from './components/MediaTrend.vue';
@@ -85,7 +104,16 @@ export default {
       storytree__loading: false,
       drawer: true,
       currentSelectedMedia: null,
-      iframeSrc: 'https://www.runoob.com'
+      iframeSrc: 'https://www.runoob.com',
+
+      option_domains: [],
+      select_domain: "",
+      domain_list: [],
+      option_loading: false,
+      states: [],
+
+      system_topic_event: "RUS_UKR"
+
     }
   },
   components: {
@@ -120,13 +148,32 @@ export default {
     });
   },
   mounted() {
+    let self = this
     this.currentSelectedMedia = this.gainCurrentSelectedMedia();
+    this.states = getDomains(self.system_topic_event)
+    this.domain_list = this.states.map(item => {
+      return { value: `${item}`, label: `${item}` };
+    });
   },
   methods: {
     ...mapMutations([
       'UPDATE_STORYTREE_FINISH',
       'UPDATE_CONCATDIFF_FINISH',
+      'UPDATE_CONTOUR_SEARCH_DOMAIN',
     ]),
+    remoteMethod(query) {
+      if (query !== '') {
+        this.option_loading = true;
+        setTimeout(() => {
+          this.option_loading = false;
+          this.option_domains = this.domain_list.filter(item => {
+            return item.label.toLowerCase().indexOf(query.toLowerCase()) > -1;
+          });
+        }, 200);
+      } else {
+        this.option_domains = [];
+      }
+    },
     gainCurrentSelectedMedia(){
       let result = []
       sysDatasetObj.mediaScatterSelected.forEach(element => {
@@ -167,6 +214,9 @@ export default {
     ])
   },
   watch: {
+    select_domain: function(){
+      this.UPDATE_CONTOUR_SEARCH_DOMAIN(this.select_domain);
+    },
     mediaMatrixSelectedSignal: function () {
       let self = this;
       console.log(self.mediaMatrixSelectedSignal);
@@ -332,4 +382,23 @@ export default {
       }
     }
   }
-}</style>
+}
+
+.search-input {
+  width: 130px;
+  margin-left: 41.4%;
+  margin-top: 0.1%;
+  .el-input__inner{
+    height: 30px;
+  }
+  .el-input__suffix {
+    top: 7px;
+  }
+  .el-input__icon {
+    line-height: inherit;
+  }
+  .el-input__suffix-inner {
+    display: inline-block;
+  }
+}
+</style>

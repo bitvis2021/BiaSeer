@@ -57,6 +57,7 @@ export default {
             zoomMinRatio: 1,
             rightDiv: null,
             currentViewedMediaList: null, // when zooming, can be viewed media
+            filtering_data: null,
         }
     },
     mounted: function () {
@@ -67,7 +68,8 @@ export default {
     computed: {
         ...mapState([
             'currMedium',
-            'mediaGraphLabel'
+            'mediaGraphLabel',
+            'contour_search_domain'
         ]),
     },
     watch: {
@@ -81,6 +83,16 @@ export default {
             let self = this;
             self.drawMediaGraph([ ...sysDatasetObj.mediaGraphList, ...sysDatasetObj.mediaScatterSelected]);
             // self.drawMediaGraph();
+        },
+        contour_search_domain: function(){
+            let self = this
+            let search_domain = this.contour_search_domain;
+            if(search_domain != ""){
+                let node = this.filtering_data.filter(ele=>ele.domain == search_domain)[0];
+                let nodePos = [self.xScale(node.x1),self.yScale(node.x2)];
+                let zoomingRatio = self.zoomMaxRatio / 10;
+                self.zoomOperation(node, nodePos, zoomingRatio);
+            }
         }
     },
     methods: {
@@ -89,6 +101,48 @@ export default {
             'UPDATE_MEDIA_SCATTER_CLICK',
             'UPDATE_MEDIA_GRAPH_LABEL'
         ]),
+        moveToCenterScale: function (point, zoomingRatio) {
+            let self = this
+            let treeVisMapCanvasHeight = self.$refs.mediascatter.clientWidth;
+            let treeVisMapCanvasWidth = self.$refs.mediascatter.clientHeight;
+            return d3.zoomIdentity
+                .translate(treeVisMapCanvasHeight / 2, treeVisMapCanvasWidth / 2)
+                .scale(zoomingRatio)
+                .translate(-point[0], -point[1]);
+        },
+        zoomOperation: function(node, nodePos, zoomingRatio, callbackFunc=null) {
+            let self = this
+            let zoomOperator = self.zoomOperator;
+            let transformEvent = self.moveToCenterScale(nodePos, zoomingRatio);
+            self.transformEvent = transformEvent;
+            d3.select(self.$el)
+                .select('.media__contour__svg')
+                .transition()
+                .duration(3000)
+                .call(zoomOperator.transform, transformEvent)
+                .on("end", function() {
+                    // self.updateZoomingRatio(transformEvent)
+                    if (callbackFunc != null) {
+                        callbackFunc(transformEvent)
+                    }
+                    self.unhighlightSearchDots();
+                    self.highlightSearchDot(node.domain);
+                });
+        },
+        unhighlightSearchDots(){
+            // unhighlight all media
+            d3.select(this.$el)
+                .select(".media__contour__svg")
+                .select(".media-point-circle-g")
+                .selectAll("circle").classed("dot-search-hover", false);
+        },
+        highlightSearchDot(domain){
+            // highlight searched media
+            d3.select(this.$el)
+                .select(".media__contour__svg")
+                .select(".media-point-circle-g")
+                .select("#media_id_"+ domain.replaceAll(".","_")).classed("dot-search-hover", true);
+        },
         keepFunc(){
             let self = this;
             self.UPDATE_MEDIA_GRAPH_LABEL();
@@ -129,29 +183,17 @@ export default {
 
             let contour_g = svg.append("g")
                 .attr("class", "media-point-contour-g")
-                // .attr("width", innerWidth)
-                // .attr("height", innerHeight)
-                // .attr("transform", `translate(${margin.left}, ${margin.top})`)
             
             let graph_g = svg.append("g")
                 .attr("class", "media-point-graph-g")
-                // .attr("width", innerWidth)
-                // .attr("height", innerHeight)
-                // .attr("transform", `translate(${margin.left}, ${margin.top})`)
             self.graph_g = graph_g;
-            
-            let label_g = svg.append("g")
-                .attr("class", "media-point-label-g")
-                // .attr("width", innerWidth)
-                // .attr("height", innerHeight)
-                // .attr("transform", `translate(${margin.left}, ${margin.top})`)
-            self.label_g = label_g;
             
             let circle_g = svg.append("g")
                 .attr("class", "media-point-circle-g")
-                // .attr("width", innerWidth)
-                // .attr("height", innerHeight)
-                // .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            
+            let label_g = svg.append("g")
+                .attr("class", "media-point-label-g")
+            self.label_g = label_g;
             
             let rightDiv = d3.select('.media-scatter-container')
                 .select('.flow-node-menu');
@@ -304,6 +346,8 @@ export default {
 
             console.log('data:', data);
             let tdata = data['details'];
+            self.filtering_data = tdata;
+
             xyScale(tdata);
             renderCircles(tdata);
             renderContours(tdata, 10);
@@ -319,8 +363,8 @@ export default {
                 .on("zoom", zoomed)
                 .on("end", d=>{
                     // zoom end, to redraw graph
-                    // self.UPDATE_MEDIA_GRAPH_LABEL();
                     console.log("zoom end...");
+                    self.unhighlightSearchDots();
                 });
             svg.call(self.zoomOperator);
             
@@ -681,14 +725,16 @@ export default {
                         .attr("y", d=> doaminText[d][1])
                         .attr("dy", "-0.31em")
                         .attr('text-anchor',"start")
+                        .attr("paint-order", "stroke")
                         .text(d=>d)
                         ,
                     update => update
                         .call(update => update.transition(t)
                         .attr("x", d=> doaminText[d][0])
                         .attr("y", d=> doaminText[d][1])
-                        .attr("dy", "-0.71em")
+                        .attr("dy", "-0.31em")
                         .attr('text-anchor',"start")
+                        .attr("paint-order", "stroke")
                         .text(d=>d)
                         ),
                     exit => exit
@@ -759,6 +805,12 @@ export default {
     /* font-family: 'Arial'; */
     font-size: 10px;
     fill: black;
+    stroke: white;
+    stroke-width: 1px;
+}
+
+.dot-search-hover{
+    fill: #e34a33;
 }
 
 .testcss{
