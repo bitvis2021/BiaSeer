@@ -1,5 +1,8 @@
 <template>
     <div class="sankeytree-node-iframe">
+        <div class="wordcloud">
+            <div ref='wordCloudBox'></div>
+        </div>
         <el-collapse v-model="node_details" @change="handleChange">
             <el-collapse-item v-for="(item,index) in node_details" :title="item.name" :name="index">
                 <template #title>
@@ -8,12 +11,8 @@
                 <p> {{ item.node_detail_info[0].lines }}</p>
             </el-collapse-item>
         </el-collapse>
-        <div class="wordcloud">
-            <div ref='wordCloudBox'></div>
-        </div>
     </div>
 </template>
-  
 <script>
 // Structors
 import { mapState, mapMutations } from 'vuex';
