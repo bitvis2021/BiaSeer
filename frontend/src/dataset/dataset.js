@@ -11,6 +11,8 @@ export function Dataset () {
 
     this.storyTreeDataset = null;
 
+    this.SankeyTreePathNode = null;
+
     this.mediaScatterSelected = ['msn.com', 'menafn.com','yahoo.com'];
 
     this.mediaGraphList = [];
@@ -41,6 +43,10 @@ Dataset.prototype = {
 
     updateStoryTreeDataset: function(data) {
         this.storyTreeDataset = data;
+    },
+
+    updateSankeyTreePathNode: function(data) {
+        this.SankeyTreePathNode = data;
     },
 
     updateMediaScatterSelected: function(data) {
