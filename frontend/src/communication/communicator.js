@@ -31,6 +31,7 @@ export function getMediaMatrixData(callback) {
     })
 }
 
+
 export function getMediaStoryTreeData(tree_param, meidaList, callback) {
     console.log("tree_param: ", tree_param);
     let topics = Array.from(tree_param['topics']);

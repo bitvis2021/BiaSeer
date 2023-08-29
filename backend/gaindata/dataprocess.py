@@ -116,6 +116,7 @@ def mediaMatrixDataSet():
         result.append(tmp)
     return result
 
+
 def gainTimeBins():
     result = []
     time_range = timeRange()
@@ -145,9 +146,11 @@ def gainTimeBins():
 def gainMediaTopicTimeBinsData(mele, mtopic, timeBins, timeBinsIndex):
     result = []
     tmp = pd.read_csv(MEDIA_CONCAT + mele + '.' + 'doctone.csv')
+    tmp1 = pd.read_csv(MEDIA_CONCAT + mele + '.' + 'docnums.csv')
     for index, time in enumerate(timeBins):
         value = sum(tmp.loc[timeBinsIndex[index][0]:timeBinsIndex[index][-1], str(int(mtopic) - 1)]) / len(time)
-        result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value , 'topic': mtopic})
+        value2 = sum(tmp1.loc[timeBinsIndex[index][0]:timeBinsIndex[index][-1], str(int(mtopic) - 1)]) / len(time)
+        result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value ,'value2' : value2, 'topic': mtopic})
     return result
 
 

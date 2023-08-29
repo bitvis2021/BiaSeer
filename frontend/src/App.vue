@@ -78,7 +78,7 @@
 <script>
 // Structors
 import { mapState, mapMutations } from 'vuex';
-import { getMediaData, getMediaMatrixData } from '@/communication/communicator.js'
+import { getMediaData, getMediaMatrixData} from '@/communication/communicator.js'
 import { getMediaStoryTreeData, getMediaDiffConcatData } from '@/communication/communicator.js'
 import { Dataset } from '@/dataset/dataset.js'
 import { getDomains } from './assets/js/country_code'
