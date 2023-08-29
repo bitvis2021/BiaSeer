@@ -54,24 +54,34 @@ export default {
             // https://observablehq.com/d/8d37e6aa05ce1b9a
             let self = this;
             let data1 = null;
+            let data2 = null;
             if(flag === 'single'){
                 data1 = sysDatasetObj.mediaMatrixDataSet.filter(ele => ele['domain'] == domain)[0];
+                console.log('sysDatasetObj.mediaMatrixDataSetNum', sysDatasetObj.mediaMatrixDataSetNum);
             }
             else if(flag === 'concat'){
                 data1 = sysDatasetObj.mediaConcatDiffDataSet[0];
             }
-            // console.log(data1);
+            console.log('data1', data1);
 
             let xdata = data1['values'][0]['details'].map(ele=>ele['date0']);
             let ydata = data1.values.map(ele => ele.topic);
             let matrix = []; // for reordering
             let vdata = [];
+            let vdata2 = [];
             data1.values.forEach(element => {
                 matrix.push(element.details.map(ele=>ele.value));
                 element.details.forEach(ele=>{
                     vdata.push(ele.value);
                 })
             });
+            console.log(data1.values);
+            data1.values.forEach(element=> {
+                element.details.forEach(ele=>{
+                    vdata2.push(ele.value2);
+                })
+            });
+            console.log('vdata2', vdata2);
 
             let row_labels = [];
             let col_labels = [];
@@ -98,7 +108,7 @@ export default {
             // console.log(row_inv);
             // console.log(col_inv);
             // console.log(matrix);
-            // console.log(vdata);
+            console.log('vdata', vdata);
 
             let computeColorNeg = d3.interpolate('red', '#f9f9f9');
             let linearVDataNeg = d3.scaleLinear()  
@@ -106,13 +116,29 @@ export default {
                 .range([0, 1]);
             
             let computeColorPos = d3.interpolate('#f9f9f9', 'green');
+            if(flag === 'concat'){
+                computeColorPos = d3.interpolate('#f9f9f9', 'gray');
+            }
             let linearVDataPos = d3.scaleLinear()
                 .domain([0, d3.max(vdata)])
                 .range([0, 1]);
             
-            let rectWH = 10;
-            let m = ({ l: 95, r: 25, t: 6, b: 35 });            
+            // let rectWH = 9;
+            
+            let rectWH = d3.scaleLinear()
+                .domain([0, d3.max(vdata2)])
+                .range([3, 9]);
+            
+            // let rectWH = d3.scaleLinear()
+            //     .domain([0, d3.max(vdata2)])
+            //     .range([3, 9])
+
+
+            let m = ({ l: 97, r: 20, t: 6, b: 20 });
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
+            // let innerHeight = height - m.t - m.b;
+            // let innerWidth = width - m.l;
+  
             // let y = d3.scaleLinear()
             //     .domain(d3.extent(ydata, d => +d))
             //     .range([m.t, height - m.b]);
@@ -121,7 +147,7 @@ export default {
                 .range([m.t, height - m.b]);
             
             let xAxis = g => g.append('g')
-                .attr('transform', `translate(0, ${height - m.b + rectWH})`)
+                .attr('transform', `translate(0, ${height - m.b})`)
                 .call(d3.axisBottom(x))
 
             let yAxis = g => g.append('g')
@@ -154,7 +180,25 @@ export default {
                     return getTopic((i + 1).toString())
                 });
                 
-            let charts = rectsG.selectAll('g')
+            // let charts = rectsG.selectAll('g')
+            //     .data(data1.values)
+            //     .join('g')
+            //     .attr('class', 'ggg')
+            //     .attr('transform', d=>`translate(${0}, ${y(d.topic)})`)
+            //     .selectAll('rect')
+            //     .data(d=>d.details)
+            //     .join('rect')
+            //     .attr('class', 'media_matrix_rect')
+            //     .attr("x", d=> x(new Date(d.date0)))
+            //     .attr("width", rectWH)
+            //     .attr("height", rectWH)
+            //     .attr('fill', d=> {
+            //         if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
+            //         else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
+            //         else return 'white';
+            //     })
+
+                let charts = rectsG.selectAll('g')
                 .data(data1.values)
                 .join('g')
                 .attr('class', 'ggg')
@@ -164,8 +208,20 @@ export default {
                 .join('rect')
                 .attr('class', 'media_matrix_rect')
                 .attr("x", d=> x(new Date(d.date0)))
-                .attr("width", rectWH)
-                .attr("height", rectWH)
+                .attr("height", d=> {
+                    if (flag === 'concat') return 9;
+                    else if (flag === 'single') {
+                        if (d.value2 > 0)  return rectWH(d.value2);
+                        else return 3;
+                    }
+                })
+                .attr("width", d=> {
+                    if (flag === 'concat') return 9;
+                    else if (flag === 'single') {
+                        if (d.value2 > 0)  return rectWH(d.value2);
+                        else return 3;
+                    }
+                })
                 .attr('fill', d=> {
                     if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                     else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));

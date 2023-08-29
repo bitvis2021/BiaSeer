@@ -52,6 +52,12 @@ export default {
             nodeMenuFlag: false,
             graph_g: null,
             label_g: null,
+            zoomOperator: null,
+            zoomMaxRatio: 16,
+            zoomMinRatio: 1,
+            rightDiv: null,
+            currentViewedMediaList: null, // when zooming, can be viewed media
+            filtering_data: null,
         }
     },
     mounted: function () {
@@ -62,7 +68,8 @@ export default {
     computed: {
         ...mapState([
             'currMedium',
-            'mediaGraphLabel'
+            'mediaGraphLabel',
+            'contour_search_domain'
         ]),
     },
     watch: {
@@ -74,7 +81,18 @@ export default {
         },
         mediaGraphLabel: function() {
             let self = this;
-            self.drawMediaGraph(sysDatasetObj.mediaGraphList);
+            self.drawMediaGraph([ ...sysDatasetObj.mediaGraphList, ...sysDatasetObj.mediaScatterSelected]);
+            // self.drawMediaGraph();
+        },
+        contour_search_domain: function(){
+            let self = this
+            let search_domain = this.contour_search_domain;
+            if(search_domain != ""){
+                let node = this.filtering_data.filter(ele=>ele.domain == search_domain)[0];
+                let nodePos = [self.xScale(node.x1),self.yScale(node.x2)];
+                let zoomingRatio = self.zoomMaxRatio / 10;
+                self.zoomOperation(node, nodePos, zoomingRatio);
+            }
         }
     },
     methods: {
@@ -83,6 +101,48 @@ export default {
             'UPDATE_MEDIA_SCATTER_CLICK',
             'UPDATE_MEDIA_GRAPH_LABEL'
         ]),
+        moveToCenterScale: function (point, zoomingRatio) {
+            let self = this
+            let treeVisMapCanvasHeight = self.$refs.mediascatter.clientWidth;
+            let treeVisMapCanvasWidth = self.$refs.mediascatter.clientHeight;
+            return d3.zoomIdentity
+                .translate(treeVisMapCanvasHeight / 2, treeVisMapCanvasWidth / 2)
+                .scale(zoomingRatio)
+                .translate(-point[0], -point[1]);
+        },
+        zoomOperation: function(node, nodePos, zoomingRatio, callbackFunc=null) {
+            let self = this
+            let zoomOperator = self.zoomOperator;
+            let transformEvent = self.moveToCenterScale(nodePos, zoomingRatio);
+            self.transformEvent = transformEvent;
+            d3.select(self.$el)
+                .select('.media__contour__svg')
+                .transition()
+                .duration(3000)
+                .call(zoomOperator.transform, transformEvent)
+                .on("end", function() {
+                    // self.updateZoomingRatio(transformEvent)
+                    if (callbackFunc != null) {
+                        callbackFunc(transformEvent)
+                    }
+                    self.unhighlightSearchDots();
+                    self.highlightSearchDot(node.domain);
+                });
+        },
+        unhighlightSearchDots(){
+            // unhighlight all media
+            d3.select(this.$el)
+                .select(".media__contour__svg")
+                .select(".media-point-circle-g")
+                .selectAll("circle").classed("dot-search-hover", false);
+        },
+        highlightSearchDot(domain){
+            // highlight searched media
+            d3.select(this.$el)
+                .select(".media__contour__svg")
+                .select(".media-point-circle-g")
+                .select("#media_id_"+ domain.replaceAll(".","_")).classed("dot-search-hover", true);
+        },
         keepFunc(){
             let self = this;
             self.UPDATE_MEDIA_GRAPH_LABEL();
@@ -108,7 +168,7 @@ export default {
             const yValue = d => d.x2;
             const rValue = d => d.nums;
 
-            const margin = { top: 40, right: 90, bottom: 40, left: 40 };
+            const margin = { top: 4, right: 9, bottom: 4, left: 4 };
             const innerWidth = width - margin.left - margin.right;
             const innerHeight = height - margin.top - margin.bottom;
 
@@ -116,28 +176,28 @@ export default {
                 .select(self.$el)
                 .append("svg")
                 .attr("class", "media__contour__svg")
-                .attr('viewBox', [0, 0, width, height])
+                .attr("width", innerWidth)
+                .attr("height", innerHeight)
+                .attr("transform", `translate(${margin.left}, ${margin.top})`)
+                // .attr('viewBox', [0, 0, 0.5 * width, 0.5 * height])
 
             let contour_g = svg.append("g")
-                .attr("class", "media-point-contour-g");
+                .attr("class", "media-point-contour-g")
             
-            self.graph_g = svg.append("g")
+            let graph_g = svg.append("g")
                 .attr("class", "media-point-graph-g")
-                .attr("width", innerWidth)
-                .attr("height", innerHeight)
-                .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            self.graph_g = graph_g;
             
-            self.label_g = svg.append("g")
-                .attr("class", "media-point-label-g")
-                .attr("width", innerWidth)
-                .attr("height", innerHeight)
-                .attr("transform", `translate(${margin.left}, ${margin.top})`)
-
             let circle_g = svg.append("g")
                 .attr("class", "media-point-circle-g")
-                .attr("width", innerWidth)
-                .attr("height", innerHeight)
-                .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            
+            let label_g = svg.append("g")
+                .attr("class", "media-point-label-g")
+            self.label_g = label_g;
+            
+            let rightDiv = d3.select('.media-scatter-container')
+                .select('.flow-node-menu');
+            self.rightDiv = rightDiv;
 
             let xScale = d3.scaleLinear().range([0, innerWidth]);
             let yScale = d3.scaleLinear().range([innerHeight, 0]);
@@ -153,14 +213,22 @@ export default {
 
 
             function xyScale(data) {
-                let sdata = data['details'];
-                xScale.domain(d3.extent(sdata, xValue));
-                yScale.domain(d3.extent(sdata, yValue));
-                let rMaxMin = d3.extent(sdata, rValue);
+                // let sdata = data['details'];
+                xScale.domain(d3.extent(data, xValue));
+                yScale.domain(d3.extent(data, yValue));
+                let rMaxMin = d3.extent(data, rValue);
                 console.log(rMaxMin);
-                rScale = (nums) => {
-                    if (data.topic == "RUS_UKR") {
-                        return d3.scaleLinear().domain(rMaxMin).range([3, 13])(nums);
+                let system_topic_event = "RUS_UKR"
+                rScale = (event_num) => {
+                    // if(self.system_topic_event == "RUS_UKR"){
+                    if(system_topic_event == "RUS_UKR"){
+                        if(event_num < 70) return d3.scaleLinear().domain([rMaxMin[0], 70]).range([1.5, 3])(event_num);
+                        else if(event_num < 90) return d3.scaleLinear().domain([71, 90]).range([3.1, 6])(event_num);
+                        else if(event_num < 150) return d3.scaleLinear().domain([91, 150]).range([6.1, 7])(event_num);
+                        else if(event_num < 200) return d3.scaleLinear().domain([151, 200]).range([7.1, 9])(event_num);
+                        else if(event_num < 300) return d3.scaleLinear().domain([201, 300]).range([9.1, 10])(event_num);
+                        else if(event_num < 500) return d3.scaleLinear().domain([301, 500]).range([10.1, 11])(event_num);
+                        else return d3.scaleLinear().domain([501, rMaxMin[1]]).range([11.1, 13])(event_num);
                     }
                 }
                 self.xScale = xScale;
@@ -170,13 +238,13 @@ export default {
             }
 
             function renderContours(data, bandwidth) {
-                let sdata = data['details'];
+                // let sdata = data['details'];
                 const contourData = d3.contourDensity()
                     .x(d => xScale(xValue(d)))
                     .y(d => yScale(yValue(d)))
                     .size([innerWidth, innerHeight])
                     .bandwidth(bandwidth)
-                    (sdata);
+                    (data);
 
                 colorScale.domain(d3.extent(contourData, d => d.value));
 
@@ -203,7 +271,7 @@ export default {
 
                 const circles = circle_g
                     .selectAll(".dot")
-                    .data(data['details']);
+                    .data(data);
 
                 circles
                     .join(
@@ -254,7 +322,7 @@ export default {
                         // sysDatasetObj.updateMediaScatterSelected(d.domain);
                     })
                     .on("contextmenu", d => {
-                        console.log(d);
+                        // console.log(d);
                         d3.event.preventDefault();
                         self.nodeMenuFlag = true;
 
@@ -262,7 +330,6 @@ export default {
                         // add a div
                         self.rightClickDiv();
                     })
-
             }
 
             function transform(d) {
@@ -278,10 +345,88 @@ export default {
             });
 
             console.log('data:', data);
+            let tdata = data['details'];
+            self.filtering_data = tdata;
 
-            xyScale(data);
-            let tdata = data;
+            xyScale(tdata);
             renderCircles(tdata);
+            renderContours(tdata, 10);
+
+            // d3.select(this.$el).select(".media-point-contour-g").on('mousemove', () => {
+            //     renderContours(tdata, (d3.event.x / 20) );
+            // });
+
+            self.zoomOperator = d3.zoom()
+                .extent([[0, 0], [innerWidth, innerHeight]])
+                .scaleExtent([self.zoomMinRatio, self.zoomMaxRatio])
+                .duration(1000)
+                .on("zoom", zoomed)
+                .on("end", d=>{
+                    // zoom end, to redraw graph
+                    console.log("zoom end...");
+                    self.unhighlightSearchDots();
+                });
+            svg.call(self.zoomOperator);
+            
+            function zoomed() {
+                // 1. clear media circle tooltip.
+                circle_g
+                    .select(".circlr_g__contour_tooltip")
+                    .remove();
+                // 2. rescale x y.
+                xScale = d3.event.transform.rescaleX(xScaleCopy);
+                yScale = d3.event.transform.rescaleY(yScaleCopy);
+
+                // 3. get zoom scale.
+                let zoomScale_k = d3.event.transform.k;
+                // tdata = data.filter(d=> +d["zoom_"+Math.floor(zoomScale_k-1)] == 1);
+                tdata = data["details"];
+                // 4. transform media circle.
+                d3.select(self.$el).selectAll(".dot").attr("transform", transform);
+                // 5. render circles.
+                renderCircles(tdata);
+                // 6. filter media which can be viewed.
+                let dots = d3.select(self.$el).selectAll(".dot").filter(function() {
+                    return d3.select(this).attr("cx") > margin.left &&
+                    d3.select(this).attr("cx") < innerWidth &&
+                    d3.select(this).attr("cy") > margin.top &&
+                    d3.select(this).attr("cy") < innerHeight;
+                });
+                console.log("dots: ", dots);
+
+                tdata = [];
+                self.currentViewedMediaList = [];
+                dots.filter(d=>{
+                    // console.log(d);
+                    tdata.push(d);
+                    // after zooming, update the viewed media list.
+                    self.currentViewedMediaList.push(d.domain);
+                });
+                renderCircles(tdata);
+                renderContours(tdata, 10);
+
+                self.UPDATE_MEDIA_GRAPH_LABEL();
+            }
+            
+            // function zooming(){
+            //     let circle_g = d3.select(self.$el).select('.media-point-circle-g');
+            //     let contour_g = d3.select(self.$el).select('.media-point-contour-g');
+            //     svg.call(d3.zoom()
+            //         .extent([[0, 0], [innerWidth, innerHeight]])
+            //         .scaleExtent([1, 18])
+            //         .on("zoom", zoomed));
+            //     function zoomed() {
+            //         self.xScale = d3.event.transform.rescaleX(xScaleCopy);
+            //         self.yScale = d3.event.transform.rescaleY(yScaleCopy);
+            //         // console.log("d3.zoomTransform(this): ", d3.zoomTransform(this));
+            //         circle_g.attr("transform", d3.zoomTransform(this));
+            //         contour_g.attr("transform", d3.zoomTransform(this));
+            //         graph_g.attr("transform", d3.zoomTransform(this));
+            //         label_g.attr("transform", d3.zoomTransform(this));
+            //         // self.rightDiv.attr("transform", d3.zoomTransform(this));
+            //     }
+            // }
+            // zooming();
         },
         drawMediaHorizonChart(domain) {
             console.log(domain);
@@ -331,7 +476,7 @@ export default {
             self.innerHeight = height - self.margin.top - self.margin.bottom;
 
             self.step = (height - (self.margin.top + self.margin.bottom)) / self.draw_data.length - 1;
-            let colorArr = ["#fddbc7", "#f4a582", "#4393c3", "#92c5de", "#d6604d", "#b2182b", "#67001f"];
+            let colorArr = ["#c73b3b", "#f06565", "#4393c3", "#92c5de", "#d6604d", "#fddbc7", "#f4a582"];
             self.color = i => colorArr[i + (i >= 0) + self.overlap];
             self.mirror = false;
             self.xValue = d => new Date(d.date);
@@ -449,9 +594,10 @@ export default {
 
             let delta = 20;
 
-            let rightDiv = d3.select('.media-scatter-container')
-                .select('.flow-node-menu');
-            rightDiv.style('top', d => {
+            // let rightDiv = d3.select('.media-scatter-container')
+            //     .select('.flow-node-menu');
+            self.rightDiv.attr("transform", d3.zoomTransform(this));
+            self.rightDiv.style('top', d => {
                     return delta + self.mouse_this[1] + "px";
                 })
                 .style('left', function () {
@@ -501,9 +647,15 @@ export default {
                 for(let i = 0; i < 5; i++){
                     let link_domain = keys[i].split("_");
                     let path = [];
-                    path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
-                    path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
-                    domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                    if(self.currentViewedMediaList.includes(link_domain[0])
+                     && self.currentViewedMediaList.includes(link_domain[1]) ){
+                        path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
+                        path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
+                        domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                    }
+                    // path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
+                    // path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
+                    // domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
                 }
             })
             console.log(domainOneStep);
@@ -516,10 +668,10 @@ export default {
                 let link_domain = ele.split("_");
                 d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
                     .select('#media_id_' + link_domain[0].replaceAll(".","_"))
-                    .classed("dot_mouseover", true)            
+                    .classed("dot_mouseover", true)
                 d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
                     .select('#media_id_' + link_domain[1].replaceAll(".","_"))
-                    .classed("dot_mouseover", true)            
+                    .classed("dot_mouseover", true)
             })
 
             self.lineGenerator = d3.line()
@@ -528,7 +680,6 @@ export default {
 
             const t = d3.select(self.$el).select(".media__contour__svg").select(".media-point-graph-g").transition()
                 .duration(300);
-            // d3.select(self.$el).select(".media__contour__svg").select(".media-point-graph-g")
             self.graph_g
                 .selectAll("path")
                 .data(Object.keys(domainOneStep))
@@ -572,15 +723,17 @@ export default {
                         .attr("x", d=> doaminText[d][0])
                         .attr("y", d=> doaminText[d][1])
                         .attr("dy", "-0.31em")
-                        .attr('text-anchor',"start")
+                        .attr('text-anchor',"middle")
+                        .attr("paint-order", "stroke")
                         .text(d=>d)
                         ,
                     update => update
                         .call(update => update.transition(t)
                         .attr("x", d=> doaminText[d][0])
                         .attr("y", d=> doaminText[d][1])
-                        .attr("dy", "-0.71em")
-                        .attr('text-anchor',"start")
+                        .attr("dy", "-0.31em")
+                        .attr('text-anchor',"middle")
+                        .attr("paint-order", "stroke")
                         .text(d=>d)
                         ),
                     exit => exit
@@ -599,6 +752,7 @@ export default {
     .flow-node-menu{
         position: absolute;
         width: 50px;
+        z-index:999;
         // height: 60px;      
         .el-button--mini {
             width: 100%;
@@ -617,10 +771,10 @@ export default {
 }
 
 .dot_mouseover {
-    fill: red;
-    stroke-width: 1.5px;
-    stroke: red;
-    opacity: 0.5;
+    fill: steelblue;
+    stroke-width: 1px;
+    stroke: white;
+    /* opacity: 0.5; */
 }
 
 .media_horizon_chart_tooltip_div {
@@ -641,14 +795,30 @@ export default {
 }
 
 .link{
-    stroke: red;
-    stroke-opacity: 0.3;
+    stroke: steelblue;
+    /* stroke-opacity: 0.3; */
 }
 
 .text_label{
     /* font-weight: 400; */
     /* font-family: 'Arial'; */
     font-size: 10px;
-    fill: red;
+    fill: black;
+    stroke: white;
+    stroke-width: 1px;
+}
+
+.dot-search-hover{
+    fill: #e34a33;
+}
+
+.testcss{
+    fill : #fddbc7;
+    fill : #f4a582;
+    fill : #4393c3;
+    fill : #92c5de;
+    fill : #d6604d;
+    fill : #c73b3b;
+    fill : #f06565;
 }
 </style>

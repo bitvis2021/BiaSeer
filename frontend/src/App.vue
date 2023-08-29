@@ -1,9 +1,49 @@
 <template>
   <div id="app" v-if="!loadingData">
+    <el-menu
+      class="el-menu-demo"
+      mode="horizontal"
+      background-color="#676767"
+      text-color="#fff"
+      :default-active="activeIndex"
+      active-text-color="#ffd04b">
+      <el-menu-item class='labelIcon' id="title">
+        {{appName}}
+      </el-menu-item>
+      <!-- <el-tooltip class='labelIcon' v-for="operation in operationArray" :key="operation" :content="operation" effect="light">
+        <el-menu-item :index="operation">
+          <div type="text" v-if="operation==='submit selection'" @click="submitSelect" :loading="loadingSelect">
+            {{loadingSelectInfo}}<i class="el-icon-upload el-icon--right"></i>
+          </div>
+          <div type="text" v-if="operation==='counter'">
+            {{counter}}/100
+          </div>
+        </el-menu-item>
+      </el-tooltip> -->
+    </el-menu>
+
+
     <div class="media-topic">
       <div class="media-topic-vector-reduction-view">
         <MediaScatter></MediaScatter>
       </div>
+      <div class="search-input">
+          <el-select
+            v-model="select_domain"
+            filterable
+            remote
+            clearable
+            placeholder="Searching domain"
+            :remote-method="remoteMethod"
+            :loading="option_loading">
+            <el-option
+              v-for="item in option_domains"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
       <div class="media-topic-difference-concat-view">
         <div class="media-concat-list">
           <MediaTags></MediaTags>
@@ -20,13 +60,14 @@
           <!-- <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree> -->
           <MediaSankeyTree :storytree__loading="storytree__loading"></MediaSankeyTree>
         </div>
-        <!-- <div class="event-iframeview"> -->
+        <div class="event-iframeview">
+          <SankeyTreeNodeIFrameVue></SankeyTreeNodeIFrameVue>
           <!-- <iframe :src="iframeSrc" class="iframe-class"></iframe> -->
-        <!-- </div> -->
+        </div>
         
       </div>
       <div class="single-event-evolution">
-        <div class="single-domain-tree" v-for="item in currentSelectedMedia" :key="item.domain" :id="item.domain.replaceAll('.','_')">
+        <div class="single-domain-tree" v-model="currentSelectedMedia" v-for="item in currentSelectedMedia" :key="item.domain" :id="item.domain.replaceAll('.','_')">
           <SingleTree :storytree__loading="storytree__loading" :domain="item.domain"></SingleTree>
         </div>
       </div>
@@ -37,9 +78,11 @@
 <script>
 // Structors
 import { mapState, mapMutations } from 'vuex';
-import { getMediaData, getMediaMatrixData } from '@/communication/communicator.js'
+import { getMediaData, getMediaMatrixData} from '@/communication/communicator.js'
 import { getMediaStoryTreeData, getMediaDiffConcatData } from '@/communication/communicator.js'
 import { Dataset } from '@/dataset/dataset.js'
+import { getDomains } from './assets/js/country_code'
+
 // Components
 import MediaScatter from './components/MediaScatter.vue';
 import MediaTrend from './components/MediaTrend.vue';
@@ -49,17 +92,28 @@ import MediaStoryTree from './components/MediaStoryTree.vue';
 import MediaSankeyTree from './components/MediaSankeyTree.vue';
 import MediaTags from './views/MediaTags.vue';
 import SingleTree from './views/SingleTree.vue';
+import SankeyTreeNodeIFrameVue from './views/SankeyTreeNodeIFrame.vue';
 
 export default {
   name: 'App',
   data() {
     return {
+      appName: "BiaSeer",
       loadingData: true,
       topicCodeList: null,
       storytree__loading: false,
       drawer: true,
       currentSelectedMedia: null,
-      iframeSrc: 'https://www.runoob.com'
+      iframeSrc: 'https://www.runoob.com',
+
+      option_domains: [],
+      select_domain: "",
+      domain_list: [],
+      option_loading: false,
+      states: [],
+
+      system_topic_event: "RUS_UKR"
+
     }
   },
   components: {
@@ -70,7 +124,8 @@ export default {
     MediaStoryTree,
     MediaSankeyTree,
     MediaTags,
-    SingleTree
+    SingleTree,
+    SankeyTreeNodeIFrameVue
   },
   beforeMount: function () {
     let self = this;
@@ -93,13 +148,32 @@ export default {
     });
   },
   mounted() {
+    let self = this
     this.currentSelectedMedia = this.gainCurrentSelectedMedia();
+    this.states = getDomains(self.system_topic_event)
+    this.domain_list = this.states.map(item => {
+      return { value: `${item}`, label: `${item}` };
+    });
   },
   methods: {
     ...mapMutations([
       'UPDATE_STORYTREE_FINISH',
       'UPDATE_CONCATDIFF_FINISH',
+      'UPDATE_CONTOUR_SEARCH_DOMAIN',
     ]),
+    remoteMethod(query) {
+      if (query !== '') {
+        this.option_loading = true;
+        setTimeout(() => {
+          this.option_loading = false;
+          this.option_domains = this.domain_list.filter(item => {
+            return item.label.toLowerCase().indexOf(query.toLowerCase()) > -1;
+          });
+        }, 200);
+      } else {
+        this.option_domains = [];
+      }
+    },
     gainCurrentSelectedMedia(){
       let result = []
       sysDatasetObj.mediaScatterSelected.forEach(element => {
@@ -140,6 +214,9 @@ export default {
     ])
   },
   watch: {
+    select_domain: function(){
+      this.UPDATE_CONTOUR_SEARCH_DOMAIN(this.select_domain);
+    },
     mediaMatrixSelectedSignal: function () {
       let self = this;
       console.log(self.mediaMatrixSelectedSignal);
@@ -171,6 +248,9 @@ export default {
 //   border-radius: 5px;
 //   margin: .5px;
 // }
+
+@menu-height: 2.5rem;
+@title-container-height: 160px;
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -181,12 +261,33 @@ export default {
   bottom: 0%;
   left: 0%;
   right: 0%;
-  // overflow-x: hidden;
+  overflow-x: hidden;
   overflow-y: hidden;
+
+  .el-menu.el-menu--horizontal {
+    .el-menu-item {
+      height: @menu-height;
+      line-height: @menu-height;
+    }
+    .el-menu-item {
+      border-bottom-color: rgb(84, 92, 100) !important;
+      font-weight: bolder;
+      font-size: 1rem;
+      color: #dadada !important;
+      padding: 0 10px;
+      .icon {
+        color: #dadada !important;
+      }
+    }
+  }
+  .labelIcon {
+    font-size: 1rem;
+  }
 
   .media-topic {
     position: absolute;
-    top: 0%;
+    // top: 0%;
+    top: @menu-height;
     bottom: 65%;
     left: 0%;
     right: 0%;
@@ -196,24 +297,24 @@ export default {
       bottom: 0%;
       left: 0%;
       right: 50%;
-      border-left: 1px solid steelblue;
-      border-top: 1px solid steelblue;
+      border-left: 1px solid gray;
+      border-top: 1px solid gray;
     }
 
     .media-topic-difference-concat-view {
       position: absolute;
-      top: 0%;
+      top: 0%;     
       bottom: 0%;
       left: 50%;
       right: 0%;
-      // border: 1px solid steelblue;
+      // border: 1px solid gray;
       .media-concat-list{
         position: absolute;
         top: 0%;
         bottom: 92%;
         left: 0%;
         right: 0%;
-        border: 1px solid steelblue;
+        border: 1px solid gray;
         display: flex;
         align-items: center;
       }
@@ -223,7 +324,7 @@ export default {
         bottom: 0%;
         left: 0%;
         right: 0%;
-        border-left: 1px solid steelblue;
+        border-left: 1px solid gray;
       }
     }
   }
@@ -242,29 +343,29 @@ export default {
       bottom: 30%;
       left: 0%;
       right: 0%;
-      // border: 1px solid steelblue;
+      // border: 1px solid gray;
       .event-evolution-storytree{
         position: absolute;
         top: 0%;
         bottom: 0%;
         left: 0%;
-        right: 0%;
-        border: 1px solid steelblue;
+        right: 30%;
+        border: 1px solid gray;
       }
-      // .event-iframeview{
-      //   position: absolute;
-      //   top: 0%;
-      //   bottom: 0%;
-      //   left: 70%;
-      //   right: 0%;
-      //   border-top: 1px solid steelblue;
-      //   border-bottom: 1px solid steelblue;
-      //   border-right: 1px solid steelblue;
-      //   .iframe-class{
-      //     width: 100%;
-      //     height: 100%;
-      //   }
-      // }
+      .event-iframeview{
+        position: absolute;
+        top: 0%;
+        bottom: 0%;
+        left: 70%;
+        right: 0%;
+        border-top: 1px solid gray;
+        border-bottom: 1px solid gray;
+        border-right: 1px solid gray;
+        .iframe-class{
+          width: 100%;
+          height: 100%;
+        }
+      }
     }
 
     .single-event-evolution {
@@ -273,6 +374,7 @@ export default {
       bottom: 0%;
       left: 0%;
       right: 0%;
+      overflow-x: scroll;
       display: flex;
       .single-domain-tree{
         flex: 1;
@@ -280,4 +382,23 @@ export default {
       }
     }
   }
-}</style>
+}
+
+.search-input {
+  width: 130px;
+  margin-left: 41.4%;
+  margin-top: 0.1%;
+  .el-input__inner{
+    height: 30px;
+  }
+  .el-input__suffix {
+    top: 7px;
+  }
+  .el-input__icon {
+    line-height: inherit;
+  }
+  .el-input__suffix-inner {
+    display: inline-block;
+  }
+}
+</style>

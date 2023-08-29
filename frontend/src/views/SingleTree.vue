@@ -75,6 +75,21 @@ export default {
                     .attr("font-family", "sans-serif")
                     .attr("font-size", 10)
                     .attr("transform", `translate(${margin.left},${margin.top})`);
+                
+                // const timeAxis = d3.axisBottom(reScale);
+                // const xAxisG = g.append('g').call(timeAxis)
+                //     .attr('transform', `translate(${0},${innerHeight})`);
+                // xAxisG.selectAll("text")
+                //     .attr("transform", "translate(-0,0)rotate(-30)")
+                //     .style("text-anchor", "end")
+                //     .on("mouseover", function(d) {
+                //         d3.select(this).classed("line-hover", true);
+                //     })
+                //     .on("mouseout", function(d) {
+                //         d3.select(this)
+                //             .classed("line-hover", false);
+                //     });
+                // xAxisG.selectAll('.domain').remove();
 
                 const link = g
                     .append("g")
