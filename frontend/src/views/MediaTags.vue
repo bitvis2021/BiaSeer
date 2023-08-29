@@ -28,6 +28,7 @@ export default {
     },
     mounted() {
         this.dynamicTags = sysDatasetObj.mediaScatterSelected;
+        this.changeConcatStatus()
     },
     methods: {
         ...mapMutations([
