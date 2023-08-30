@@ -67,9 +67,13 @@
         
       </div>
       <div class="single-event-evolution">
-        <div class="single-domain-tree" v-model="currentSelectedMedia" v-for="item in currentSelectedMedia" :key="item.domain" :id="item.domain.replaceAll('.','_')">
+        <el-card v-for="item in currentSelectedMedia" :key="item.domain" :id="item.domain.replaceAll('.','_')">
+
+        <div class="single-domain-tree" slot="header" >
+          
           <SingleTree :storytree__loading="storytree__loading" :domain="item.domain"></SingleTree>
         </div>
+        </el-card>
       </div>
     </div>
   </div>

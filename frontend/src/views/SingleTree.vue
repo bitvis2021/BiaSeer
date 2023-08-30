@@ -3,6 +3,7 @@
     v-loading="storytree__loading"
     ref="singlestorytree"
     element-loading-text="Waiting Loading Story Tree">
+    <el-button style="float: right; padding: 3px 0" type="text">Choose</el-button>
     <svg id="single_storytree__svg"></svg>
     </div>
 </template>
@@ -52,7 +53,7 @@ export default {
                 root.each(d => {
                     if (d.x > x1) x1 = d.x;
                     if (d.x < x0) x0 = d.x;
-                });
+                });//find max and min
                 d3.select(self.$el).select("#single_storytree__svg").selectAll('g').remove();
                 
                 const svg = d3.select(self.$el).select("#single_storytree__svg")
@@ -93,10 +94,10 @@ export default {
 
                 const link = g
                     .append("g")
-                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
+                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)//????
                     .attr("fill", "none")
-                    .attr("stroke", "steelblue")
-                    .attr("stroke-opacity", 0.4)
+                    .attr("stroke", "grey")
+                    
                     .selectAll("path")
                     .data(root.links())
                     .join("path")
@@ -122,6 +123,12 @@ export default {
                             //     .y(d => d.x)(d)
                         }
                     })
+                    .attr("stroke-opacity", d=>{
+                        if(d.target.data.tree_mSrcName.indexOf(self.domain) < 0){
+                            return 0.5;
+                        }
+                        return 1.0;
+                    })//0.4
                     // .attr("stroke-width", d=>{
                     //     return lineWidthScale(+d.target.data.tree_maxCompatibility)
                     // })
@@ -184,7 +191,7 @@ export default {
                             }                            
                         }
                     })
-                    .attr("stroke", "steelblue")
+                    .attr("stroke", "grey")
                     .attr("stroke-dasharray", d=>{
                         if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
                             return "2"
@@ -196,7 +203,7 @@ export default {
                     .attr("stroke-width", "1px")
                     .attr("r", d=> {
                         if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
-                            return 4;
+                            return 0;
                         }
                         else{
                             let index = d.data.mSrc_list.indexOf(self.domain)
