@@ -1,10 +1,6 @@
 <template>
     <div class="sankeytree-node-iframe">
 
-        <div class="wordcloud">
-            <div ref='wordCloudBox'></div>
-        </div>
-
         <div class="mytip" v-for="(item,index) in node_details2">
             <!-- <h4> {{ item.name.split("+")[0]+"."  }}</h4>
             <p> {{ item.node_detail_info[0].lines }}</p> -->
@@ -17,6 +13,10 @@
                     <p> {{ item.node_detail_info[0].lines }}</p>
                 </el-collapse-item>
             </el-collapse>
+        </div>
+
+        <div class="wordcloud">
+            <div ref='wordCloudBox'></div>
         </div>
 
     </div>

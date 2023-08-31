@@ -794,24 +794,20 @@ export default {
 
 <style>
 .dot {
-    fill: gray;
+    fill: rgb(157, 157, 157);
     stroke: white;
     stroke-width: 0.4px;
-    /* fill: steelblue; */
-    /* opacity: 0.5; */
 }
 
 .dot_mouseover {
-    fill: steelblue;
+    fill: #50bfff;
     stroke-width: 1px;
     stroke: white;
-    /* opacity: 0.5; */
 }
 .dot_mouseover1 {
-    fill: steelblue;
+    fill: #50bfff;
     stroke-width: 1px;
     stroke: white;
-    /* opacity: 0.5; */
 }
 
 .media_horizon_chart_tooltip_div {
@@ -823,7 +819,6 @@ export default {
     text-align: center;
     display: block;
     font: sans-serif;
-    /* font-weight: bold; */
 }
 
 .close-icon {
@@ -832,13 +827,10 @@ export default {
 }
 
 .link{
-    stroke: steelblue;
-    /* stroke-opacity: 0.3; */
+    stroke: #50bfff;
 }
 
 .text_label{
-    /* font-weight: 400; */
-    /* font-family: 'Arial'; */
     font-size: 10px;
     fill: black;
     stroke: white;

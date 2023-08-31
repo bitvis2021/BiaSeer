@@ -117,7 +117,7 @@ export default {
             
             let computeColorPos = d3.interpolate('#f9f9f9', 'green');
             if(flag === 'concat'){
-                computeColorPos = d3.interpolate('#f9f9f9', 'gray');
+                computeColorPos = d3.interpolate('#f9f9f9', '#50bfff');
             }
             let linearVDataPos = d3.scaleLinear()
                 .domain([0, d3.max(vdata)])
@@ -289,13 +289,14 @@ export default {
                             self.selected['topics'].add(d.topic);
                             self.selected['date_index'].add(i);
                             self.selected['date'].add(d.date0);
-                            return 'red';
+                            return 'gray';
                         }
                         else{
                             // return 'steelblue';
                             return '';
                         }
-                    })                    
+                    })
+                    .attr('stroke-width', 0.1)
                 }
             }
 
