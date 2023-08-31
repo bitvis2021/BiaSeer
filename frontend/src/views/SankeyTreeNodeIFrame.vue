@@ -1,5 +1,5 @@
 <template>
-    <div class="sankeytree-node-iframe">
+    <div class="sankeytree-node-iframe" ref="iframediv">
 
         <div class="mytip" v-for="(item,index) in node_details2">
             <!-- <h4> {{ item.name.split("+")[0]+"."  }}</h4>
@@ -38,6 +38,7 @@ export default {
             node_details: [],
             node_details2: [],
             isShowCarousel: false,
+            width: 400,
         }
     },
     components: {
@@ -46,6 +47,7 @@ export default {
     },
     mounted: function () {
         this.isShowCarousel = false
+        this.width = this.$refs.iframediv.clientWidth;
         // let wordList = [
         //         {text:'vue',size:20},
         //         {text:'html',size:25},
@@ -63,7 +65,7 @@ export default {
         getWordCloud(wordList){
             let wordOption = {  
                 wordList, 
-                size:[400,257],  // 盒子的宽高
+                size:[this.width,257],  // 盒子的宽高
                 svgElement: this.$refs.wordCloudBox  //使用ref选择节点
             }
             myCloud(wordOption,this.getArticleList)
@@ -108,6 +110,8 @@ export default {
                 if(d.data.name == 'ROOT' || d.data.time_e == 'time'){return}
                 self.node_details.push(d.data);
                 wordList.push(...d.data.tree_topickey)
+                wordList.push(...d.data.tree_keyword.flat())
+                wordList.push(...d.data.tree_titlekeyword.flat())
             })
             // console.log(self.node_details);
             self.activeNames = ['1', '2'];

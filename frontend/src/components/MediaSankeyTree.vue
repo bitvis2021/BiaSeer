@@ -277,7 +277,7 @@ export default {
             let innerHeight = height - margin.top - margin.bottom;
             
 
-            let renderSankeyTree = (root, sankeyData, biasMaxMin, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope) => {
+            let renderSankeyTree = (root, sankeyData, biasMaxMin, wordSizeScale, wordListCountDict, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope) => {
                 let x0 = Infinity;
                 let x1 = -x0;
                 root.each(d => {
@@ -336,12 +336,23 @@ export default {
                 //             d.target.name + "\n" + d.value;
                 //     });
                 
+                let colorWord = d3.scaleOrdinal(d3.schemePaired);
+                // let colorWord =()=>{return 'gray'};
                 // add the link path text
                 link.append('text')
                     .append('textPath')
                     .attr('xlink:href', function (d,i) { return '#link' + i; })
-                    // .attr('startOffset','25%')
-                    .text(function (d) { return d.target.tree_topickey.join(" "); })
+                    .selectAll(".tspan")
+                    .data(d=>d.target.tree_topickey)
+                    .enter()
+                    .append("tspan")
+                    .attr("font-size", d=> wordSizeScale(wordListCountDict[d])+"px" )
+                    .attr("fill", (d,i)=> {return colorWord(i)})
+                    .attr("y", '0.35em')
+                    .text(function (d) { 
+                        if(wordSizeScale(wordListCountDict[d]) > 10)
+                            return "  " + d
+                    })
                     // .text(function (d) { return d.target.title.split("+")[0]; })
 
                 // add in the nodes
@@ -715,11 +726,29 @@ export default {
             let root = tree(data);
             // console.log(root);
 
-
             // sankeyData = {nodes: root.descendants(), links: root.links()};
             console.log(sankeyData);
 
-            renderSankeyTree(root, sankeyData, biasMaxMin, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope);
+
+            let wordList = [];
+            root.each(d=>{
+                if(d.data.name == 'ROOT' || d.data.time_e == 'time'){return}
+                wordList.push(...d.data.tree_topickey)
+                wordList.push(...d.data.tree_keyword.flat())
+                wordList.push(...d.data.tree_titlekeyword.flat())
+            })
+            const wordListCountDict = wordList.reduce((obj,key)=>{
+                if (key in obj){
+                    obj[key]++
+                }else{
+                    obj[key]=1
+                }
+                return obj
+            },{})
+            let wordSizeScale = d3.scaleLinear().domain(d3.extent(Object.values(wordListCountDict)))
+                .range([10, 60])
+
+            renderSankeyTree(root, sankeyData, biasMaxMin, wordSizeScale, wordListCountDict, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope);
 
         },
     }
