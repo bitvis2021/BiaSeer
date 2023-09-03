@@ -14,7 +14,7 @@ export default function (option,callback) {
      var layout = cloud()
        .size(theSize)
        .words(theWordList)
-       .padding(5)
+       .padding(1.5)
        //配置随机旋转的角度
        .rotate(function () {return ~~(Math.random() * 3) * 30;})
        .font("Impact")

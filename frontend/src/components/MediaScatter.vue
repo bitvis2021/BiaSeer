@@ -16,7 +16,6 @@
 import { mapState, mapMutations } from 'vuex';
 import { getTopic } from '../assets/data/topicList'
 
-
 export default {
     name: 'MediaScatter',
     props: {
@@ -69,7 +68,8 @@ export default {
         ...mapState([
             'currMedium',
             'mediaGraphLabel',
-            'contour_search_domain'
+            'contour_search_domain',
+            'isConcated'
         ]),
     },
     watch: {
@@ -92,6 +92,20 @@ export default {
                 let nodePos = [self.xScale(node.x1),self.yScale(node.x2)];
                 let zoomingRatio = self.zoomMaxRatio / 10;
                 self.zoomOperation(node, nodePos, zoomingRatio);
+            }
+        },
+        isConcated:function(){
+            console.log(this.isConcated)
+            let self = this
+            if(!this.isConcated){
+                let selected_media_len = sysDatasetObj.mediaScatterSelected.length
+                console.log(selected_media_len)
+                if(selected_media_len > 0){
+                    self.UPDATE_CURRENT_MEDIUM(sysDatasetObj.mediaScatterSelected[selected_media_len - 1]);
+                }else{
+                    sysDatasetObj.mediaScatterSelected.push("msn.com");
+                    self.UPDATE_CURRENT_MEDIUM("msn.com");
+                }
             }
         }
     },
@@ -183,11 +197,11 @@ export default {
 
             let contour_g = svg.append("g")
                 .attr("class", "media-point-contour-g")
-            
+
             let graph_g = svg.append("g")
                 .attr("class", "media-point-graph-g")
             self.graph_g = graph_g;
-            
+
             let circle_g = svg.append("g")
                 .attr("class", "media-point-circle-g")
             
@@ -299,7 +313,7 @@ export default {
                         self.mouse_this = d3.mouse(this);
 
                         // hover highlight
-                        d3.select(this).classed("dot_mouseover", true);
+                        d3.select(this).classed("dot_mouseover1", true);
                         
                         // draw mediagraph
                         // 更改要画的媒体列表
@@ -314,8 +328,24 @@ export default {
                         self.nodeMenuFlag = false;
                     })
                     .on("mouseout", function (d) {
-                        // d3.select(this).classed("dot_mouseover", false);
+                        d3.select(this).classed("dot_mouseover1", false);
                         sysDatasetObj.mediaGraphList.splice(sysDatasetObj.mediaGraphList.indexOf(d.domain), 1);
+                        // self.UPDATE_MEDIA_GRAPH_LABEL();
+
+                        // judge concat info
+                        console.log(self.isConcated)
+                        if(self.isConcated){
+                            self.UPDATE_MEDIA_SCATTER_CLICK();
+                        }else{
+                            let selected_media_len = sysDatasetObj.mediaScatterSelected.length
+                            console.log(selected_media_len)
+                            if(selected_media_len > 0){
+                                self.UPDATE_CURRENT_MEDIUM(sysDatasetObj.mediaScatterSelected[selected_media_len - 1]);
+                            }else{
+                                sysDatasetObj.mediaScatterSelected.push("msn.com");
+                                self.UPDATE_CURRENT_MEDIUM("msn.com");
+                            }
+                        }
                     })
                     .on("click", function (d) {
                         // self.UPDATE_MEDIA_SCATTER_CLICK();
@@ -682,7 +712,8 @@ export default {
                 .duration(300);
             self.graph_g
                 .selectAll("path")
-                .data(Object.keys(domainOneStep))
+                .data(Object.keys(domainOneStep),function(d, i) {
+                    return i;})
                 .join(
                     enter => enter.append("path")
                         .attr("class", "link")
@@ -722,7 +753,7 @@ export default {
                         .attr("class", "text_label")
                         .attr("x", d=> doaminText[d][0])
                         .attr("y", d=> doaminText[d][1])
-                        .attr("dy", "-0.31em")
+                        .attr("dy", "-0.75em")
                         .attr('text-anchor',"middle")
                         .attr("paint-order", "stroke")
                         .text(d=>d)
@@ -731,7 +762,7 @@ export default {
                         .call(update => update.transition(t)
                         .attr("x", d=> doaminText[d][0])
                         .attr("y", d=> doaminText[d][1])
-                        .attr("dy", "-0.31em")
+                        .attr("dy", "-0.75em")
                         .attr('text-anchor',"middle")
                         .attr("paint-order", "stroke")
                         .text(d=>d)
@@ -763,18 +794,20 @@ export default {
 
 <style>
 .dot {
-    fill: gray;
+    fill: rgb(157, 157, 157);
     stroke: white;
     stroke-width: 0.4px;
-    /* fill: steelblue; */
-    /* opacity: 0.5; */
 }
 
 .dot_mouseover {
-    fill: steelblue;
+    fill: #50bfff;
     stroke-width: 1px;
     stroke: white;
-    /* opacity: 0.5; */
+}
+.dot_mouseover1 {
+    fill: #50bfff;
+    stroke-width: 1px;
+    stroke: white;
 }
 
 .media_horizon_chart_tooltip_div {
@@ -786,7 +819,6 @@ export default {
     text-align: center;
     display: block;
     font: sans-serif;
-    /* font-weight: bold; */
 }
 
 .close-icon {
@@ -795,13 +827,10 @@ export default {
 }
 
 .link{
-    stroke: steelblue;
-    /* stroke-opacity: 0.3; */
+    stroke: #50bfff;
 }
 
 .text_label{
-    /* font-weight: 400; */
-    /* font-family: 'Arial'; */
     font-size: 10px;
     fill: black;
     stroke: white;

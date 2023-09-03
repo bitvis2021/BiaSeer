@@ -67,9 +67,14 @@
         
       </div>
       <div class="single-event-evolution">
-        <div class="single-domain-tree" v-model="currentSelectedMedia" v-for="item in currentSelectedMedia" :key="item.domain" :id="item.domain.replaceAll('.','_')">
+        <el-card v-for="(item, index) in currentRankMedia" :key="index" :id="item.domain.replaceAll('.','_')" style="margin-right:10px">
+
+          <div class="single-domain-tree" slot="header" >
+            <span>{{item.domain}}</span>
+            <el-button style="float: right; padding: 3px 0" type="text" @click="getTreeDiffData(item.domain)">Choose</el-button>
+          </div>
           <SingleTree :storytree__loading="storytree__loading" :domain="item.domain"></SingleTree>
-        </div>
+        </el-card>
       </div>
     </div>
   </div>
@@ -78,7 +83,7 @@
 <script>
 // Structors
 import { mapState, mapMutations } from 'vuex';
-import { getMediaData, getMediaMatrixData } from '@/communication/communicator.js'
+import { getMediaData, getMediaMatrixData, getTreeDiff} from '@/communication/communicator.js'
 import { getMediaStoryTreeData, getMediaDiffConcatData } from '@/communication/communicator.js'
 import { Dataset } from '@/dataset/dataset.js'
 import { getDomains } from './assets/js/country_code'
@@ -93,6 +98,7 @@ import MediaSankeyTree from './components/MediaSankeyTree.vue';
 import MediaTags from './views/MediaTags.vue';
 import SingleTree from './views/SingleTree.vue';
 import SankeyTreeNodeIFrameVue from './views/SankeyTreeNodeIFrame.vue';
+import d3 from './assets/js/horizon';
 
 export default {
   name: 'App',
@@ -104,6 +110,7 @@ export default {
       storytree__loading: false,
       drawer: true,
       currentSelectedMedia: null,
+      currentRankMedia: null,
       iframeSrc: 'https://www.runoob.com',
 
       option_domains: [],
@@ -150,6 +157,16 @@ export default {
   mounted() {
     let self = this
     this.currentSelectedMedia = this.gainCurrentSelectedMedia();
+    var rank_list=Array()
+    var temp_value=1;
+    for(var i=0;i<this.currentSelectedMedia.length;i++){
+      var new_dict={}
+      new_dict["domain"]=this.currentSelectedMedia[i].domain;
+      new_dict["value"]=temp_value;
+      temp_value=temp_value+10
+      rank_list.push(new_dict);
+    }
+    this.currentRankMedia=rank_list;
     this.states = getDomains(self.system_topic_event)
     this.domain_list = this.states.map(item => {
       return { value: `${item}`, label: `${item}` };
@@ -204,6 +221,16 @@ export default {
         mediaMatrixSelectedDataDeferObj.resolve();
       });
     },
+    getTreeDiffData(tree_name){
+      let self=this;
+      
+      getTreeDiff(self.currentSelectedMedia,tree_name,function(data){
+        console.log("tree_diff_data",data)
+        self.currentRankMedia=data;
+        self.UPDATE_STORYTREE_FINISH();
+        console.log("currentrank ",self.currentRankMedia)
+      });
+    }
   },
   computed: {
     ...mapState([
@@ -211,7 +238,10 @@ export default {
       'mediaMatrixSelectedSignal',
       'mediaDiffConcatSignal',
       'mediaScatterClick'
-    ])
+    ]),
+    showSrcName:function(){
+      return "jintain"
+    },
   },
   watch: {
     select_domain: function(){
@@ -238,6 +268,17 @@ export default {
     },
     mediaScatterClick: function(){
       this.currentSelectedMedia = this.gainCurrentSelectedMedia();
+      var rank_list=Array()
+      var temp_value=1;
+      for(var i=0;i<this.currentSelectedMedia.length;i++){
+      var new_dict={}
+      new_dict["domain"]=this.currentSelectedMedia[i].domain;
+      new_dict["value"]=temp_value;
+      temp_value+=10;
+      rank_list.push(new_dict);
+      }
+      this.currentRankMedia=rank_list;
+      
     }
   }
 }
@@ -378,6 +419,7 @@ export default {
       display: flex;
       .single-domain-tree{
         flex: 1;
+        justify-content: space-around;
         margin: 4px;
       }
     }

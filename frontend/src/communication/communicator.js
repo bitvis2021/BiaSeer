@@ -31,6 +31,7 @@ export function getMediaMatrixData(callback) {
     })
 }
 
+
 export function getMediaStoryTreeData(tree_param, meidaList, callback) {
     console.log("tree_param: ", tree_param);
     let topics = Array.from(tree_param['topics']);
@@ -74,5 +75,22 @@ export function getMediaDiffConcatData(meidaList, callback) {
         let mediaDiffConcatData = res["data"]["data"];
         console.log('mediaDiffConcatData:', mediaDiffConcatData);
         callback(mediaDiffConcatData);
+    })
+}
+export function getTreeDiff(meidaList, tree_name,callback) {
+    let formData = {
+        "mSrc_list": meidaList,
+        "tree_name":tree_name
+    }
+    axios({
+        methods: 'get',
+        url: server_address + '/tree_diff',
+        params: formData,
+        timeout: 1000000,
+    })
+    .then((res) => {
+        let tree_diff_data = res["data"]["data"];
+        // console.log('tree_diff_data:', tree_diff_data);
+        callback(tree_diff_data);
     })
 }

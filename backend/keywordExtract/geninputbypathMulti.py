@@ -758,7 +758,12 @@ def mergeTxt():
 
         for src_path in txt_dict_sort[txt_key]:
             src_f=open(src_path,'r')
-            o_list.extend(src_f.readlines())
+            templist=src_f.readlines()
+            if len(o_list)!=0:
+                templist.pop(0)
+                o_list.extend(templist)
+            else:
+                o_list.extend(templist)
             src_f.close()
         o_f.writelines(o_list)
         o_f.close()

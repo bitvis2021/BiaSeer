@@ -25,7 +25,7 @@ export default new Vuex.Store({
     tree_node_circle_click_path_list: null,
 
     isConcated: false,
-
+    
     clickSankeyTreeNode: 0,
 
     contour_search_domain: '',
@@ -39,6 +39,7 @@ export default new Vuex.Store({
       // console.log("点击了一个节点")
       state.clickSankeyTreeNode = (state.clickSankeyTreeNode + 1 ) % 5;
     },
+
     ['UPDATE_DISPLAY_MODE'] (state, displayMode) {
       state.displayMode = displayMode;
     },
