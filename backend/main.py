@@ -5,6 +5,7 @@ import json
 from utils.helper import readJsontoDict
 from keywordExtract.test import test
 from keywordExtract.storytree import getStoryTreedata
+from keywordExtract.treeDiff import gen_diff
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -68,6 +69,21 @@ def getMediaMatrixStoryTreeDataSet():
     # testdata = readJsontoDict("./tree_pro.json")
     return {'data': testdata}
 
+@app.route('/tree_diff', methods=['GET'])
+@cross_origin()
+def getTreeDiff():
+    args_dict = request.args.to_dict()
+    print(args_dict)
+    value_list=list(args_dict.values())
+    tree_name=value_list.pop(-1)
+    mSrc_list = value_list
+    
+    print("in main.py treediff")
+    print(mSrc_list)
+    data = None
+    if len(mSrc_list) > 1:
+        data = gen_diff(mSrc_list,tree_name)
+    return {'data': data}
 if __name__ == "__main__":
     print('run 0.0.0.0:14449')
     app.run(host='0.0.0.0', port=14449)
