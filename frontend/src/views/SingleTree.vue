@@ -43,7 +43,7 @@ export default {
         drawStoryTree(width, height) {
             let self = this;
             // console.log(width, height);
-            let margin = { top: 5, bottom: 15, left: 1, right: 2 };
+            let margin = { top: 1, bottom: 15, left: 1, right: 2 };
             let innerWidth = width - margin.left - margin.right;
             let innerHeight = height - margin.top - margin.bottom;
             
@@ -95,7 +95,7 @@ export default {
 
                 const link = g
                     .append("g")
-                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)//????
+                    .attr('transform', `translate(${reScale.bandwidth()/2},${-10})`)//????
                     .attr("fill", "none")
                     .attr("stroke", "grey")
                     
@@ -147,7 +147,7 @@ export default {
                 let node = g
                     .append("g")
                     .attr("class", "storytree__node")
-                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
+                    .attr('transform', `translate(${reScale.bandwidth()/2},${-10})`)
                     .attr("stroke-linejoin", "round")
                     .attr("stroke-width", 3)
                     .selectAll(".story_tree_node")
@@ -312,10 +312,10 @@ export default {
     watch: {
         storytree_finish:function(){
             let self = this;
-            this.width = this.$refs.singlestorytree.clientWidth;
-            this.height = this.$refs.singlestorytree.clientHeight;
+            // this.width = this.$refs.singlestorytree.clientWidth;
+            // this.height = this.$refs.singlestorytree.clientHeight;
             console.log("storytree width height",this.width,this.height)
-            self.drawStoryTree(self.width+10, self.height+7);
+            self.drawStoryTree(self.width, self.height);
         },
     }
 }
@@ -324,7 +324,21 @@ export default {
 <style lang="less" scoped>
 .single_tree{
     width: 100%;
-    height: 100%;
-    
+    height: 100%;  
 }
+</style>
+
+
+<style>
+.el-card__header {
+  padding: 2px 10px !important;
+  /* background-color: palegoldenrod; */
+  background-color: rgb(229, 228, 228);
+  
+}
+.el-card__body {
+  padding: 0px !important;
+  /* background-color: powderblue; */
+}
+
 </style>
