@@ -5,6 +5,8 @@ from utils.helper import create_date_range,saveDictoJson
 import itertools
 import operator
 import numpy as np
+import sys
+import json
 
 
 TOPIC = 'RUS_UKR'
@@ -211,3 +213,82 @@ def concatMediaTopicTimeBinsDataDiff(meidaList, mtopic, timeBins, timeBinsIndex)
         result.append({'date0' : time[0], 'date1' : time[-1], 'value' : value , 'topic': mtopic})
     
     return result
+
+
+def getConnectedComponent (matrix):
+      
+    domain = connectedDomain(matrix)
+
+    domain = {key: value for key, value in domain.items() if len(value) > 1}
+
+    component = {}
+
+    label = -1 
+    for key, value in domain.items():
+        label += 1
+        leftmost1, leftmost2, rightmost1, rightmost2 = find_left_right_extremes(value)
+        component[label] = []
+        component[label].append(leftmost1)
+        component[label].append(leftmost2)
+        component[label].append(rightmost1)
+        component[label].append(rightmost2)
+
+    return component
+
+def connectedDomain(img):
+        h,w = img.shape
+        print('height', h)
+        print('width', w)
+        domain =dict()
+        label = -1 
+
+        flag = True 
+        for j in range(w):
+            if float(img[0,j]) > 0.2:
+                if flag: 
+                    label += 1
+                    domain[label] = set()
+                domain[label].add((0,j))
+                flag = False
+            else:
+                flag = True
+        for i in range(1,h):
+            flag = True
+            for j in range(w):
+                if float(img[i,j]) > 0.:
+                    for key in domain:
+                        if (i-1,j) in domain[key]:
+                            domain[key].add((i,j))
+                            
+                            if not flag:
+                                if last_label != key:
+                                    domain[key]=domain[key].union(domain[last_label]) 
+                                    del domain[last_label]
+                                    
+                            last_label = key    
+                            break
+                    else:
+                        if flag:
+                            label += 1
+                            domain[label] = set()
+                            domain[label].add((i,j))
+                            last_label = label
+                        else:
+                            domain[last_label].add((i,j))
+                    
+                    flag = False
+                else:
+                    flag = True
+        return domain
+
+def find_left_right_extremes(s):
+        x_coords1 = [coord[0] for coord in s]
+        x_coords2 = [coord[1] for coord in s]
+        # print('x_coords1', x_coords1)
+        # print('x_coords2', x_coords2)
+        leftmost1 = min(x_coords1)
+        leftmost2 = max(x_coords1)
+        rightmost1 = min(x_coords2)
+        rightmost2 = max(x_coords2)
+        return leftmost1, leftmost2, rightmost1, rightmost2
+    

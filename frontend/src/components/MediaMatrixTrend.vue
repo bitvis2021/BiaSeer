@@ -7,6 +7,7 @@
 
 import { mapState, mapMutations } from 'vuex';
 import { getTopic } from '../assets/data/topicList';
+
 let reorder = require('@/assets/js/reorder');
 
 export default {
@@ -57,7 +58,6 @@ export default {
             let data2 = null;
             if(flag === 'single'){
                 data1 = sysDatasetObj.mediaMatrixDataSet.filter(ele => ele['domain'] == domain)[0];
-                console.log('sysDatasetObj.mediaMatrixDataSetNum', sysDatasetObj.mediaMatrixDataSetNum);
             }
             else if(flag === 'concat'){
                 data1 = sysDatasetObj.mediaConcatDiffDataSet[0];
@@ -105,7 +105,7 @@ export default {
 
             let row_inv = reorder.inverse_permutation(row_perm);
             let col_inv = reorder.inverse_permutation(col_perm);
-            // console.log(row_inv);
+            console.log('row_inv', row_inv);
             // console.log(col_inv);
             // console.log(matrix);
             console.log('vdata', vdata);
@@ -117,7 +117,7 @@ export default {
             
             let computeColorPos = d3.interpolate('#f9f9f9', 'green');
             if(flag === 'concat'){
-                computeColorPos = d3.interpolate('#f9f9f9', '#50bfff');
+                computeColorPos = d3.interpolate('#f9f9f9', 'gray');
             }
             let linearVDataPos = d3.scaleLinear()
                 .domain([0, d3.max(vdata)])
@@ -129,6 +129,7 @@ export default {
                 .domain([0, d3.max(vdata2)])
                 .range([3, 9]);
             
+            
             // let rectWH = d3.scaleLinear()
             //     .domain([0, d3.max(vdata2)])
             //     .range([3, 9])
@@ -138,6 +139,16 @@ export default {
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
             // let innerHeight = height - m.t - m.b;
             // let innerWidth = width - m.l;
+
+            // let areaW = d3.scaleLinear()
+            //     .domain([0,43])
+            //     .range([m.l, width-m.l]);
+
+            // let areaH = d3.scaleLinear()
+            //     .domain([0,19])
+            //     .range([m.t, height - m.b]);
+                
+            
   
             // let y = d3.scaleLinear()
             //     .domain(d3.extent(ydata, d => +d))
@@ -164,6 +175,10 @@ export default {
             
             let rectsG = svg.append('g')
                 .attr('class', 'rectsG');
+            
+            // let concat_areaG = svg.append('g')
+            //     .attr('transform', `translate(${m.l}, ${0})`)
+            //     .attr('class', 'concat_areaG');
             
             let yG = svg.append('g')
                 .attr('class', 'yG')
@@ -262,6 +277,24 @@ export default {
                     return brushed;
                 })
 
+            function rearrangeMatrix(matrix, rowPermutation) {
+                console.log("Original Matrix:", matrix)
+                const numRows = matrix.length;
+                const rearrangedMatrix = [];
+                // const tempMatrix = [];
+
+                for (let i = 0; i < numRows; i++) {
+                    const targetRowIndex = rowPermutation[i];
+                    // console.log('targetRowIndex', targetRowIndex)
+                    rearrangedMatrix[targetRowIndex] = matrix[i];
+                    const tempMatrix = Array.from(matrix[i]);
+                    matrix[i] = matrix[targetRowIndex];
+                    matrix[targetRowIndex] = tempMatrix
+                }
+
+                return rearrangedMatrix;
+            }
+
             function brushed() {
                 let selection = d3.event.selection;
                 if (selection === null){
@@ -289,7 +322,7 @@ export default {
                             self.selected['topics'].add(d.topic);
                             self.selected['date_index'].add(i);
                             self.selected['date'].add(d.date0);
-                            return 'gray';
+                            return 'red';
                         }
                         else{
                             // return 'steelblue';
@@ -305,6 +338,24 @@ export default {
                 .call(brush)
                 .select('.selection').append('title')
                 .text('aaa');
+
+            
+            // data2 = sysDatasetObj.concatMatrixConCom;
+            // console.log('sysDatasetObj.concatMatrixConCom', data2)
+            
+            // concat_areaG
+            //     .selectAll(".concat_area_element")
+            //     .data(Object.values(sysDatasetObj.concatMatrixConCom))
+            //     .enter()
+            //     .append('rect')
+            //     .attr("x", d=> (areaW(d[2])))
+            //     .attr("y", d=> areaH(d[0]))
+            //     .attr("width", d => Math.abs(d[3]-d[2]+1) * 19)
+            //     .attr("height", d => Math.abs(d[1]-d[0]+1) * 10)
+            //     .attr("fill", 'none')
+            //     .attr("stroke", 'red')
+            //     .attr("stroke-width", 1)
+            
         }
     }
 }

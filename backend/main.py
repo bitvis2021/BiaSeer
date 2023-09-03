@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-from gaindata.dataprocess import mediaDataSet, mediaMatrixDataSet, concatMediaDiff
+from gaindata.dataprocess import mediaDataSet, mediaMatrixDataSet, getConnectedComponent, concatMediaDiff
 import json
 from utils.helper import readJsontoDict
 from keywordExtract.test import test
 from keywordExtract.storytree import getStoryTreedata
-from keywordExtract.treeDiff import gen_diff
+import numpy as np
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -32,12 +32,33 @@ def getMediaMatrixDataSet():
 @cross_origin()
 def getMediaConcatDiffDataSet():
     args_dict = request.args
+    print('args_dict1', args_dict)
     mSrc_list = args_dict.getlist('mSrc_list[]')
+    print('msrc_list', mSrc_list)
     # print(mSrc_list)
     data = None
     if len(mSrc_list) > 1:
         data = concatMediaDiff(mSrc_list)
     return {'data': data}
+
+@app.route('/concat_connected_component', methods=['GET'])
+@cross_origin()
+def getMediaConcatConCom():
+    args_dict = request.args
+    print('args_dict ', args_dict)
+    matrix = [[None for _ in range(44)] for _ in range(20)]
+    for i in range (20):
+        for j in range (44):
+            matrix[i][j] = args_dict.get('matrix['+str(i)+']'+'['+str(j)+']')
+    matrix = np.array(matrix)
+    # matrix = args_dict.get('matrix['+)
+
+    print('multi_array', matrix)
+    data = None
+    if len(matrix) > 1:
+        data = getConnectedComponent(matrix)
+    return {'data': data}
+
 
 @app.route('/media_matrix_stroytree', methods=['GET'])
 @cross_origin()
@@ -69,21 +90,6 @@ def getMediaMatrixStoryTreeDataSet():
     # testdata = readJsontoDict("./tree_pro.json")
     return {'data': testdata}
 
-@app.route('/tree_diff', methods=['GET'])
-@cross_origin()
-def getTreeDiff():
-    args_dict = request.args.to_dict()
-    print(args_dict)
-    value_list=list(args_dict.values())
-    tree_name=value_list.pop(-1)
-    mSrc_list = value_list
-    
-    print("in main.py treediff")
-    print(mSrc_list)
-    data = None
-    if len(mSrc_list) > 1:
-        data = gen_diff(mSrc_list,tree_name)
-    return {'data': data}
 if __name__ == "__main__":
     print('run 0.0.0.0:14449')
     app.run(host='0.0.0.0', port=14449)
