@@ -12,9 +12,14 @@ export function Dataset () {
 
     this.storyTreeDataset = null;
 
+    this.ReorderedMatrix = null;
+
+    this.concatMatrixConCom = null;
+
     this.SankeyTreePathNode = null;
 
     this.mediaScatterSelected = ['msn.com', 'menafn.com','yahoo.com'];
+
 
     this.mediaGraphList = [];
 }
@@ -41,6 +46,14 @@ Dataset.prototype = {
 
     updateMediaMatrixSelected: function(data) {
         this.mediaMatrixSelected = data;
+    },
+
+    updateMediaMatrixConCom: function(data) {
+        this.concatMatrixConCom = data;
+    },
+
+    updateReorderedMatrix: function(data) {
+        this.ReorderedMatrix = data;
     },
 
     updateStoryTreeDataset: function(data) {

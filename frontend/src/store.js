@@ -19,6 +19,7 @@ export default new Vuex.Store({
 
     mediaDiffConcatSignal: 0,
     concatdiff_finish: 0,
+    concatdiffconcom_finish:0,
     
     tree_node_click: null,
     tree_node_circle_click: -1,
@@ -36,7 +37,6 @@ export default new Vuex.Store({
       state.contour_search_domain = contour_search_domain
     },
     ['UPDATE_CLICK_SANKEY_TREE_NODE_MODE'] (state) {
-      // console.log("点击了一个节点")
       state.clickSankeyTreeNode = (state.clickSankeyTreeNode + 1 ) % 5;
     },
 
@@ -72,6 +72,10 @@ export default new Vuex.Store({
 
     ['UPDATE_CONCATDIFF_FINISH'](state){
       state.concatdiff_finish = (state.concatdiff_finish + 1 ) % 5;
+    },
+
+    ['UPDATE_CONCATDIFFCONCOM_FINISH'](state){
+      state.concatdiffconcom_finish = (state.concatdiffconcom_finish + 1 ) % 5;
     },
 
     ['UPDATE_TREE_NODE_CLICK_PATH_LIST'] (state, tree_node_circle_click_path_list) {

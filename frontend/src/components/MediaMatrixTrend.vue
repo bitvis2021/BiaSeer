@@ -107,8 +107,19 @@ export default {
             let col_inv = reorder.inverse_permutation(col_perm);
             console.log('row_inv', row_inv);
             // console.log(col_inv);
-            // console.log(matrix);
-            console.log('vdata', vdata);
+            console.log('matrix',matrix);
+            // console.log('vdata', vdata);
+            //reodering the matrix
+            const rearrangedMatrix = rearrangeMatrix(matrix, row_inv);
+            console.log('rearrangedMatrix', rearrangedMatrix);
+
+            sysDatasetObj.updateReorderedMatrix(rearrangedMatrix);
+
+            console.log('reordered matrix', sysDatasetObj.ReorderedMatrix);
+            console.log('reordered matrix connected componnet', sysDatasetObj.concatMatrixConCom);
+
+
+
 
             let computeColorNeg = d3.interpolate('red', '#f9f9f9');
             let linearVDataNeg = d3.scaleLinear()  
@@ -128,6 +139,7 @@ export default {
             let rectWH = d3.scaleLinear()
                 .domain([0, d3.max(vdata2)])
                 .range([3, 9]);
+
             
             
             // let rectWH = d3.scaleLinear()
@@ -340,8 +352,13 @@ export default {
                 .text('aaa');
 
             
+<<<<<<< Updated upstream
             // data2 = sysDatasetObj.concatMatrixConCom;
             // console.log('sysDatasetObj.concatMatrixConCom', data2)
+=======
+            data2 = sysDatasetObj.concatMatrixConCom;
+            console.log('sysDatasetObj.concatMatrixConCom', data2)
+>>>>>>> Stashed changes
             
             // concat_areaG
             //     .selectAll(".concat_area_element")
