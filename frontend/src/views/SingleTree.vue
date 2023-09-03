@@ -1,8 +1,10 @@
 <template>
     <div class="single_tree"
+    :class="domain"
     v-loading="storytree__loading"
     ref="singlestorytree"
     element-loading-text="Waiting Loading Story Tree">
+    
     <svg id="single_storytree__svg"></svg>
     </div>
 </template>
@@ -47,28 +49,28 @@ export default {
             
 
             let renderStoryTree = (root, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope) => {
-                let x0 = Infinity;
+                let x0 = 10;
                 let x1 = -x0;
                 root.each(d => {
                     if (d.x > x1) x1 = d.x;
                     if (d.x < x0) x0 = d.x;
-                });
+                });//find max and min
                 d3.select(self.$el).select("#single_storytree__svg").selectAll('g').remove();
                 
                 const svg = d3.select(self.$el).select("#single_storytree__svg")
                     .attr("width", width - 10)
                     .attr("height", height - 10);
 
-                svg.append("defs").html(`
-                    <style>
-                    .highlight circle { fill:black }
-                    .highlight circle { fill:black }
-                    .highlight text { fill:black }
-                    .leaf circle { fill:black }
-                    .leaf circle { fill:black }
-                    .leaf text { fill:black }
-                    path.highlight { stroke:black }
-                    <style>`);
+                // svg.append("defs").html(`
+                //     <style>
+                //     .highlight circle { fill:black }
+                //     .highlight circle { fill:black }
+                //     .highlight text { fill:black }
+                //     .leaf circle { fill:black }
+                //     .leaf circle { fill:black }
+                //     .leaf text { fill:black }
+                //     path.highlight { stroke:black }
+                //     <style>`);
 
                 const g = svg
                     .append("g")
@@ -93,10 +95,10 @@ export default {
 
                 const link = g
                     .append("g")
-                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
+                    .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)//????
                     .attr("fill", "none")
-                    .attr("stroke", "steelblue")
-                    .attr("stroke-opacity", 0.4)
+                    .attr("stroke", "grey")
+                    
                     .selectAll("path")
                     .data(root.links())
                     .join("path")
@@ -122,6 +124,12 @@ export default {
                             //     .y(d => d.x)(d)
                         }
                     })
+                    .attr("stroke-opacity", d=>{
+                        if(d.target.data.tree_mSrcName.indexOf(self.domain) < 0){
+                            return 0.5;
+                        }
+                        return 1.0;
+                    })//0.4
                     // .attr("stroke-width", d=>{
                     //     return lineWidthScale(+d.target.data.tree_maxCompatibility)
                     // })
@@ -167,9 +175,9 @@ export default {
                 let linearVDataPos = d3.scaleLinear()  
                     .domain([0.5, 0.8])
                     .range([0, 1]);
-                node
-                    .append("circle")
-                    .attr("fill", d=> {
+                var rect=node
+                    .append("rect");
+                    rect.attr("fill", d=> {
                         if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
                             return "white";
                         }else{
@@ -184,7 +192,7 @@ export default {
                             }                            
                         }
                     })
-                    .attr("stroke", "steelblue")
+                    .attr("stroke", "grey")
                     .attr("stroke-dasharray", d=>{
                         if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
                             return "2"
@@ -194,15 +202,47 @@ export default {
                         }
                     })
                     .attr("stroke-width", "1px")
-                    .attr("r", d=> {
+                    .attr("width", d=> {
                         if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
-                            return 4;
+                            return 0;
                         }
                         else{
                             let index = d.data.mSrc_list.indexOf(self.domain)
                             return reScaleCircleRadia(+d.data.tree_nodeSrcN[index])
                         }
-                    });
+                    })
+                    .attr("height",d=>{
+                        if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
+                            return 0;
+                        }
+                        else{
+                            let index = d.data.mSrc_list.indexOf(self.domain)
+                            return reScaleCircleRadia(+d.data.tree_nodeSrcN[index])
+                        }
+                    })
+                    var rect_y=rect.attr("y")
+                    rect.attr("y",d=>{
+                        if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
+                            return 0;
+                        }
+                        else{
+                            let index = d.data.mSrc_list.indexOf(self.domain)
+                            return -reScaleCircleRadia(+d.data.tree_nodeSrcN[index])/2
+                        }
+                        
+                    })
+                    .attr("x",d=>{
+                        if(d.data.tree_mSrcName.indexOf(self.domain) < 0){
+                            return 0;
+                        }
+                        else{
+                            let index = d.data.mSrc_list.indexOf(self.domain)
+                            return -reScaleCircleRadia(+d.data.tree_nodeSrcN[index])/2
+                        }
+                        
+                    })
+                    
+                    
             }
 
 
@@ -274,7 +314,8 @@ export default {
             let self = this;
             this.width = this.$refs.singlestorytree.clientWidth;
             this.height = this.$refs.singlestorytree.clientHeight;
-            self.drawStoryTree(self.width, self.height);
+            console.log("storytree width height",this.width,this.height)
+            self.drawStoryTree(self.width+10, self.height+7);
         },
     }
 }
@@ -284,5 +325,6 @@ export default {
 .single_tree{
     width: 100%;
     height: 100%;
+    
 }
 </style>
