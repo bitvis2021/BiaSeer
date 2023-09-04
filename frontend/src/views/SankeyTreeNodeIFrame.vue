@@ -15,9 +15,9 @@
             </el-collapse>
         </div>
 
-        <div class="wordcloud">
+        <!-- <div class="wordcloud">
             <div ref='wordCloudBox'></div>
-        </div>
+        </div> -->
 
     </div>
 </template>

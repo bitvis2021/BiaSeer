@@ -57,8 +57,8 @@
     <div class="event-evolution">
       <div class="union-event-evolution">
         <div class="event-evolution-storytree" id="story_tree_div">
-          <!-- <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree> -->
-          <MediaSankeyTree :storytree__loading="storytree__loading"></MediaSankeyTree>
+          <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
+          <!-- <MediaSankeyTree :storytree__loading="storytree__loading"></MediaSankeyTree> -->
         </div>
         <div class="event-iframeview">
           <SankeyTreeNodeIFrameVue></SankeyTreeNodeIFrameVue>

@@ -404,12 +404,9 @@ export default {
 
                 // the function for moving the nodes
                 function dragmove(d) {
-                    // console.log(d);
-                    // self.UPDATE_CLICK_SANKEY_TREE_NODE_MODE();
                     d3.select(this).attr("transform",
                         "translate(" + (
                             d.xPos
-                            // d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
                         )
                         + "," + (
                             d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
@@ -426,7 +423,6 @@ export default {
                 }
                 svg.selectAll(".sankeytree__node")
                     .on("mouseover", function () {
-                        self.UPDATE_CLICK_SANKEY_TREE_NODE_MODE();
 
                         const m = d3.mouse(this);
                         // console.log("m:", m);
@@ -487,6 +483,7 @@ export default {
                         self.cuurent_root_path_node = path__node;
                         console.log('cuurent_root_path', self.cuurent_root_path)
                         sysDatasetObj.updateSankeyTreePathNode(self.cuurent_root_path);
+                        self.UPDATE_CLICK_SANKEY_TREE_NODE_MODE();
                         console.log(sysDatasetObj.SankeyTreePathNode)
                         
 
