@@ -352,7 +352,7 @@ export default {
       .media-concat-list{
         position: absolute;
         top: 0%;
-        bottom: 92%;
+        bottom: 87%;
         left: 0%;
         right: 0%;
         border: 1px solid gray;
@@ -361,7 +361,7 @@ export default {
       }
       .media-concat-diffarea{
         position: absolute;
-        top: 8%;
+        top: 13%;
         bottom: 0%;
         left: 0%;
         right: 0%;

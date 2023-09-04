@@ -255,22 +255,43 @@ export default {
 
             let brush = d3.brush()
                 .extent([[m.l, m.t], [width, height]])
-                .on('start brush', brushed)
-                .on('end', d=>{ // ending brush, gain storytree and draw stroytree
-                    sysDatasetObj.updateMediaMatrixSelected(self.selected);
-                    self.UPDATE_MATRIX_SELECTED_SIGNAL();
-                    return brushed;
-                })
+                // .on('start brush', brushed)
+                .on('end', brushed)
+                // .on('end', d=>{ // ending brush, gain storytree and draw stroytree
+                //     sysDatasetObj.updateMediaMatrixSelected(self.selected);
+                //     self.UPDATE_MATRIX_SELECTED_SIGNAL();
+                //     // return brushed;
+                // })
+            
+            // function updateChart() {
+            //     let extent = d3.event.selection
+            //     // charts.classed("selected", function(d){ return isBrushed(extent, x(new Date(d.date0)), new_y(d.topic) ) } )
+            //     charts.attr("fill-opacity", 0.3)
+            //         .filter(d=>isBrushed(extent, x(new Date(d.date0)), new_y(d.topic) ))
+            //         .attr("fill-opacity", 0.3)
+            // }
+
+            // A function that return TRUE or FALSE according if a dot is in the selection or not
+            // function isBrushed(brush_coords, cx, cy) {
+            //     var x0 = brush_coords[0][0],
+            //         x1 = brush_coords[1][0],
+            //         y0 = brush_coords[0][1],
+            //         y1 = brush_coords[1][1];
+            //     return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    // This return TRUE or FALSE depending on if the points is in the selected area
+            // }
 
             function brushed() {
                 let selection = d3.event.selection;
-                if (selection === null){
+                if (selection == null){
                     charts.attr('fill', d=> {
-                        if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
-                        else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
-                        else return white;
-                    })
+                            if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
+                            else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
+                            else return 'white';
+                        })
+                        .attr("fill-opacity", 1);
+                    
                     self.selected = {'topics': new Set(), 'date_index': new Set(), 'date': new Set()};
+                    return ;
                 }
                 else {
                     let [minX, minY] = d3.event.selection[0] || [];
@@ -278,25 +299,24 @@ export default {
                     
                     self.selected = {'topics': new Set(), 'date_index': new Set(), 'date': new Set()};
 
-                    charts.attr('stroke', (d,i) =>{ // i represents the i-th time range index
-                        // console.log(topicLocation)
-
-                        if(minX <= x(new Date(d.date0)) 
+                    let selected = charts
+                        .attr("fill-opacity", 0.1)
+                        .filter((d,i)=>{
+                            if(minX <= x(new Date(d.date0)) 
                             && x(new Date(d.date0)) <= maxX
                             && minY <= new_y(d.topic)
-                            && new_y(d.topic) <= maxY
-                        ){
-                            self.selected['topics'].add(d.topic);
-                            self.selected['date_index'].add(i);
-                            self.selected['date'].add(d.date0);
-                            return 'gray';
-                        }
-                        else{
-                            // return 'steelblue';
-                            return '';
-                        }
-                    })
-                    .attr('stroke-width', 0.1)
+                            && new_y(d.topic) <= maxY) {
+                                self.selected['topics'].add(d.topic);
+                                self.selected['date_index'].add(i);
+                                self.selected['date'].add(d.date0);
+                                return true;
+                            }
+                            return false
+                        })
+                        .attr("fill-opacity", 1);
+                    
+                    sysDatasetObj.updateMediaMatrixSelected(self.selected);
+                    self.UPDATE_MATRIX_SELECTED_SIGNAL();
                 }
             }
 
