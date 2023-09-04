@@ -2,15 +2,12 @@
     <div class="sankeytree-node-iframe" ref="iframediv">
 
         <div class="mytip" v-for="(item,index) in node_details2">
-            <!-- <h4> {{ item.name.split("+")[0]+"."  }}</h4>
-            <p> {{ item.node_detail_info[0].lines }}</p> -->
             <el-collapse>
                 <el-collapse-item >
                     <template #title>
-                        <h3 class="el-collapse-item-title"> {{ item.name.split("+")[0]+"."  }}</h3>
-                        <!-- <div class="el-collapse-item-title">{{ " [" + (index + 1) +"] " + item.name.split("+")[0]+"." }}</div> -->
+                        <h3 class="el-collapse-item-title"> {{ item.title.split("+")[0]+"."  }}</h3>
                     </template>
-                    <p> {{ item.node_detail_info[0].lines }}</p>
+                    <p> {{ item.lines }}</p>
                 </el-collapse-item>
             </el-collapse>
         </div>
@@ -48,12 +45,7 @@ export default {
     mounted: function () {
         this.isShowCarousel = false
         this.width = this.$refs.iframediv.clientWidth;
-        // let wordList = [
-        //         {text:'vue',size:20},
-        //         {text:'html',size:25},
-        //         {text:'js',size:30},
-        //     ]
-        // this.getWordCloud(wordList);
+
     },
     methods: {
         ...mapMutations([
@@ -73,6 +65,30 @@ export default {
         //回调
         getArticleList(){
             console.log("...")
+        },
+        drawWordCloud(){
+            let root = d3.hierarchy(sysDatasetObj.storyTreeDataset);
+            let wordList = [];
+            root.each(d=>{
+                if(d.data.name == 'ROOT' || d.data.time_e == 'time'){return}
+                wordList.push(...d.data.tree_topickey)
+                wordList.push(...d.data.tree_keyword.flat())
+                wordList.push(...d.data.tree_titlekeyword.flat())
+            })
+            // console.log(wordList);
+            const wordListCountDict = wordList.reduce((obj,key)=>{
+                if (key in obj){
+                    obj[key]++
+                }else{
+                    obj[key]=1
+                }
+                return obj
+            },{})
+            wordList = []
+            for (const [key, value] of Object.entries(wordListCountDict)) {
+                wordList.push({text: key, size: value * 10})
+            }
+            this.getWordCloud(wordList);
         }
     },
     computed: {
@@ -93,10 +109,18 @@ export default {
             data.forEach(d=>{
                 console.log(d);
                 if(d.name == 'ROOT' || d.time_e == 'time'){return}
-                self.node_details2.push(d);
-                console.log('node_details', self.node_details2)
+                // self.node_details2.push(...d.node_detail_info);
+                d.node_detail_info.forEach(ele=>{
+                    self.node_details2.push(ele)
+                    if(ele.related_infos.length > 0){
+                        ele.related_infos.forEach(e=>{
+                            self.node_details2.push(e)
+                        })
+                    }
                 })
-            // 那全局数据
+            })
+            console.log('node_details2', self.node_details2)
+            // 全局数据
             self.isShowCarousel = true;
         },
         storytree_finish: function(){
@@ -104,38 +128,23 @@ export default {
             let data = sysDatasetObj.storyTreeDataset;
             let root = d3.hierarchy(data);
             self.node_details = [];
-            let wordList = [];
+            self.node_details2 = [];
             root.each(d=>{
-                // console.log(d);
                 if(d.data.name == 'ROOT' || d.data.time_e == 'time'){return}
-                self.node_details.push(d.data);
-                wordList.push(...d.data.tree_topickey)
-                wordList.push(...d.data.tree_keyword.flat())
-                wordList.push(...d.data.tree_titlekeyword.flat())
+                // self.node_details.push(...d.data.node_detail_info);
+                d.data.node_detail_info.forEach(ele=>{
+                    self.node_details2.push(ele)
+                    if(ele.related_infos.length > 0){
+                        ele.related_infos.forEach(e=>{
+                            self.node_details2.push(e)
+                        })
+                    }
+                })
             })
-            // console.log(self.node_details);
             self.activeNames = ['1', '2'];
 
-            console.log(wordList);
-            const wordListCountDict = wordList.reduce((obj,key)=>{
-                if (key in obj){
-                    obj[key]++
-                }else{
-                    obj[key]=1
-                }
-                return obj
-            },{})
-            console.log(wordListCountDict);
-            wordList = []
-            for (const [key, value] of Object.entries(wordListCountDict)) {
-                wordList.push({text: key, size: value * 10})
-            }
-            // wordList = [
-            //     {text:'vue',size:20},
-            //     {text:'html',size:25},
-            //     {text:'js',size:30},
-            // ]
-            this.getWordCloud(wordList);
+
+            
         }
     }
 }
@@ -185,7 +194,6 @@ export default {
   .mytip {
     padding: 8px 16px;
     background-color: #ecf8ff;
-    border-radius: 4px;
     border-left: 5px solid #50bfff;
     margin-top: 5px;
     }
