@@ -255,11 +255,7 @@ def connectedDomain(img):
         for i in range(1,h):
             flag = True
             for j in range(w):
-<<<<<<< Updated upstream
-                if float(img[i,j]) > 0.:
-=======
                 if float(img[i,j]) > 0.2:
->>>>>>> Stashed changes
                     for key in domain:
                         if (i-1,j) in domain[key]:
                             domain[key].add((i,j))

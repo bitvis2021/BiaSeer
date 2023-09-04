@@ -1,13 +1,24 @@
 <template>
-    <div class="mediatags">
-        <el-switch v-model="isConcated" active-text="concat" @change="changeConcatStatus" class="concat-switch">
-        </el-switch>
-        <el-tag size="medium" :key="tag" v-for="tag in dynamicTags" closable :disable-transitions="false"
-            @close="handleClose(tag)">
-            {{ tag }}
-        </el-tag>
-        <!-- <el-button type="primary" size="mini" @click="gainConcatDiff">Concat</el-button> -->
+    <div class="MediaConcat" style="display: flex; justify-content: space-between;">
+        <div class="mediatags" style="order:1;">
+            <div class="concat_text">
+                <span>
+                    SELECTED MEDIA:
+                </span>
+            </div>
+            <el-tag size="medium" :key="tag" v-for="tag in dynamicTags" closable :disable-transitions="false"
+                @close="handleClose(tag)">
+                {{ tag }}
+            </el-tag>
+        </div>
+        <div class="concatswitch" style="order:2;">
+            <el-switch v-model="isConcated" active-text="concat" @change="changeConcatStatus" class="concat-switch">
+            </el-switch>
+        </div>
     </div>
+    <!-- <div class="mediatags"> -->
+        <!-- <el-button type="primary" size="mini" @click="gainConcatDiff">Concat</el-button> -->
+    <!-- </div> -->
 </template>
   
 <script>
@@ -79,6 +90,16 @@ export default {
 </script>
   
 <style lang="less" scoped>
+.concat_text {
+    margin-right: 10px;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 2.5px;
+}
+.MediaConcat {
+    width: 100%;
+    padding: 10px;
+}
 .mediatags {
     // height: 100%;
     display: flex;

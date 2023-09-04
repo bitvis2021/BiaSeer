@@ -140,6 +140,10 @@ export default {
                 .domain([0, d3.max(vdata2)])
                 .range([3, 9]);
 
+            let rectWH2 = d3.scaleLinear()
+                .domain([0, d3.max(vdata)])
+                .range([3, 9]);
+
             
             
             // let rectWH = d3.scaleLinear()
@@ -236,16 +240,22 @@ export default {
                 .attr('class', 'media_matrix_rect')
                 .attr("x", d=> x(new Date(d.date0)))
                 .attr("height", d=> {
-                    if (flag === 'concat') return 9;
-                    else if (flag === 'single') {
+                    if (flag === 'single'){
                         if (d.value2 > 0)  return rectWH(d.value2);
+                        else return 3;
+                    }
+                    else if (flag === 'concat') {
+                        if (d.value > 0)  return rectWH2(d.value);
                         else return 3;
                     }
                 })
                 .attr("width", d=> {
-                    if (flag === 'concat') return 9;
-                    else if (flag === 'single') {
+                    if (flag === 'single'){
                         if (d.value2 > 0)  return rectWH(d.value2);
+                        else return 3;
+                    }
+                    else if (flag === 'concat') {
+                        if (d.value > 0)  return rectWH2(d.value);
                         else return 3;
                     }
                 })
@@ -352,13 +362,8 @@ export default {
                 .text('aaa');
 
             
-<<<<<<< Updated upstream
             // data2 = sysDatasetObj.concatMatrixConCom;
             // console.log('sysDatasetObj.concatMatrixConCom', data2)
-=======
-            data2 = sysDatasetObj.concatMatrixConCom;
-            console.log('sysDatasetObj.concatMatrixConCom', data2)
->>>>>>> Stashed changes
             
             // concat_areaG
             //     .selectAll(".concat_area_element")

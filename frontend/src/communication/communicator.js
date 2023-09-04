@@ -78,7 +78,6 @@ export function getMediaDiffConcatData(meidaList, callback) {
         callback(mediaDiffConcatData);
     })
 }
-<<<<<<< Updated upstream
 export function getTreeDiff(meidaList, tree_name,callback) {
     let formData = {
         "mSrc_list": meidaList,
@@ -87,29 +86,12 @@ export function getTreeDiff(meidaList, tree_name,callback) {
     axios({
         methods: 'get',
         url: server_address + '/tree_diff',
-=======
-
-export function getMediaDiffConcatConCom(reordered_matrix, callback) {
-    let formData = {
-        "matrix": reordered_matrix
-    }
-    console.log('matrix', formData);
-    axios({
-        methods: 'get',
-        url: server_address + '/concat_connected_component',
->>>>>>> Stashed changes
         params: formData,
         timeout: 1000000,
     })
     .then((res) => {
-<<<<<<< Updated upstream
         let tree_diff_data = res["data"]["data"];
         // console.log('tree_diff_data:', tree_diff_data);
         callback(tree_diff_data);
-=======
-        let mediaDiffConcatConCom = res["data"]["data"];
-        console.log('mediaDiffConcatConComData:', mediaDiffConcatConCom);
-        callback(mediaDiffConcatConCom);
->>>>>>> Stashed changes
     })
 }
