@@ -67,7 +67,7 @@
         
       </div>
       <div class="single-event-evolution">
-        <el-card v-for="(item, index) in currentRankMedia" :key="index" :id="item.domain.replaceAll('.','_')" style="margin-right:10px">
+        <el-card v-for="(item, index) in currentRankMedia" :key="index" :id="item.domain.replaceAll('.','_')" style="margin-right:10px; width:25%">
 
           <div class="single-domain-tree" slot="header" >
             <span>{{item.domain}}</span>
@@ -417,11 +417,10 @@ export default {
       right: 0%;
       overflow-x: scroll;
       display: flex;
-      .single-domain-tree{
-        flex: 1;
-        justify-content: space-around;
-        margin: 4px;
-      }
+      // .single-domain-tree{
+      //   flex: 1;
+      //   margin: 4px;
+      // }
     }
   }
 }
