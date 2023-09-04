@@ -57,8 +57,8 @@
     <div class="event-evolution">
       <div class="union-event-evolution">
         <div class="event-evolution-storytree" id="story_tree_div">
-          <!-- <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree> -->
-          <MediaSankeyTree :storytree__loading="storytree__loading"></MediaSankeyTree>
+          <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
+          <!-- <MediaSankeyTree :storytree__loading="storytree__loading"></MediaSankeyTree> -->
         </div>
         <div class="event-iframeview">
           <SankeyTreeNodeIFrameVue></SankeyTreeNodeIFrameVue>
@@ -67,7 +67,7 @@
         
       </div>
       <div class="single-event-evolution">
-        <el-card v-for="(item, index) in currentRankMedia" :key="index" :id="item.domain.replaceAll('.','_')" style="margin-right:10px">
+        <el-card v-for="(item, index) in currentRankMedia" :key="index" :id="item.domain.replaceAll('.','_')" style="margin-right:10px; width:25%">
 
           <div class="single-domain-tree" slot="header" >
             <span>{{item.domain}}</span>
@@ -352,7 +352,7 @@ export default {
       .media-concat-list{
         position: absolute;
         top: 0%;
-        bottom: 92%;
+        bottom: 87%;
         left: 0%;
         right: 0%;
         border: 1px solid gray;
@@ -361,7 +361,7 @@ export default {
       }
       .media-concat-diffarea{
         position: absolute;
-        top: 8%;
+        top: 13%;
         bottom: 0%;
         left: 0%;
         right: 0%;
@@ -417,11 +417,10 @@ export default {
       right: 0%;
       overflow-x: scroll;
       display: flex;
-      .single-domain-tree{
-        flex: 1;
-        justify-content: space-around;
-        margin: 4px;
-      }
+      // .single-domain-tree{
+      //   flex: 1;
+      //   margin: 4px;
+      // }
     }
   }
 }

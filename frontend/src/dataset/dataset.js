@@ -14,7 +14,7 @@ export function Dataset () {
 
     this.SankeyTreePathNode = null;
 
-    this.mediaScatterSelected = ['msn.com', 'menafn.com','yahoo.com'];
+    this.mediaScatterSelected = ['msn.com', 'menafn.com','yahoo.com', 'interfax.com.ua'];
 
     this.mediaGraphList = [];
 }
