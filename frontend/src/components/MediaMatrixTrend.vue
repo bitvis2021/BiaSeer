@@ -128,11 +128,10 @@ export default {
             let rectWH = d3.scaleLinear()
                 .domain([0, d3.max(vdata2)])
                 .range([3, 9]);
-            
-            // let rectWH = d3.scaleLinear()
-            //     .domain([0, d3.max(vdata2)])
-            //     .range([3, 9])
-
+                
+            let rectWH2 = d3.scaleLinear()
+                .domain([0, d3.max(vdata)])
+                .range([3, 9]);
 
             let m = ({ l: 97, r: 20, t: 6, b: 20 });
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
@@ -198,7 +197,7 @@ export default {
             //         else return 'white';
             //     })
 
-                let charts = rectsG.selectAll('g')
+            let charts = rectsG.selectAll('g')
                 .data(data1.values)
                 .join('g')
                 .attr('class', 'ggg')
@@ -209,16 +208,22 @@ export default {
                 .attr('class', 'media_matrix_rect')
                 .attr("x", d=> x(new Date(d.date0)))
                 .attr("height", d=> {
-                    if (flag === 'concat') return 9;
-                    else if (flag === 'single') {
+                    if (flag === 'single'){
                         if (d.value2 > 0)  return rectWH(d.value2);
+                        else return 3;
+                    }
+                    else if (flag === 'concat') {
+                        if (d.value > 0)  return rectWH2(d.value);
                         else return 3;
                     }
                 })
                 .attr("width", d=> {
-                    if (flag === 'concat') return 9;
-                    else if (flag === 'single') {
+                    if (flag === 'single'){
                         if (d.value2 > 0)  return rectWH(d.value2);
+                        else return 3;
+                    }
+                    else if (flag === 'concat') {
+                        if (d.value > 0)  return rectWH2(d.value);
                         else return 3;
                     }
                 })

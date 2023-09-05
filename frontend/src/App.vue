@@ -426,13 +426,17 @@ export default {
 }
 
 .search-input {
-  width: 130px;
-  margin-left: 41.4%;
+  width: 230px;
+  margin-left: 37.4%;
   margin-top: 0.1%;
   .el-input__inner{
     height: 30px;
+    font-size: 1.5em;
+    font-weight: bolder;
+    color: #4e6ef2;
   }
   .el-input__suffix {
+    width: 200px;
     top: 7px;
   }
   .el-input__icon {
