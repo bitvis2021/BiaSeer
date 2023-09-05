@@ -69,8 +69,11 @@
       <div class="single-event-evolution">
         <el-card v-for="(item, index) in currentRankMedia" :key="index" :id="item.domain.replaceAll('.','_')" style="margin-right:10px; width:25%">
 
-          <div class="single-domain-tree" slot="header" >
-            <span>{{item.domain}}</span>
+          <div class="single-domain-tree" ref="singleTree" slot="header" >
+            <span class="mSrcSpan">{{item.domain}}</span>
+            <!-- <svg class="mSrcSvg" width="20" height="15">
+              <circle r="5" cx="8" cy="5" :fill=genMsrcColor(item.domain)></circle>
+            </svg> -->
             <el-button style="float: right; padding: 3px 0" type="text" @click="getTreeDiffData(item.domain)">Choose</el-button>
           </div>
           <SingleTree :storytree__loading="storytree__loading" :domain="item.domain"></SingleTree>
@@ -171,8 +174,24 @@ export default {
     this.domain_list = this.states.map(item => {
       return { value: `${item}`, label: `${item}` };
     });
+    // self.drawMediaSpan()
+
+
   },
   methods: {
+    genMsrcColor1(mSrc_name){
+      console.log("in genMsrcColor!!!")
+      var mSrc_list=this.currentSelectedMedia
+      let piecolorScale_1=(i)=>{
+          let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+          return colorArray[i%4];
+      }
+      for(var i=0;i<mSrc_list.length;i++){
+        if(mSrc_list[i].domian==mSrc_name)
+          return "color:"+piecolorScale_1(i)
+      }
+      
+    },
     ...mapMutations([
       'UPDATE_STORYTREE_FINISH',
       'UPDATE_CONCATDIFF_FINISH',
@@ -230,7 +249,33 @@ export default {
         self.UPDATE_STORYTREE_FINISH();
         console.log("currentrank ",self.currentRankMedia)
       });
-    }
+    },
+    genMsrcColor(mSrc_name){
+      console.log("in genMsrcColor!!!")
+      var mSrc_list=this.currentSelectedMedia
+      let piecolorScale_1=(i)=>{
+          let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+          return colorArray[i%4];
+      }
+      for(var i=0;i<mSrc_list.length;i++){
+        if(mSrc_list[i].domian==mSrc_name)
+          return piecolorScale_1(i)
+      }
+      
+    },
+    // drawMediaSpan(){
+    //         let self=this
+    //         let span1=d3.select("body").selectAll(".single-domain-tree").selectAll("span")
+    //         // console.log("span,",d3.select("body"))
+    //         // console.log("span,",d3.select("body").select(this.$refs.singleTree))
+    //         // console.log("span,",d3.select("body").select(".event-evolution").selectAll(".single-domain-tree"))
+    //         // console.log("span,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution"))
+    //         // console.log("span,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".el-card__body"))
+    //         console.log("span1,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span").selectAll(".mSrcSpan"))
+    //         console.log("span2,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span"))
+    //         console.log("span3,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan"))
+    //     },
+    
   },
   computed: {
     ...mapState([
@@ -239,9 +284,9 @@ export default {
       'mediaDiffConcatSignal',
       'mediaScatterClick'
     ]),
-    showSrcName:function(){
-      return "jintain"
-    },
+    
+    
+    
   },
   watch: {
     select_domain: function(){
