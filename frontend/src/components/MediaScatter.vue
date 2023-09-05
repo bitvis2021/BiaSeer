@@ -642,13 +642,7 @@ export default {
         },
         drawMediaGraph(domains) {
             let self = this;
-            // console.log(sysDatasetObj.mediaDataSet);
-            // console.log(tmpdata);
             let mediagraph = sysDatasetObj.mediaDataSet['mediagraph'];
-            // console.log(mediagraph);
-            // let mediagraphValues = Object.values(mediagraph);
-            // let edgeScale = d3.scaleLog().domain(d3.extent(mediagraphValues)).range([1,4]);
-            // console.log(d3.max(mediagraphValues));
             
             let domainOneStep = {}
             domains.forEach(domain => {
@@ -671,6 +665,8 @@ export default {
                 circles.each(function () {
                     const thisD3 = d3.select(this)
                     d3.select(this).classed("dot_mouseover", false);
+                    d3.select(this).classed("dot-keep-domain-hover", false);
+                    d3.select(this).attr("fill-opacity", 0.5);
                     circlesLocation[thisD3.attr('id').split('media_id_')[1]] = [+thisD3.attr('cx'), +thisD3.attr('cy')]
                 })
 
@@ -683,25 +679,41 @@ export default {
                         path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
                         domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
                     }
-                    // path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
-                    // path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
-                    // domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
                 }
             })
             console.log(domainOneStep);
 
             let mediagraphValues = Object.values(domainOneStep).map(ele=>ele.value);
             let edgeScale = d3.scaleLinear().domain(d3.extent(mediagraphValues)).range([1,4]);
-            console.log(d3.max(mediagraphValues));
+            // console.log(d3.max(mediagraphValues));
 
             Object.keys(domainOneStep).forEach(ele=>{
                 let link_domain = ele.split("_");
                 d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
                     .select('#media_id_' + link_domain[0].replaceAll(".","_"))
+                    .attr("fill-opacity", 1)
                     .classed("dot_mouseover", true)
                 d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
                     .select('#media_id_' + link_domain[1].replaceAll(".","_"))
+                    .attr("fill-opacity", 1)
                     .classed("dot_mouseover", true)
+                
+                if(domains.includes(link_domain[0])){
+                    d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                        .select('#media_id_' + link_domain[0].replaceAll(".","_"))
+                        .classed("dot_mouseover", false)
+                    d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                        .select('#media_id_' + link_domain[0].replaceAll(".","_"))
+                        .classed("dot-keep-domain-hover", true)
+                }
+                if(domains.includes(link_domain[1])){
+                    d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                        .select('#media_id_' + link_domain[1].replaceAll(".","_"))
+                        .classed("dot_mouseover", false)
+                    d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                        .select('#media_id_' + link_domain[1].replaceAll(".","_"))
+                        .classed("dot-keep-domain-hover", true)
+                }
             })
 
             self.lineGenerator = d3.line()
@@ -838,6 +850,10 @@ export default {
 }
 
 .dot-search-hover{
+    fill: #e34a33;
+}
+
+.dot-keep-domain-hover{
     fill: #e34a33;
 }
 

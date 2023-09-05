@@ -220,7 +220,8 @@ export default {
         ...mapMutations([
             'UPDATE_TREE_NODE_CIRCLE_CLICK',
             'UPDATE_TREE_NODE_CLICK',
-            'UPDATE_TREE_NODE_CLICK_PATH_LIST'
+            'UPDATE_TREE_NODE_CLICK_PATH_LIST',
+            'UPDATE_CLICK_SANKEY_TREE_NODE_MODE'
         ]),
         initLeftTopPos: function() {
             let odiv=document.getElementById('div_id_storytree');
@@ -344,8 +345,6 @@ export default {
                     .append("g")
                     .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
                     .attr("fill", "none")
-                    .attr("stroke", "steelblue")
-                    .attr("stroke-opacity", 0.4)
                     .selectAll("path")
                     .data(root.links())
                     .join("path")
@@ -372,12 +371,14 @@ export default {
                                 .y(d => d.x)(d)
                         }
                     })
+                    .attr("stroke", "gray")
                     .attr("stroke-width", d=>{
-                        return lineWidthScale(+d.target.data.tree_maxCompatibility)
+                        // return lineWidthScale(+d.target.data.tree_maxCompatibility)
+                        return 1
                     })
                     .attr("stroke-opacity", d=>{
-                        return lineFillScale(+d.target.data.tree_maxCompatibility)
-                        // return 0.4
+                        // return lineFillScale(+d.target.data.tree_maxCompatibility)
+                        return 0.8
                     })
                     .on("mouseover", function(d) {
                         d3.select(this).classed("line-hover", true);
@@ -436,6 +437,13 @@ export default {
                     let ele_g = d3.select(this.$el).select("#story_tree_node_" + ele.index).append("g")
                         .attr("class", "ele-g");
                     
+                    // root node
+                    if(ele.data.name == "ROOT"){
+                        ele_g.append('path')
+                            .attr('d',d3.symbol().type(d3.symbolStar).size(200))
+                            .attr('fill','gray')
+                    }
+                    
                     let pie_r = ele.data.totalbias !="null" ? reScaleCircleRadia(+ele.data.totalbias) : 1;
                     
                     ele_g.selectAll(".story_tree_node_pie")
@@ -465,7 +473,7 @@ export default {
                     .attr("fill", "steelblue")
                     .text(d=>{
                         let show_str = d.data.tree_topickey.slice(0,3).toString().replaceAll(",","; ")
-                        return show_str == 'null' ? 'Story' : show_str;
+                        return d.data.tree_topickey.length == 0 ? 'ROOT' : show_str;
                     })
                     .clone(true)
                     .lower()
@@ -520,7 +528,11 @@ export default {
                         const leaf = node.data()[
                             d3.scan(node.data().map(d => dist2([reScale(d.data.time_e), d.x], m)))
                         ];
-                        // console.log("leaf:", leaf);
+                        console.log("leaf:", leaf);
+                        // 如果mouseover在了根节点上直接返回
+                        if(leaf.data.name == 'ROOT' || leaf.time_e == 'time'){
+                            return;
+                        }
 
                         let d = root
                             .links()
@@ -676,6 +688,9 @@ export default {
                         node.classed("highlight", d => path.indexOf(d.data) > -1);
                         node.classed("leaf", d => path.indexOf(d.data) === 0);
                         link.classed("highlight", d => path.indexOf(d.target.data) > -1);
+
+                        sysDatasetObj.updateSankeyTreePathNode(self.ego_path);
+                        self.UPDATE_CLICK_SANKEY_TREE_NODE_MODE();
 
                     })
                     .on("mouseout", function () {

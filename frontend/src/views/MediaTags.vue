@@ -101,10 +101,15 @@ export default {
     padding: 10px;
 }
 .mediatags {
-    // height: 100%;
     display: flex;
-    justify-items: center;
-    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    .switch-div{
+        width: 20px;
+    }
+    .tags-div{
+        flex: 1;
+    }
 }
 .concat-switch{
     margin-left: 5px;

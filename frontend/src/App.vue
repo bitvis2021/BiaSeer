@@ -57,8 +57,8 @@
     <div class="event-evolution">
       <div class="union-event-evolution">
         <div class="event-evolution-storytree" id="story_tree_div">
-          <!-- <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree> -->
-          <MediaSankeyTree :storytree__loading="storytree__loading"></MediaSankeyTree>
+          <MediaStoryTree :storytree__loading="storytree__loading"></MediaStoryTree>
+          <!-- <MediaSankeyTree :storytree__loading="storytree__loading"></MediaSankeyTree> -->
         </div>
         <div class="event-iframeview">
           <SankeyTreeNodeIFrameVue></SankeyTreeNodeIFrameVue>
@@ -67,9 +67,14 @@
         
       </div>
       <div class="single-event-evolution">
-        <div class="single-domain-tree" v-model="currentSelectedMedia" v-for="item in currentSelectedMedia" :key="item.domain" :id="item.domain.replaceAll('.','_')">
+        <el-card v-for="(item, index) in currentRankMedia" :key="index" :id="item.domain.replaceAll('.','_')" style="margin-right:10px; width:25%">
+
+          <div class="single-domain-tree" slot="header" >
+            <span>{{item.domain}}</span>
+            <el-button style="float: right; padding: 3px 0" type="text" @click="getTreeDiffData(item.domain)">Choose</el-button>
+          </div>
           <SingleTree :storytree__loading="storytree__loading" :domain="item.domain"></SingleTree>
-        </div>
+        </el-card>
       </div>
     </div>
   </div>
@@ -320,7 +325,7 @@ export default {
       .media-concat-list{
         position: absolute;
         top: 0%;
-        bottom: 92%;
+        bottom: 87%;
         left: 0%;
         right: 0%;
         border: 1px solid gray;
@@ -329,7 +334,7 @@ export default {
       }
       .media-concat-diffarea{
         position: absolute;
-        top: 8%;
+        top: 13%;
         bottom: 0%;
         left: 0%;
         right: 0%;
