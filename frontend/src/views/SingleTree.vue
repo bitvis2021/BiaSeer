@@ -37,7 +37,7 @@ export default {
         self.width = self.$refs.singlestorytree.clientWidth;
         self.height = self.$refs.singlestorytree.clientHeight;
         // self.drawStoryTree(self.width, self.height);
-        self.drawMediaSpan()
+        // self.drawMediaSpan()
         
         
     },
@@ -48,7 +48,7 @@ export default {
         drawMediaSpan(){
             let self=this
             
-            var mSrc_n_list=self.se
+            
             console.log("span1,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span").selectAll(".mSrcSpan"))
             console.log("span2,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span"))
             console.log("span3,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan"))
