@@ -69,8 +69,11 @@
       <div class="single-event-evolution">
         <el-card v-for="(item, index) in currentRankMedia" :key="index" :id="item.domain.replaceAll('.','_')" style="margin-right:10px; width:25%">
 
-          <div class="single-domain-tree" slot="header" >
-            <span>{{item.domain}}</span>
+          <div class="single-domain-tree" ref="singleTree" slot="header" >
+            <span class="mSrcSpan">{{item.domain}}</span>
+            <!-- <svg class="mSrcSvg" width="20" height="15">
+              <circle r="5" cx="8" cy="5" :fill=genMsrcColor(item.domain)></circle>
+            </svg> -->
             <el-button style="float: right; padding: 3px 0" type="text" @click="getTreeDiffData(item.domain)">Choose</el-button>
           </div>
           <SingleTree :storytree__loading="storytree__loading" :domain="item.domain"></SingleTree>
@@ -111,8 +114,7 @@ export default {
       drawer: true,
       currentSelectedMedia: null,
       currentRankMedia: null,
-      iframeSrc: 'https://www.runoob.com',
-
+      activeIndex: 1,
       option_domains: [],
       select_domain: "",
       domain_list: [],
@@ -171,8 +173,76 @@ export default {
     this.domain_list = this.states.map(item => {
       return { value: `${item}`, label: `${item}` };
     });
+    // self.drawMediaSpan()
+    
+
   },
   methods: {
+    drawMediaSpan(){
+            let self=this
+            
+            
+            console.log("span1,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span").selectAll(".mSrcSpan"))
+            console.log("span2,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span"))
+            console.log("span3,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan"))
+            var span_list=d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan")
+            // span_list.selectAll("svg").remove()
+            // span_list.append("svg")
+            //     .attr("class","mSrcCircle")
+            //     .attr("height",12)
+            //     .attr("width",20)
+            //     .append("circle").attr("r",5)
+            //     .attr("cx",9)
+            //     .attr("cy",6)
+            //     .attr("fill",piecolorScale_1())
+            span_list=span_list._groups[0]
+            console.log("in spanlist ",span_list[0])
+            let piecolorScale_1 = (i)=>{
+                    let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+                    return colorArray[i%4];
+                }
+            var select_list=self.currentSelectedMedia
+            console.log("select_list",select_list)
+            for(var i=0;i<span_list.length;i++){
+              
+             
+              
+              for(var j=0;j<self.currentSelectedMedia.length;j++){
+                
+                if(d3.select(span_list[i]).text()==select_list[j].domain){
+                  console.log("domian and name",d3.select(span_list[i]).text(),j)
+                  d3.select(span_list[i]).style('color',piecolorScale_1(j))
+                  d3.select(span_list[i]).selectAll("svg").remove()
+                  d3.select(span_list[i]).append("svg")
+                  .attr("class","mSrcCircle")
+                  .attr("height",12)
+                  .attr("width",20)
+                  .append("circle").attr("r",5)
+                  .attr("cx",9)
+                  .attr("cy",6)
+                  .attr("fill",piecolorScale_1(j))
+                  break
+
+                }
+              }
+                
+          
+            }
+            
+        },
+    genMsrcColor1(mSrc_name){
+      console.log("in genMsrcColor!!!")
+      var mSrc_list=this.currentSelectedMedia
+      let piecolorScale_1=(i)=>{
+          let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+          return colorArray[i%4];
+      }
+      for(var i=0;i<mSrc_list.length;i++){
+        if(mSrc_list[i].domian==mSrc_name)
+          return "color:"+piecolorScale_1(i)
+      }
+      
+    },
     ...mapMutations([
       'UPDATE_STORYTREE_FINISH',
       'UPDATE_CONCATDIFF_FINISH',
@@ -214,23 +284,58 @@ export default {
       let mediaMatrixSelectedDataDeferObj = $.Deferred();
       $.when(mediaMatrixSelectedDataDeferObj).then(async () => {
         self.storytree__loading = false;
+        self.drawMediaSpan()
       })
       getMediaStoryTreeData(sysDatasetObj.mediaMatrixSelected,sysDatasetObj.mediaScatterSelected, function (data) {
         sysDatasetObj.updateStoryTreeDataset(data);
         self.UPDATE_STORYTREE_FINISH();
         mediaMatrixSelectedDataDeferObj.resolve();
       });
+     
+
     },
     getTreeDiffData(tree_name){
       let self=this;
-      
+      let treeDifDeferObj=$.Deferred();
+      $.when(treeDifDeferObj).then(async () => {
+        
+        self.drawMediaSpan()
+      })
       getTreeDiff(self.currentSelectedMedia,tree_name,function(data){
         console.log("tree_diff_data",data)
         self.currentRankMedia=data;
         self.UPDATE_STORYTREE_FINISH();
         console.log("currentrank ",self.currentRankMedia)
+        treeDifDeferObj.resolve();
       });
-    }
+      
+    },
+    genMsrcColor(mSrc_name){
+      console.log("in genMsrcColor!!!")
+      var mSrc_list=this.currentSelectedMedia
+      let piecolorScale_1=(i)=>{
+          let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+          return colorArray[i%4];
+      }
+      for(var i=0;i<mSrc_list.length;i++){
+        if(mSrc_list[i].domian==mSrc_name)
+          return piecolorScale_1(i)
+      }
+      
+    },
+    // drawMediaSpan(){
+    //         let self=this
+    //         let span1=d3.select("body").selectAll(".single-domain-tree").selectAll("span")
+    //         // console.log("span,",d3.select("body"))
+    //         // console.log("span,",d3.select("body").select(this.$refs.singleTree))
+    //         // console.log("span,",d3.select("body").select(".event-evolution").selectAll(".single-domain-tree"))
+    //         // console.log("span,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution"))
+    //         // console.log("span,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".el-card__body"))
+    //         console.log("span1,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span").selectAll(".mSrcSpan"))
+    //         console.log("span2,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span"))
+    //         console.log("span3,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan"))
+    //     },
+    
   },
   computed: {
     ...mapState([
@@ -239,9 +344,9 @@ export default {
       'mediaDiffConcatSignal',
       'mediaScatterClick'
     ]),
-    showSrcName:function(){
-      return "jintain"
-    },
+    
+    
+    
   },
   watch: {
     select_domain: function(){
