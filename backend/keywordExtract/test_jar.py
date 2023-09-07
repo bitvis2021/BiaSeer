@@ -21,7 +21,7 @@ class PyJar:
         return jpype.JClass(classpath)
 
 
-def javaMain(txt_path='test_data50',jar_path="keywordExtract/storyteller_1.jar"):
+def javaMain(txt_path='test_data50',jar_path="keywordExtract/storyteller_3.jar"):
     # jar = PyJar("keywordExtract/storyforest8.jar")
     # txt_path='test_data50'
     file_list=os.listdir(txt_path)
@@ -29,7 +29,7 @@ def javaMain(txt_path='test_data50',jar_path="keywordExtract/storyteller_1.jar")
         file_name=txt_path+'/' +file_list[0]
         os.remove(file_name)
 
-    jar = PyJar("keywordExtract/storyteller_1_gbr_eur.jar")
+    jar = PyJar("keywordExtract/storyteller_3.jar")
 
     jar.initialize()
     # pr
