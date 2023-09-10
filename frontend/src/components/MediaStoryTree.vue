@@ -59,11 +59,11 @@ export default {
         tree_node_click: function () {
             let self = this;
             let click_node_id = self.tree_node_click.split("+").slice(0,1);
-            console.log("self.tree_node_click", self.tree_node_click);
-            console.log("self.ego_path__node", self.ego_path__node);
+            // console.log("self.tree_node_click", self.tree_node_click);
+            // console.log("self.ego_path__node", self.ego_path__node);
 
             let curr_click_node = self.ego_path__node.filter(ele => ele.index == click_node_id)[0];
-            console.log("curr_click_node", curr_click_node);
+            // console.log("curr_click_node", curr_click_node);
             // alert(self.tree_node_click);
 
             let m_width = 300;
@@ -374,7 +374,7 @@ export default {
                     .attr("stroke", "gray")
                     .attr("stroke-width", d=>{
                         // return lineWidthScale(+d.target.data.tree_maxCompatibility)
-                        return 1
+                        return 3.5
                     })
                     .attr("stroke-opacity", d=>{
                         // return lineFillScale(+d.target.data.tree_maxCompatibility)
@@ -440,7 +440,7 @@ export default {
                     // root node
                     if(ele.data.name == "ROOT"){
                         ele_g.append('path')
-                            .attr('d',d3.symbol().type(d3.symbolStar).size(200))
+                            .attr('d',d3.symbol().type(d3.symbolStar).size(300))
                             .attr('fill','gray')
                     }
                     
@@ -468,9 +468,10 @@ export default {
 
                 node
                     .append("text")
-                    .attr("dy", "1.5em")
+                    .attr("dy", "2em")
                     .attr("text-anchor", "middle")
                     .attr("fill", "steelblue")
+                    .attr("font-weight", "bold")
                     .text(d=>{
                         let show_str = d.data.tree_topickey.slice(0,3).toString().replaceAll(",","; ")
                         return d.data.tree_topickey.length == 0 ? 'ROOT' : show_str;
@@ -752,7 +753,7 @@ export default {
             let lineWidthScale = d3.scaleLinear().domain(d3.extent(tree_maxCompatibilityMaxMin)).range([2, 5]);
             let lineFillScale = d3.scaleLinear().domain(d3.extent(tree_maxCompatibilityMaxMin)).range([0.4, 1]);
 
-            let reScaleCircleRadia = d3.scaleLinear().domain(d3.extent(biasMaxMin)).range([5,10]);
+            let reScaleCircleRadia = d3.scaleLinear().domain(d3.extent(biasMaxMin)).range([8,15]);
             // console.log(timescope);
             // console.log(reScale("time"));
             let tree = data => {
