@@ -291,6 +291,7 @@ export default {
                     .join(
                         enter => enter.append("circle")
                             .attr("class", "dot")
+                            .attr("fill-opacity", 0.5)
                             .attr("transform", transform)
                             .attr("id", d => "media_id_" + d.domain.replaceAll(".", "_"))
                             .attr("cx", function (d) { return xScale(d.x1); })
@@ -422,7 +423,7 @@ export default {
                     d3.select(this).attr("cy") > margin.top &&
                     d3.select(this).attr("cy") < innerHeight;
                 });
-                console.log("dots: ", dots);
+                // console.log("dots: ", dots);
 
                 tdata = [];
                 self.currentViewedMediaList = [];
