@@ -108,7 +108,6 @@ export default {
             data.forEach(d=>{
                 console.log(d);
                 if(d.name == 'ROOT' || d.time_e == 'time'){return}
-                // self.node_details2.push(...d.node_detail_info);
                 // 提取出可能的媒体源
                 let temp_mSrc_list = d.mSrc_list;
                 d.node_detail_info.forEach(ele=>{
@@ -144,11 +143,26 @@ export default {
             self.node_details2 = [];
             root.each(d=>{
                 if(d.data.name == 'ROOT' || d.data.time_e == 'time'){return}
-                // self.node_details.push(...d.data.node_detail_info);
+                // 提取出可能的媒体源
+                let temp_mSrc_list = d.data.mSrc_list;
                 d.data.node_detail_info.forEach(ele=>{
+                    // 检测媒体源，加入媒体ele中
+                    temp_mSrc_list.forEach((mele,imele)=>{
+                        if(ele.url.split("/")[2].includes(mele)){
+                            ele.media_source = mele;
+                            ele.media_source_index = imele;
+                        }
+                    })
                     self.node_details2.push(ele)
                     if(ele.related_infos.length > 0){
                         ele.related_infos.forEach(e=>{
+                            // 检测媒体源，加入媒体e中
+                            temp_mSrc_list.forEach((mele,imele)=>{
+                                if(e.url.split("/")[2].includes(mele)){
+                                    e.media_source = mele;
+                                    e.media_source_index = imele;
+                                }
+                            })
                             self.node_details2.push(e)
                         })
                     }
