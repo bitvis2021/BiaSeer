@@ -1,13 +1,13 @@
 <template>
     <div class="sankeytree-node-iframe" ref="iframediv">
 
-        <div class="mytip" v-for="(item,index) in node_details2">
+        <div class="mytip" v-for="(item,index) in node_details2" :id="item.media_source_index" :style="piecolorScale_1(item.media_source_index)">
             <el-collapse>
                 <el-collapse-item >
                     <template #title>
-                        <h3 class="el-collapse-item-title"> {{ item.title.split("+")[0]+"."  }}</h3>
+                        <h3 class="el-collapse-item-title" :style="piecolorScale_2(item.media_source_index)"> {{ item.title.split("+")[0]+"."  }}</h3>
                     </template>
-                    <p> {{ item.lines }}</p>
+                    <p :style="piecolorScale_2(item.media_source_index)"> {{ item.lines }}</p>
                 </el-collapse-item>
             </el-collapse>
         </div>
@@ -31,10 +31,8 @@ export default {
     },
     data() {
         return {
-            activeNames: ['1'],
             node_details: [],
             node_details2: [],
-            isShowCarousel: false,
             width: 400,
         }
     },
@@ -43,16 +41,20 @@ export default {
     beforeMount: function () {
     },
     mounted: function () {
-        this.isShowCarousel = false
         this.width = this.$refs.iframediv.clientWidth;
 
     },
     methods: {
         ...mapMutations([
             // 'UPDATE_STORYTREE_FINISH',
-        ]),  
-        handleChange(val) {
-            console.log(val);
+        ]),
+        piecolorScale_1(i){
+            let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+            return 'border-left: 5px solid ' + colorArray[i%4];
+        },
+        piecolorScale_2(i){
+            let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+            return 'color: ' + colorArray[i%4];
         },
         getWordCloud(wordList){
             let wordOption = {  
@@ -60,10 +62,9 @@ export default {
                 size:[this.width,257],  // 盒子的宽高
                 svgElement: this.$refs.wordCloudBox  //使用ref选择节点
             }
-            myCloud(wordOption,this.getArticleList)
+            myCloud(wordOption,this.callBackFunc())
         },
-        //回调
-        getArticleList(){
+        callBackFunc(){
             console.log("...")
         },
         drawWordCloud(){
@@ -99,29 +100,41 @@ export default {
     },
     watch: {
         clickSankeyTreeNode: function(){
-            // 更新新闻列表
-            console.log("更新新闻列表...")
             let self = this;
             let data = sysDatasetObj.SankeyTreePathNode;
             data.reverse();
-            console.log('data', data);
+            // console.log('data', data);
             self.node_details2 = []
             data.forEach(d=>{
                 console.log(d);
                 if(d.name == 'ROOT' || d.time_e == 'time'){return}
                 // self.node_details2.push(...d.node_detail_info);
+                // 提取出可能的媒体源
+                let temp_mSrc_list = d.mSrc_list;
                 d.node_detail_info.forEach(ele=>{
+                    // 检测媒体源，加入媒体ele中
+                    temp_mSrc_list.forEach((mele,imele)=>{
+                        if(ele.url.split("/")[2].includes(mele)){
+                            ele.media_source = mele;
+                            ele.media_source_index = imele;
+                        }
+                    })
                     self.node_details2.push(ele)
                     if(ele.related_infos.length > 0){
                         ele.related_infos.forEach(e=>{
+                            // 检测媒体源，加入媒体e中
+                            temp_mSrc_list.forEach((mele,imele)=>{
+                                if(e.url.split("/")[2].includes(mele)){
+                                    e.media_source = mele;
+                                    e.media_source_index = imele;
+                                }
+                            })
                             self.node_details2.push(e)
                         })
                     }
                 })
             })
-            console.log('node_details2', self.node_details2)
-            // 全局数据
-            self.isShowCarousel = true;
+            console.log('node_details2', self.node_details2);
         },
         storytree_finish: function(){
             let self = this;
@@ -140,11 +153,7 @@ export default {
                         })
                     }
                 })
-            })
-            self.activeNames = ['1', '2'];
-
-
-            
+            })            
         }
     }
 }
@@ -166,42 +175,49 @@ export default {
 </style>
 
 <style>
-  .el-carousel__item h3 {
-    color: #475669;
-    font-size: 14px;
-    opacity: 0.75;
-    line-height: 200px;
-    margin: 0;
-  }
-  
-  .el-carousel__item:nth-child(2n) {
-    background-color: #99a9bf;
-  }
-  
-  .el-carousel__item:nth-child(2n+1) {
-    background-color: #d3dce6;
-  }
+.el-carousel__item h3 {
+  color: #475669;
+  font-size: 14px;
+  opacity: 0.75;
+  line-height: 200px;
+  margin: 0;
+}
+ 
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+ 
+.el-carousel__item:nth-child(2n+1) {
+  background-color: #d3dce6;
+}
 
 
-  .el-carousel__item--card{
-    /* display: flex;
-    align-items: center;
-    justify-items: center; */
-    overflow-y: auto;
-    /* overflow-x: auto; */
-  }
+.el-carousel__item--card{
+  /* display: flex;
+  align-items: center;
+  justify-items: center; */
+  overflow-y: auto;
+  /* overflow-x: auto; */
+}
 
-  .mytip {
+.mytip {
     padding: 8px 16px;
-    background-color: #ecf8ff;
-    border-left: 5px solid #50bfff;
+    background-color: rgb(244 244 244);
     margin-top: 5px;
-    }
-    .el-collapse{
-        background-color: #ecf8ff !important;
-    }
+}
+.el-collapse{
+    background-color: rgb(244 244 244) !important;
+}
 
-    .el-collapse-item__header,.el-collapse-item__wrap {
-        background-color: transparent !important;
-    }
+.el-collapse-item__header,.el-collapse-item__wrap {
+    background-color: transparent !important;
+    border-bottom: 0 !important;
+}
+
+.el-collapse-item__header{
+    height: 24px !important;
+}
+.el-collapse-item__content {
+    padding-bottom: 0px !important;
+}
 </style>
