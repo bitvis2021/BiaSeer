@@ -86,8 +86,7 @@ export default {
         },
         drawStoryTree(width, height) {
             let self = this;
-            // console.log(width, height);
-            let margin = { top: 1, bottom: 15, left: 1, right: 2 };
+            let margin = { top: 15, bottom: 15, left: 15, right: 15 };
             let innerWidth = width - margin.left - margin.right;
             let innerHeight = height - margin.top - margin.bottom;
             
@@ -102,48 +101,22 @@ export default {
                 d3.select(self.$el).select("#single_storytree__svg").selectAll('g').remove();
                 
                 const svg = d3.select(self.$el).select("#single_storytree__svg")
-                    .attr("width", width - 10)
-                    .attr("height", height - 10);
-
-                // svg.append("defs").html(`
-                //     <style>
-                //     .highlight circle { fill:black }
-                //     .highlight circle { fill:black }
-                //     .highlight text { fill:black }
-                //     .leaf circle { fill:black }
-                //     .leaf circle { fill:black }
-                //     .leaf text { fill:black }
-                //     path.highlight { stroke:black }
-                //     <style>`);
+                    .attr("width", width)
+                    .attr("height", height);
 
                 const g = svg
                     .append("g")
                     .attr("font-family", "sans-serif")
                     .attr("font-size", 10)
-                    .attr("transform", `translate(${margin.left},${margin.top})`);
-                
-                // const timeAxis = d3.axisBottom(reScale);
-                // const xAxisG = g.append('g').call(timeAxis)
-                //     .attr('transform', `translate(${0},${innerHeight})`);
-                // xAxisG.selectAll("text")
-                //     .attr("transform", "translate(-0,0)rotate(-30)")
-                //     .style("text-anchor", "end")
-                //     .on("mouseover", function(d) {
-                //         d3.select(this).classed("line-hover", true);
-                //     })
-                //     .on("mouseout", function(d) {
-                //         d3.select(this)
-                //             .classed("line-hover", false);
-                //     });
-                // xAxisG.selectAll('.domain').remove();
-
+                    .attr("width", innerWidth)
+                    .attr("height", innerHeight)
+                    .attr("transform", `translate(${margin.left},${-dx / 2.5 + margin.top})`);
 
                 const link = g
                     .append("g")
-                    .attr('transform', `translate(${reScale.bandwidth()/2},${-10})`)//????
+                    // .attr('transform', `translate(${reScale.bandwidth()/2},${-5})`)
                     .attr("fill", "none")
                     .attr("stroke", "grey")
-                    
                     .selectAll("path")
                     .data(root.links())
                     .join("path")
@@ -174,13 +147,7 @@ export default {
                             return 0.2;
                         }
                         return 1.0;
-                    })//0.4
-                    // .attr("stroke-width", d=>{
-                    //     return lineWidthScale(+d.target.data.tree_maxCompatibility)
-                    // })
-                    // .attr("stroke-opacity", d=>{
-                    //     return lineFillScale(+d.target.data.tree_maxCompatibility)
-                    // })
+                    })
                     .on("mouseover", function(d) {
                         d3.select(this).classed("line-hover", true);
                     })
@@ -192,7 +159,7 @@ export default {
                 let node = g
                     .append("g")
                     .attr("class", "storytree__node")
-                    .attr('transform', `translate(${reScale.bandwidth()/2},${-10})`)
+                    // .attr('transform', `translate(${reScale.bandwidth()/2},${-5})`)
                     .attr("stroke-linejoin", "round")
                     .attr("stroke-width", 3)
                     .selectAll(".story_tree_node")
@@ -298,8 +265,6 @@ export default {
                         }
                         
                     })
-                    
-                    
             }
 
 
@@ -350,10 +315,6 @@ export default {
             let tree = data => {
                 let i = 0;
                 const root = d3.hierarchy(data).eachBefore(d=>{d.index = i++;});
-                // root.dx = innerHeight / (root.children.length + 3);
-                // root.dy = innerWidth / (root.height + 3);
-                // return d3.tree().nodeSize([root.dx, root.dy])(root);
-                // return d3.tree().size([innerHeight,innerWidth])(root);
                 return d3.cluster().size([innerHeight,innerWidth])(root);
             }
             let root = tree(data);
@@ -371,7 +332,7 @@ export default {
             let self = this;
             // this.width = this.$refs.singlestorytree.clientWidth;
             // this.height = this.$refs.singlestorytree.clientHeight;
-            console.log("storytree width height",this.width,this.height)
+            // console.log("storytree width height",this.width,this.height)
             self.drawStoryTree(self.width, self.height);
         },
     }

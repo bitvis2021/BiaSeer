@@ -75,13 +75,13 @@ export default {
                     vdata.push(ele.value);
                 })
             });
-            console.log(data1.values);
+            // console.log(data1.values);
             data1.values.forEach(element=> {
                 element.details.forEach(ele=>{
                     vdata2.push(ele.value2);
                 })
             });
-            console.log('vdata2', vdata2);
+            // console.log('vdata2', vdata2);
 
             let row_labels = [];
             let col_labels = [];
@@ -108,7 +108,7 @@ export default {
             // console.log(row_inv);
             // console.log(col_inv);
             // console.log(matrix);
-            console.log('vdata', vdata);
+            // console.log('vdata', vdata);
 
             let computeColorNeg = d3.interpolate('red', '#f9f9f9');
             let linearVDataNeg = d3.scaleLinear()  
@@ -178,24 +178,6 @@ export default {
                 .text((d,i)=> {
                     return getTopic((i + 1).toString())
                 });
-                
-            // let charts = rectsG.selectAll('g')
-            //     .data(data1.values)
-            //     .join('g')
-            //     .attr('class', 'ggg')
-            //     .attr('transform', d=>`translate(${0}, ${y(d.topic)})`)
-            //     .selectAll('rect')
-            //     .data(d=>d.details)
-            //     .join('rect')
-            //     .attr('class', 'media_matrix_rect')
-            //     .attr("x", d=> x(new Date(d.date0)))
-            //     .attr("width", rectWH)
-            //     .attr("height", rectWH)
-            //     .attr('fill', d=> {
-            //         if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
-            //         else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
-            //         else return 'white';
-            //     })
 
             let charts = rectsG.selectAll('g')
                 .data(data1.values)
@@ -251,7 +233,6 @@ export default {
                 .text((d,i)=> {
                     return getTopic(topicLocation[i+1].toString())});
                 
-            // console.log(topicLocation);
             new_ydate = Object.values(topicLocation).map(ele=>ele.toString())
             // console.log(new_ydate);
             let new_y = d3.scaleBand()
@@ -267,26 +248,12 @@ export default {
                 //     self.UPDATE_MATRIX_SELECTED_SIGNAL();
                 //     // return brushed;
                 // })
-            
-            // function updateChart() {
-            //     let extent = d3.event.selection
-            //     // charts.classed("selected", function(d){ return isBrushed(extent, x(new Date(d.date0)), new_y(d.topic) ) } )
-            //     charts.attr("fill-opacity", 0.3)
-            //         .filter(d=>isBrushed(extent, x(new Date(d.date0)), new_y(d.topic) ))
-            //         .attr("fill-opacity", 0.3)
-            // }
-
-            // A function that return TRUE or FALSE according if a dot is in the selection or not
-            // function isBrushed(brush_coords, cx, cy) {
-            //     var x0 = brush_coords[0][0],
-            //         x1 = brush_coords[1][0],
-            //         y0 = brush_coords[0][1],
-            //         y1 = brush_coords[1][1];
-            //     return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    // This return TRUE or FALSE depending on if the points is in the selected area
-            // }
 
             function brushed() {
                 let selection = d3.event.selection;
+                yG.selectAll("text")
+                    .attr("font-weight", '')
+                    .attr('fill','black');
                 if (selection == null){
                     charts.attr('fill', d=> {
                             if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
@@ -316,9 +283,23 @@ export default {
                                 self.selected['date'].add(d.date0);
                                 return true;
                             }
-                            return false
+                            return false;
                         })
                         .attr("fill-opacity", 1);
+                    
+                    yG.selectAll("text")
+                        .attr("font-weight", (d,i)=> {
+                            if(self.selected['topics'].has(new_ydate[i])){
+                                return 'bold';
+                            }
+                            return ''; 
+                        })
+                        .attr('fill',(d,i)=> {
+                            if(self.selected['topics'].has(new_ydate[i])){
+                                return 'red';
+                            }
+                            return 'black'; 
+                        });
                     
                     sysDatasetObj.updateMediaMatrixSelected(self.selected);
                     self.UPDATE_MATRIX_SELECTED_SIGNAL();
