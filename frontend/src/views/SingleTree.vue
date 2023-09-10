@@ -11,6 +11,7 @@
   
 <script>
 // Structors
+import d3 from '@/assets/js/horizon';
 import { mapState, mapMutations } from 'vuex';
 
 export default {
@@ -29,17 +30,60 @@ export default {
     components: {
     },
     beforeMount: function () {
+        
     },
     mounted: function () {
         let self = this;
         self.width = self.$refs.singlestorytree.clientWidth;
         self.height = self.$refs.singlestorytree.clientHeight;
         // self.drawStoryTree(self.width, self.height);
+        // self.drawMediaSpan()
+        
+        
     },
     methods: {
         ...mapMutations([
             // 'UPDATE_STORYTREE_FINISH',
         ]),
+        drawMediaSpan(){
+            let self=this
+            
+            
+            console.log("span1,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span").selectAll(".mSrcSpan"))
+            console.log("span2,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span"))
+            console.log("span3,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan"))
+            var span_list=d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan")
+            // span_list.selectAll("svg").remove()
+            // span_list.append("svg")
+            //     .attr("class","mSrcCircle")
+            //     .attr("height",12)
+            //     .attr("width",20)
+            //     .append("circle").attr("r",5)
+            //     .attr("cx",9)
+            //     .attr("cy",6)
+            //     .attr("fill",piecolorScale_1())
+            span_list=span_list._groups[0]
+            console.log("in spanlist ",span_list[0])
+            let piecolorScale_1 = (i)=>{
+                    let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+                    return colorArray[i%4];
+                }
+            for(var i=0;i<span_list.length;i++){
+                d3.select(span_list[i]).style('color',piecolorScale_1(i))
+                d3.select(span_list[i]).selectAll("svg").remove()
+                d3.select(span_list[i]).append("svg")
+                .attr("class","mSrcCircle")
+                .attr("height",12)
+                .attr("width",20)
+                .append("circle").attr("r",5)
+                .attr("cx",9)
+                .attr("cy",6)
+                .attr("fill",piecolorScale_1(i))
+
+                console.log('span i ', span_list[i])
+            }
+            
+        },
         drawStoryTree(width, height) {
             let self = this;
             // console.log(width, height);
@@ -93,6 +137,7 @@ export default {
                 //     });
                 // xAxisG.selectAll('.domain').remove();
 
+
                 const link = g
                     .append("g")
                     .attr('transform', `translate(${reScale.bandwidth()/2},${-10})`)//????
@@ -126,7 +171,7 @@ export default {
                     })
                     .attr("stroke-opacity", d=>{
                         if(d.target.data.tree_mSrcName.indexOf(self.domain) < 0){
-                            return 0.5;
+                            return 0.2;
                         }
                         return 1.0;
                     })//0.4
@@ -175,6 +220,18 @@ export default {
                 let linearVDataPos = d3.scaleLinear()  
                     .domain([0.5, 0.8])
                     .range([0, 1]);
+                
+                node.each(ele=>{
+                    // root node
+                    if(ele.data.name == "ROOT"){
+                        let ele_g = d3.select(this.$el).select("#story_tree_node_" + ele.index).append("g")
+                            .attr("class", "ele-g");
+                        ele_g.append('path')
+                            .attr('d',d3.symbol().type(d3.symbolStar).size(100))
+                            .attr('fill','gray')
+                    }
+                })
+
                 var rect=node
                     .append("rect");
                     rect.attr("fill", d=> {
@@ -301,7 +358,7 @@ export default {
             }
             let root = tree(data);
             renderStoryTree(root, reScale, reScaleCircleRadia, delta_timeScale, attrsMaxMin, dx, dy, timescope);
-
+            
         },
     },
     computed: {
