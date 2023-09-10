@@ -217,7 +217,7 @@ export default {
 .mytip {
     padding: 8px 16px;
     background-color: rgb(244 244 244);
-    margin-top: 5px;
+    margin-bottom: 5px;
 }
 .el-collapse{
     background-color: rgb(244 244 244) !important;
