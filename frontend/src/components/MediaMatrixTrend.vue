@@ -133,7 +133,7 @@ export default {
                 .domain([0, d3.max(vdata)])
                 .range([3, 9]);
 
-            let m = ({ l: 97, r: 20, t: 6, b: 20 });
+            let m = ({ l: 100, r: 20, t: 6, b: 20 });
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
             // let innerHeight = height - m.t - m.b;
             // let innerWidth = width - m.l;
@@ -178,6 +178,19 @@ export default {
                 .text((d,i)=> {
                     return getTopic((i + 1).toString())
                 });
+            
+            let labelRects = rectsG.selectAll('g')
+                .data(ydata)
+                .enter()
+                .append('rect')
+                .attr('class', 'label-rects')
+                .attr('x', 3)
+                .attr('y', d=>y(d))
+                .attr('width', m.l - 8)
+                .attr('height', y.bandwidth())
+
+                // .attr('transform', d=>`translate(${0}, ${y(d.topic)})`)
+
 
             let charts = rectsG.selectAll('g')
                 .data(data1.values)
@@ -191,24 +204,29 @@ export default {
                 .attr("x", d=> x(new Date(d.date0)))
                 .attr("height", d=> {
                     if (flag === 'single'){
+                        d.reY = d.value2 > 0 ? rectWH2(d.value) : 3;
                         if (d.value2 > 0)  return rectWH(d.value2);
                         else return 3;
                     }
                     else if (flag === 'concat') {
+                        d.reY = d.value > 0 ? rectWH2(d.value) : 3;
                         if (d.value > 0)  return rectWH2(d.value);
                         else return 3;
                     }
                 })
                 .attr("width", d=> {
                     if (flag === 'single'){
+                        d.reY = d.value > 0 ? rectWH2(d.value) : 3;
                         if (d.value2 > 0)  return rectWH(d.value2);
                         else return 3;
                     }
                     else if (flag === 'concat') {
+                        d.reY = d.value > 0 ? rectWH2(d.value) : 3;
                         if (d.value > 0)  return rectWH2(d.value);
                         else return 3;
                     }
                 })
+                .attr("y", d=> d.reY)
                 .attr('fill', d=> {
                     if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                     else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
@@ -327,5 +345,12 @@ export default {
 .media_matrix_rect{
     /* stroke: steelblue; */
     stroke-width: 1px;
+}
+.label-rects{
+    fill: rgb(239, 239, 239);
+    stroke: white;
+    stroke-width: 1.5px;
+    ry: 3px;
+    rx: 3px;
 }
 </style>

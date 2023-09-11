@@ -82,7 +82,6 @@ export default {
         mediaGraphLabel: function() {
             let self = this;
             self.drawMediaGraph([ ...sysDatasetObj.mediaGraphList, ...sysDatasetObj.mediaScatterSelected]);
-            // self.drawMediaGraph();
         },
         contour_search_domain: function(){
             let self = this
@@ -227,14 +226,12 @@ export default {
 
 
             function xyScale(data) {
-                // let sdata = data['details'];
                 xScale.domain(d3.extent(data, xValue));
                 yScale.domain(d3.extent(data, yValue));
                 let rMaxMin = d3.extent(data, rValue);
                 console.log(rMaxMin);
                 let system_topic_event = "RUS_UKR"
                 rScale = (event_num) => {
-                    // if(self.system_topic_event == "RUS_UKR"){
                     if(system_topic_event == "RUS_UKR"){
                         if(event_num < 70) return d3.scaleLinear().domain([rMaxMin[0], 70]).range([1.5, 3])(event_num);
                         else if(event_num < 90) return d3.scaleLinear().domain([71, 90]).range([3.1, 6])(event_num);
@@ -252,7 +249,6 @@ export default {
             }
 
             function renderContours(data, bandwidth) {
-                // let sdata = data['details'];
                 const contourData = d3.contourDensity()
                     .x(d => xScale(xValue(d)))
                     .y(d => yScale(yValue(d)))
@@ -291,6 +287,7 @@ export default {
                     .join(
                         enter => enter.append("circle")
                             .attr("class", "dot")
+                            .attr("fill-opacity", 0.5)
                             .attr("transform", transform)
                             .attr("id", d => "media_id_" + d.domain.replaceAll(".", "_"))
                             .attr("cx", function (d) { return xScale(d.x1); })
@@ -352,11 +349,8 @@ export default {
                         // sysDatasetObj.updateMediaScatterSelected(d.domain);
                     })
                     .on("contextmenu", d => {
-                        // console.log(d);
                         d3.event.preventDefault();
                         self.nodeMenuFlag = true;
-
-                        // right click
                         // add a div
                         self.rightClickDiv();
                     })
@@ -374,17 +368,13 @@ export default {
                 d.nums = +d.nums;
             });
 
-            console.log('data:', data);
+            // console.log('data:', data);
             let tdata = data['details'];
             self.filtering_data = tdata;
 
             xyScale(tdata);
             renderCircles(tdata);
             renderContours(tdata, 10);
-
-            // d3.select(this.$el).select(".media-point-contour-g").on('mousemove', () => {
-            //     renderContours(tdata, (d3.event.x / 20) );
-            // });
 
             self.zoomOperator = d3.zoom()
                 .extent([[0, 0], [innerWidth, innerHeight]])
@@ -422,14 +412,12 @@ export default {
                     d3.select(this).attr("cy") > margin.top &&
                     d3.select(this).attr("cy") < innerHeight;
                 });
-                console.log("dots: ", dots);
+                // console.log("dots: ", dots);
 
                 tdata = [];
                 self.currentViewedMediaList = [];
                 dots.filter(d=>{
-                    // console.log(d);
                     tdata.push(d);
-                    // after zooming, update the viewed media list.
                     self.currentViewedMediaList.push(d.domain);
                 });
                 renderCircles(tdata);
@@ -437,26 +425,6 @@ export default {
 
                 self.UPDATE_MEDIA_GRAPH_LABEL();
             }
-            
-            // function zooming(){
-            //     let circle_g = d3.select(self.$el).select('.media-point-circle-g');
-            //     let contour_g = d3.select(self.$el).select('.media-point-contour-g');
-            //     svg.call(d3.zoom()
-            //         .extent([[0, 0], [innerWidth, innerHeight]])
-            //         .scaleExtent([1, 18])
-            //         .on("zoom", zoomed));
-            //     function zoomed() {
-            //         self.xScale = d3.event.transform.rescaleX(xScaleCopy);
-            //         self.yScale = d3.event.transform.rescaleY(yScaleCopy);
-            //         // console.log("d3.zoomTransform(this): ", d3.zoomTransform(this));
-            //         circle_g.attr("transform", d3.zoomTransform(this));
-            //         contour_g.attr("transform", d3.zoomTransform(this));
-            //         graph_g.attr("transform", d3.zoomTransform(this));
-            //         label_g.attr("transform", d3.zoomTransform(this));
-            //         // self.rightDiv.attr("transform", d3.zoomTransform(this));
-            //     }
-            // }
-            // zooming();
         },
         drawMediaHorizonChart(domain) {
             console.log(domain);
