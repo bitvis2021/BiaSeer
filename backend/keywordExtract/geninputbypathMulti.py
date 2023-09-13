@@ -172,7 +172,8 @@ def corpus_loadText(filepath):
         f.close
         return ori_text
     except:
-        return ['error']
+        print("loadText error!")
+        return 'error'
 
 def getIndexByFile(filename):  #�����ļ�����������
     #print("getting")
@@ -555,6 +556,8 @@ def gencorpus(mSrc_list,time_scope,country_list,totalSrcDict):
                     temp_corpusText= corpus_loadText(etitlelist[temp_index]['path_str'])
                     if temp_url=='error':
                          continue
+                    if temp_corpusText=='error':
+                        continue
                     # no dif media aggregate anymore
                     edict['corpus'] = edict['corpus'] + " " + temp_corpus
                     edict['title'] = edict['title'] + "+" + etitlelist[temp_index]['title']
@@ -1012,7 +1015,7 @@ def genStoryForestInput(time_scope,mSrc_list,classnum,country_list):
             temp_sep_numsources = septotallist[index_corpus]["sep_numsources"]
 
             temp_date= septotallist[index_corpus]["date"]
-
+            print("test out",temp_titlekeys,temp_mSrcName,temp_corpusText)
             str_corpus = "|".join([str(temp_id), temp_segtitle,temp_titlekeys, temp_keywords, temp_lda,
                                    time_stamp, temp_original,temp_url,temp_eventbasecode,temp_eventcode,
                                    temp_resouce,temp_avgTone,temp_goldsteinscale,temp_nummentions,temp_numarticles,

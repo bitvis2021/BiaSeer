@@ -536,9 +536,9 @@ export default {
   margin-top: 0.1%;
   .el-input__inner{
     height: 30px;
-    font-size: 1.5em;
+    font-size: 1em;
     font-weight: bolder;
-    color: #4e6ef2;
+    color: steelblue;
   }
   .el-input__suffix {
     width: 200px;

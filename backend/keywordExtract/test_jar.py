@@ -21,7 +21,7 @@ class PyJar:
         return jpype.JClass(classpath)
 
 
-def javaMain(txt_path='test_data50',jar_path="keywordExtract/storyteller_1.jar"):
+def javaMain(txt_path='test_data50',jar_path="storyteller_3.jar"):
     # jar = PyJar("keywordExtract/storyforest8.jar")
     # txt_path='test_data50'
     file_list=os.listdir(txt_path)
@@ -49,8 +49,8 @@ def testJavaMain():
     # t1.join()
     # t2.join()
 
-    jar_path1="keywordExtract/storyteller_test.jar"
-    jar_path2="keywordExtract/storyteller_ori.jar"
+    jar_path1="keywordExtract/storyteller_3.jar"
+    jar_path2="keywordExtract/storyteller_3.jar"
     jar_path="-Djava.class.path=%s;%s"%(jar_path1,jar_path2)
     try:
         jpype.startJVM(jpype.getDefaultJVMPath(),"-ea",jar_path)
@@ -65,4 +65,4 @@ def testJavaMain():
     # javaMain('test_data_ori', "keywordExtract/storyteller_ori.jar")
 
 if __name__ == '__main__':
-    javaMain('test_data50',"keywordExtract/storyteller_test.jar")
+    javaMain('test_data50',"keywordExtract/storyteller_3.jar")

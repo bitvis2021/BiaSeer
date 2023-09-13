@@ -780,12 +780,12 @@ export default {
 }
 
 .dot_mouseover {
-    fill: #50bfff;
+    fill: steelblue;
     stroke-width: 1px;
     stroke: white;
 }
 .dot_mouseover1 {
-    fill: #50bfff;
+    fill: steelblue;
     stroke-width: 1px;
     stroke: white;
 }
@@ -807,7 +807,7 @@ export default {
 }
 
 .link{
-    stroke: #50bfff;
+    stroke: steelblue;
 }
 
 .text_label{
