@@ -14,8 +14,8 @@ ALL_EVENTS = '../../preprocessv2/same_event/allevents.csv'
 
 
 # MEDIA_XY = '../../preprocessv2/datasets/mediaxy/doctone_results.json'
-MEDIA_XY = '../../preprocessv2/datasets/mediaxy/multiply_results_add101.json'
-# MEDIA_XY = '../../preprocessv2/datasets/mediaxy/multiply_results_div100.json'
+# MEDIA_XY = '../../preprocessv2/datasets/mediaxy/multiply_results_add101.json'
+MEDIA_XY = '../../preprocessv2/datasets/mediaxy/multiply_results_div100.json'
 MEDIA_NUMS = '../../preprocessv2/datasets/mediaxy/media_nums.json'
 
 TIME_BINS = 54

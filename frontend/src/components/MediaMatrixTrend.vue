@@ -201,32 +201,40 @@ export default {
                 .data(d=>d.details)
                 .join('rect')
                 .attr('class', 'media_matrix_rect')
-                .attr("x", d=> x(new Date(d.date0)))
-                .attr("height", d=> {
+                .attr("x", d=> {
                     if (flag === 'single'){
-                        d.reY = d.value2 > 0 ? rectWH2(d.value) : 3;
-                        if (d.value2 > 0)  return rectWH(d.value2);
-                        else return 3;
+                        return d.value2 > 0 ? x(new Date(d.date0)) + (9 - rectWH(d.value2)) / 2:
+                        x(new Date(d.date0)) + (9 - 3) / 2;
                     }
                     else if (flag === 'concat') {
-                        d.reY = d.value > 0 ? rectWH2(d.value) : 3;
-                        if (d.value > 0)  return rectWH2(d.value);
-                        else return 3;
+                        return d.value > 0 ? x(new Date(d.date0)) + (9 - rectWH2(d.value)) / 2:
+                        x(new Date(d.date0)) + (9 - 3) / 2;
+                    }
+                })
+                .attr("height", d=> {
+                    if (flag === 'single'){
+                        return d.value2 > 0 ? rectWH(d.value2) : 3;
+                    }
+                    else if (flag === 'concat') {
+                        return d.value > 0 ? rectWH2(d.value) : 3;
                     }
                 })
                 .attr("width", d=> {
                     if (flag === 'single'){
-                        d.reY = d.value > 0 ? rectWH2(d.value) : 3;
-                        if (d.value2 > 0)  return rectWH(d.value2);
-                        else return 3;
+                        return d.value2 > 0 ? rectWH(d.value2) : 3;
                     }
                     else if (flag === 'concat') {
-                        d.reY = d.value > 0 ? rectWH2(d.value) : 3;
-                        if (d.value > 0)  return rectWH2(d.value);
-                        else return 3;
+                        return d.value > 0 ? rectWH2(d.value) : 3;
                     }
                 })
-                //.attr("y", d=> d.reY)
+                .attr("y", d=> {
+                    if (flag === 'single'){
+                        return d.value2 > 0 ? (9 - rectWH(d.value2)) / 2: (9 - 3) / 2;
+                    }
+                    else if (flag === 'concat') {
+                        return d.value > 0 ? (9 - rectWH2(d.value)) / 2: (9 - 3) / 2;
+                    }
+                })
                 .attr('fill', d=> {
                     if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                     else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
