@@ -89,7 +89,7 @@ export default {
             if(search_domain != ""){
                 let node = this.filtering_data.filter(ele=>ele.domain == search_domain)[0];
                 let nodePos = [self.xScale(node.x1),self.yScale(node.x2)];
-                let zoomingRatio = self.zoomMaxRatio / 10;
+                let zoomingRatio = self.zoomMaxRatio / 2;
                 self.zoomOperation(node, nodePos, zoomingRatio);
             }
         },

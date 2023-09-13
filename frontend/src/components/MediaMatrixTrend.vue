@@ -226,7 +226,7 @@ export default {
                         else return 3;
                     }
                 })
-                .attr("y", d=> d.reY)
+                //.attr("y", d=> d.reY)
                 .attr('fill', d=> {
                     if(d.value > 0) return computeColorPos(linearVDataPos(d.value));
                     else if((d.value < 0)) return computeColorNeg(linearVDataNeg(d.value));
