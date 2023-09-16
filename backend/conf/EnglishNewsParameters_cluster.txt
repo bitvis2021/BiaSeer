@@ -53,5 +53,5 @@ deltaDocDistribution = .5;
 historyLength = 7;
 
 
-cut_mul=5;
-cut_add=2;
+cut_mul = 5;
+cut_add = 2;

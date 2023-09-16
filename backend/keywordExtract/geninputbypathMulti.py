@@ -150,8 +150,8 @@ def corpus_load(filepath):
         #print(corpus_index)
         return [url,wordstring]
         # quit(1)
-    except:
-        print("corpus load error!!")
+    except Exception as e:
+        print("corpus load error!! ",e)
         return ['error','error']
 
 def corpus_loadText(filepath):
@@ -785,10 +785,11 @@ def genStoryForestInputMulti(time_scope,mSrc_list,classnum,country_list):
 
     # class_list = ast.literal_eval(classnum)
     class_list = classnum
+    total_docn=0
     for class_code in class_list:
-        genStoryForestInput(time_scope,mSrc_list,class_code, country_list)
+        total_docn=total_docn+genStoryForestInput(time_scope,mSrc_list,class_code, country_list)
     mergeTxt()
-
+    return total_docn
 
 
 def genStoryForestInput(time_scope,mSrc_list,classnum,country_list):
