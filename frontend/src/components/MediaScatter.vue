@@ -620,8 +620,7 @@ export default {
                         domainLinks[key] = value
                     }
                 });
-                let items = Object.keys(domainLinks).map(
-                (key) => { return [key, domainLinks[key]] });
+                let items = Object.keys(domainLinks).map((key) => { return [key, domainLinks[key]] });
                 items.sort(
                     (first, second) => { return second[1] - first[1] }
                 );
@@ -643,9 +642,20 @@ export default {
                     let path = [];
                     if(self.currentViewedMediaList.includes(link_domain[0])
                      && self.currentViewedMediaList.includes(link_domain[1]) ){
-                        path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
-                        path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
-                        domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                        // judge currMedium, show media which have relation with currMedium.
+                        if(self.currMedium == link_domain[0] || self.currMedium == link_domain[1]){
+                            path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
+                            path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
+                            domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                        }
+                        else{
+                            if(domains.includes(link_domain[0]) && domains.includes(link_domain[1])){
+                                path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
+                                path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
+                                domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                            }
+                        }
+                        
                     }
                 }
             })
