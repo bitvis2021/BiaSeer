@@ -7,6 +7,9 @@
             <div class="prop-menu-item">
                 <el-button size="mini" @click="keepFunc">keep</el-button>
             </div>
+            <div class="prop-menu-item">
+                <el-button size="mini" @click="cancelFunc">cancel</el-button>
+            </div>
         </div>
     </div>
 </template>
@@ -158,8 +161,20 @@ export default {
         },
         keepFunc(){
             let self = this;
+            // add currmedium to keep queue
+            sysDatasetObj.keepMediaQueue.push(self.currMedium);
+            // update
             self.UPDATE_MEDIA_GRAPH_LABEL();
             sysDatasetObj.updateMediaGraphList(self.currMedium);
+            self.nodeMenuFlag = false;
+        },
+        cancelFunc(){
+            let self = this;
+            // cancel currmedium to keep queue
+            sysDatasetObj.keepMediaQueue = sysDatasetObj.keepMediaQueue.filter(item => item !== self.currMedium);
+            // update
+            self.UPDATE_MEDIA_GRAPH_LABEL();
+            sysDatasetObj.updateMediaGraphList(self.currMedium);            
             self.nodeMenuFlag = false;
         },
         addFunc(){
@@ -642,8 +657,9 @@ export default {
                     let path = [];
                     if(self.currentViewedMediaList.includes(link_domain[0])
                      && self.currentViewedMediaList.includes(link_domain[1]) ){
-                        // judge currMedium, show media which have relation with currMedium.
-                        if(self.currMedium == link_domain[0] || self.currMedium == link_domain[1]){
+                        // judge currMedium, show media which have relation with currMedium or keepMediaQueue.
+                        if(self.currMedium == link_domain[0] || self.currMedium == link_domain[1]
+                        || sysDatasetObj.keepMediaQueue.includes(link_domain[0]) || sysDatasetObj.keepMediaQueue.includes(link_domain[1])){
                             path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
                             path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
                             domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}

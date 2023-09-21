@@ -17,6 +17,8 @@ export function Dataset () {
     this.mediaScatterSelected = ['msn.com', 'menafn.com','yahoo.com', 'interfax.com.ua'];
 
     this.mediaGraphList = [];
+
+    this.keepMediaQueue = []; // keep or cancel mediuam list
 }
 
 Dataset.prototype = {
