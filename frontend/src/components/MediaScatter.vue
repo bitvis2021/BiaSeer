@@ -151,6 +151,11 @@ export default {
                 .select(".media__contour__svg")
                 .select(".media-point-circle-g")
                 .selectAll("circle").classed("dot-search-hover", false);
+                
+            d3.select(this.$el)
+                .select(".media__contour__svg")
+                .select(".media-point-label-g")
+                .selectAll("text_label").remove();
         },
         highlightSearchDot(domain){
             // highlight searched media
@@ -628,6 +633,7 @@ export default {
             let mediagraph = sysDatasetObj.mediaDataSet['mediagraph'];
             
             let domainOneStep = {}
+            let circlesLocation = {}
             domains.forEach(domain => {
                 let domainLinks = {}
                 Object.entries(mediagraph).forEach(([key, value]) => {
@@ -643,7 +649,7 @@ export default {
                 
 
                 let circles = d3.select(self.$el).select(".media__contour__svg").select(".media-point-circle-g").selectAll('circle')
-                let circlesLocation = {}
+                // let circlesLocation = {}
                 circles.each(function () {
                     const thisD3 = d3.select(this)
                     d3.select(this).classed("dot_mouseover", false);
@@ -710,6 +716,22 @@ export default {
                 }
             })
 
+            // 补丁1：：将已选择的媒体高亮
+            sysDatasetObj.mediaScatterSelected.forEach(ele=>{
+                d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                    .select('#media_id_' + ele.replaceAll(".","_"))
+                    .attr("fill-opacity", 1)
+                    .classed("dot_mouseover", true)
+                d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                    .select('#media_id_' + ele.replaceAll(".","_"))
+                    .classed("dot_mouseover", false)
+                d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                    .select('#media_id_' + ele.replaceAll(".","_"))
+                    .classed("dot-keep-domain-hover", true)
+
+            })
+
+
             self.lineGenerator = d3.line()
                 .x(d => d[0])
                 .y(d => d[1]);
@@ -751,6 +773,13 @@ export default {
                 doaminText[eles[1]] = domainOneStep[key]['location'][1]
             }
             console.log(doaminText);
+
+            // 补丁2：：将已选择的媒体名称显示
+            sysDatasetObj.mediaScatterSelected.forEach(ele=>{
+                doaminText[ele] = circlesLocation[ele.replaceAll(".", "_")]
+            })
+
+            
             self.label_g
                 .selectAll("text")
                 .data(Object.keys(doaminText))
