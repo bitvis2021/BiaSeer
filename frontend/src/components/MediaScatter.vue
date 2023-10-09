@@ -7,6 +7,9 @@
             <div class="prop-menu-item">
                 <el-button size="mini" @click="keepFunc">keep</el-button>
             </div>
+            <div class="prop-menu-item">
+                <el-button size="mini" @click="cancelFunc">cancel</el-button>
+            </div>
         </div>
     </div>
 </template>
@@ -89,7 +92,7 @@ export default {
             if(search_domain != ""){
                 let node = this.filtering_data.filter(ele=>ele.domain == search_domain)[0];
                 let nodePos = [self.xScale(node.x1),self.yScale(node.x2)];
-                let zoomingRatio = self.zoomMaxRatio / 10;
+                let zoomingRatio = self.zoomMaxRatio / 2;
                 self.zoomOperation(node, nodePos, zoomingRatio);
             }
         },
@@ -148,6 +151,11 @@ export default {
                 .select(".media__contour__svg")
                 .select(".media-point-circle-g")
                 .selectAll("circle").classed("dot-search-hover", false);
+                
+            d3.select(this.$el)
+                .select(".media__contour__svg")
+                .select(".media-point-label-g")
+                .selectAll("text_label").remove();
         },
         highlightSearchDot(domain){
             // highlight searched media
@@ -158,8 +166,20 @@ export default {
         },
         keepFunc(){
             let self = this;
+            // add currmedium to keep queue
+            sysDatasetObj.keepMediaQueue.push(self.currMedium);
+            // update
             self.UPDATE_MEDIA_GRAPH_LABEL();
             sysDatasetObj.updateMediaGraphList(self.currMedium);
+            self.nodeMenuFlag = false;
+        },
+        cancelFunc(){
+            let self = this;
+            // cancel currmedium to keep queue
+            sysDatasetObj.keepMediaQueue = sysDatasetObj.keepMediaQueue.filter(item => item !== self.currMedium);
+            // update
+            self.UPDATE_MEDIA_GRAPH_LABEL();
+            sysDatasetObj.updateMediaGraphList(self.currMedium);            
             self.nodeMenuFlag = false;
         },
         addFunc(){
@@ -613,6 +633,7 @@ export default {
             let mediagraph = sysDatasetObj.mediaDataSet['mediagraph'];
             
             let domainOneStep = {}
+            let circlesLocation = {}
             domains.forEach(domain => {
                 let domainLinks = {}
                 Object.entries(mediagraph).forEach(([key, value]) => {
@@ -620,8 +641,7 @@ export default {
                         domainLinks[key] = value
                     }
                 });
-                let items = Object.keys(domainLinks).map(
-                (key) => { return [key, domainLinks[key]] });
+                let items = Object.keys(domainLinks).map((key) => { return [key, domainLinks[key]] });
                 items.sort(
                     (first, second) => { return second[1] - first[1] }
                 );
@@ -629,7 +649,7 @@ export default {
                 
 
                 let circles = d3.select(self.$el).select(".media__contour__svg").select(".media-point-circle-g").selectAll('circle')
-                let circlesLocation = {}
+                // let circlesLocation = {}
                 circles.each(function () {
                     const thisD3 = d3.select(this)
                     d3.select(this).classed("dot_mouseover", false);
@@ -643,16 +663,28 @@ export default {
                     let path = [];
                     if(self.currentViewedMediaList.includes(link_domain[0])
                      && self.currentViewedMediaList.includes(link_domain[1]) ){
-                        path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
-                        path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
-                        domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                        // judge currMedium, show media which have relation with currMedium or keepMediaQueue.
+                        if(self.currMedium == link_domain[0] || self.currMedium == link_domain[1]
+                        || sysDatasetObj.keepMediaQueue.includes(link_domain[0]) || sysDatasetObj.keepMediaQueue.includes(link_domain[1])){
+                            path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
+                            path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
+                            domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                        }
+                        else{
+                            if(domains.includes(link_domain[0]) && domains.includes(link_domain[1])){
+                                path.push(circlesLocation[link_domain[0].replaceAll('.','_')])
+                                path.push(circlesLocation[link_domain[1].replaceAll('.','_')])
+                                domainOneStep[keys[i]] = {location: path, value: domainLinks[keys[i]]}
+                            }
+                        }
+                        
                     }
                 }
             })
             console.log(domainOneStep);
 
             let mediagraphValues = Object.values(domainOneStep).map(ele=>ele.value);
-            let edgeScale = d3.scaleLinear().domain(d3.extent(mediagraphValues)).range([1,4]);
+            let edgeScale = d3.scaleLinear().domain(d3.extent(mediagraphValues)).range([4, 1]);
             // console.log(d3.max(mediagraphValues));
 
             Object.keys(domainOneStep).forEach(ele=>{
@@ -683,6 +715,22 @@ export default {
                         .classed("dot-keep-domain-hover", true)
                 }
             })
+
+            // 补丁1：：将已选择的媒体高亮
+            sysDatasetObj.mediaScatterSelected.forEach(ele=>{
+                d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                    .select('#media_id_' + ele.replaceAll(".","_"))
+                    .attr("fill-opacity", 1)
+                    .classed("dot_mouseover", true)
+                d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                    .select('#media_id_' + ele.replaceAll(".","_"))
+                    .classed("dot_mouseover", false)
+                d3.select(this.$el).select(".media__contour__svg").select(".media-point-circle-g")
+                    .select('#media_id_' + ele.replaceAll(".","_"))
+                    .classed("dot-keep-domain-hover", true)
+
+            })
+
 
             self.lineGenerator = d3.line()
                 .x(d => d[0])
@@ -725,6 +773,13 @@ export default {
                 doaminText[eles[1]] = domainOneStep[key]['location'][1]
             }
             console.log(doaminText);
+
+            // 补丁2：：将已选择的媒体名称显示
+            sysDatasetObj.mediaScatterSelected.forEach(ele=>{
+                doaminText[ele] = circlesLocation[ele.replaceAll(".", "_")]
+            })
+
+            
             self.label_g
                 .selectAll("text")
                 .data(Object.keys(doaminText))

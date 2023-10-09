@@ -15,7 +15,7 @@ boostRateMainKeyword = 3;
 boostRateNormalKeyword = 1;
 boostRateNormalWord = 0;
 
-minSimDoc2KeyGraph = .05;  //
+minSimDoc2KeyGraph = .01;  //
 
 communityDetectAlg = betweenness;
 eventSplitAlg = DocGraph;  //

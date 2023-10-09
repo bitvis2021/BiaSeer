@@ -118,6 +118,9 @@ export default {
     padding: 0 3px;
     line-height: 20px;
     margin-right: 5px;
+    background-color: #4d4d4d;
+    border-color: #4d4d4d;
+    color: white;
 }
 </style>
 
@@ -125,6 +128,11 @@ export default {
 .el-switch__core {
  width: 30px !important;
  height: 16px !important;
+ border-color: #4d4d4d !important;
+ background-color: #4d4d4d !important;
+}
+.el-tag .el-tag__close {
+    color: white !important;
 }
 .el-switch__core::after {
  width: 12px !important;
@@ -141,5 +149,7 @@ export default {
     line-height: 1.5 !important;
     font-size: 12px !important;
     display: inline-block !important;
+    color: #4d4d4d !important;
+    font-weight: bold;
 }
 </style>

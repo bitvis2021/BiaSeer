@@ -422,7 +422,9 @@ export default {
                         .range(d3.schemeCategory10);
                 
                 let piecolorScale_1 = (i)=>{
-                    let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+                    // let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+                    // let colorArray=['#8dd3c7','#ffffb3','#bebada','#fb8072']
+                    let colorArray=['#053061','#e56b10','#a6761d','#c6c361']
                     return colorArray[i%4];
                 }
                 
@@ -470,7 +472,7 @@ export default {
                     .append("text")
                     .attr("dy", "2em")
                     .attr("text-anchor", "middle")
-                    .attr("fill", "steelblue")
+                    .attr("fill", "#4d4d4d")
                     .attr("font-weight", "bold")
                     .text(d=>{
                         let show_str = d.data.tree_topickey.slice(0,3).toString().replaceAll(",","; ")

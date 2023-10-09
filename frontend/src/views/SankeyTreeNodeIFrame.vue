@@ -49,11 +49,12 @@ export default {
             // 'UPDATE_STORYTREE_FINISH',
         ]),
         piecolorScale_1(i){
-            let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+            // let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+            let colorArray=['#053061','#e56b10','#a6761d','#c6c361']
             return 'border-left: 5px solid ' + colorArray[i%4];
         },
         piecolorScale_2(i){
-            let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+            let colorArray=['#000000','#000000','#000000','#000000']
             return 'color: ' + colorArray[i%4];
         },
         getWordCloud(wordList){

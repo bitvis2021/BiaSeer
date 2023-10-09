@@ -117,21 +117,24 @@ export default {
             
             let computeColorPos = d3.interpolate('#f9f9f9', 'green');
             if(flag === 'concat'){
-                computeColorPos = d3.interpolate('#f9f9f9', '#50bfff');
+                computeColorPos = d3.interpolate('#f9f9f9', '#000000');  
+                // #50bfff
             }
             let linearVDataPos = d3.scaleLinear()
                 .domain([0, d3.max(vdata)])
                 .range([0, 1]);
             
             // let rectWH = 9;
+            let rect_min = 5;
+            let rect_max = 10;
             
             let rectWH = d3.scaleLinear()
                 .domain([0, d3.max(vdata2)])
-                .range([3, 9]);
+                .range([rect_min, rect_max]);
                 
             let rectWH2 = d3.scaleLinear()
                 .domain([0, d3.max(vdata)])
-                .range([3, 9]);
+                .range([rect_min, rect_max]);
 
             let m = ({ l: 100, r: 20, t: 6, b: 20 });
             let x = d3.scaleTime().range([m.l, width - m.r]).domain(d3.extent(xdata, d => new Date(d)));
@@ -184,7 +187,7 @@ export default {
                 .enter()
                 .append('rect')
                 .attr('class', 'label-rects')
-                .attr('x', 3)
+                .attr('x', rect_min)
                 .attr('y', d=>y(d))
                 .attr('width', m.l - 8)
                 .attr('height', y.bandwidth())
@@ -198,34 +201,71 @@ export default {
                 .attr('class', 'ggg')
                 .attr('transform', d=>`translate(${0}, ${y(d.topic)})`)
                 .selectAll('rect')
-                .data(d=>d.details)
+                .data(d=>{
+                    let tmp_d = d.details.filter(ele=> ele.value!=0 && ele.value2 != 0);
+                    return tmp_d;
+                })
                 .join('rect')
                 .attr('class', 'media_matrix_rect')
-                .attr("x", d=> x(new Date(d.date0)))
-                .attr("height", d=> {
+                // .attr("x", d=> x(new Date(d.date0)))
+                .attr("x", d=> {
                     if (flag === 'single'){
-                        d.reY = d.value2 > 0 ? rectWH2(d.value) : 3;
-                        if (d.value2 > 0)  return rectWH(d.value2);
-                        else return 3;
+                        return d.value2 > 0 ? x(new Date(d.date0)) + (rect_max - rectWH(d.value2)) / 2:
+                        x(new Date(d.date0)) + (rect_max - rect_min) / 2;
                     }
                     else if (flag === 'concat') {
-                        d.reY = d.value > 0 ? rectWH2(d.value) : 3;
-                        if (d.value > 0)  return rectWH2(d.value);
-                        else return 3;
+                        return d.value > 0 ? x(new Date(d.date0)) + (rect_max - rectWH2(d.value)) / 2:
+                        x(new Date(d.date0)) + (rect_max - rect_min) / 2;
+                    }
+                })
+                .attr("height", d=> {
+                    if (flag === 'single'){
+                        return d.value2 > 0 ? rectWH(d.value2) : rect_min;
+                    }
+                    else if (flag === 'concat') {
+                        return d.value > 0 ? rectWH2(d.value) : rect_min;
                     }
                 })
                 .attr("width", d=> {
                     if (flag === 'single'){
-                        d.reY = d.value > 0 ? rectWH2(d.value) : 3;
-                        if (d.value2 > 0)  return rectWH(d.value2);
-                        else return 3;
+                        return d.value2 > 0 ? rectWH(d.value2) : rect_min;
                     }
                     else if (flag === 'concat') {
-                        d.reY = d.value > 0 ? rectWH2(d.value) : 3;
-                        if (d.value > 0)  return rectWH2(d.value);
-                        else return 3;
+                        return d.value > 0 ? rectWH2(d.value) : rect_min;
                     }
                 })
+                .attr("y", d=> {
+                    if (flag === 'single'){
+                        return d.value2 > 0 ? (rect_max - rectWH(d.value2)) / 2: (rect_max - rect_min) / 2;
+                    }
+                    else if (flag === 'concat') {
+                        return d.value > 0 ? (rect_max - rectWH2(d.value)) / 2: (rect_max - rect_min) / 2;
+                    }
+                })
+                // .attr("height", d=> {
+                //     if (flag === 'single'){
+                //         d.reY = d.value2 > 0 ? rectWH2(d.value) : 5;
+                //         if (d.value2 > 0)  return rectWH(d.value2);
+                //         else return 5;
+                //     }
+                //     else if (flag === 'concat') {
+                //         d.reY = d.value > 0 ? rectWH2(d.value) : 5;
+                //         if (d.value > 0)  return rectWH2(d.value);
+                //         else return 5;
+                //     }
+                // })
+                // .attr("width", d=> {
+                //     if (flag === 'single'){
+                //         d.reY = d.value > 0 ? rectWH2(d.value) : 5;
+                //         if (d.value2 > 0)  return rectWH(d.value2);
+                //         else return 5;
+                //     }
+                //     else if (flag === 'concat') {
+                //         d.reY = d.value > 0 ? rectWH2(d.value) : 5;
+                //         if (d.value > 0)  return rectWH2(d.value);
+                //         else return 5;
+                //     }
+                // })
                 // .attr("y", d=> d.reY)
                 .attr('fill', d=> {
                     if(d.value > 0) return computeColorPos(linearVDataPos(d.value));

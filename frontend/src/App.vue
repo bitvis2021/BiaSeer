@@ -198,7 +198,7 @@ export default {
             span_list=span_list._groups[0]
             console.log("in spanlist ",span_list[0])
             let piecolorScale_1 = (i)=>{
-                    let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+                    let colorArray=['#053061','#e56b10','#a6761d','#c6c361']
                     return colorArray[i%4];
                 }
             var select_list=self.currentSelectedMedia
@@ -234,7 +234,7 @@ export default {
       console.log("in genMsrcColor!!!")
       var mSrc_list=this.currentSelectedMedia
       let piecolorScale_1=(i)=>{
-          let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+          let colorArray=['#053061','#e56b10','#a6761d','#c6c361']
           return colorArray[i%4];
       }
       for(var i=0;i<mSrc_list.length;i++){
@@ -314,7 +314,7 @@ export default {
       console.log("in genMsrcColor!!!")
       var mSrc_list=this.currentSelectedMedia
       let piecolorScale_1=(i)=>{
-          let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+          let colorArray=['#053061','#e56b10','#a6761d','#c6c361']
           return colorArray[i%4];
       }
       for(var i=0;i<mSrc_list.length;i++){
@@ -457,7 +457,7 @@ export default {
       .media-concat-list{
         position: absolute;
         top: 0%;
-        bottom: 87%;
+        bottom: 90%;
         left: 0%;
         right: 0%;
         border: 1px solid gray;
@@ -466,7 +466,7 @@ export default {
       }
       .media-concat-diffarea{
         position: absolute;
-        top: 13%;
+        top: 10%;
         bottom: 0%;
         left: 0%;
         right: 0%;
@@ -532,10 +532,10 @@ export default {
 
 .search-input {
   width: 230px;
-  margin-left: 37.4%;
+  margin-left: 36.4%;
   margin-top: 0.1%;
   .el-input__inner{
-    height: 30px;
+    height: 23px;
     font-size: 1em;
     font-weight: bolder;
     color: steelblue;
