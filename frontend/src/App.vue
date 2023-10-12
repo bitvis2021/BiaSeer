@@ -198,9 +198,9 @@ export default {
             span_list=span_list._groups[0]
             console.log("in spanlist ",span_list[0])
             let piecolorScale_1 = (i)=>{
-                    let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
-                    return colorArray[i%4];
-                }
+              let colorArray=['#1d6d99','#e56b10','#a6761d','#c6c361']
+              return colorArray[i%4];
+            }
             var select_list=self.currentSelectedMedia
             console.log("select_list",select_list)
             for(var i=0;i<span_list.length;i++){

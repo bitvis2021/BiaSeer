@@ -55,11 +55,13 @@ export default {
             let self = this;
             let data1 = null;
             let data2 = null;
+            let reorder_flag = false;
             if(flag === 'single'){
                 data1 = sysDatasetObj.mediaMatrixDataSet.filter(ele => ele['domain'] == domain)[0];
                 console.log('sysDatasetObj.mediaMatrixDataSetNum', sysDatasetObj.mediaMatrixDataSetNum);
             }
             else if(flag === 'concat'){
+                reorder_flag = true;
                 data1 = sysDatasetObj.mediaConcatDiffDataSet[0];
             }
             console.log('data1', data1);
@@ -198,7 +200,11 @@ export default {
                 .attr('class', 'ggg')
                 .attr('transform', d=>`translate(${0}, ${y(d.topic)})`)
                 .selectAll('rect')
-                .data(d=>d.details)
+                .data(d=>{
+                    let tmp_d = d.details.filter(ele=> ele.value!=0 && ele.value2 != 0);
+                    // console.log(tmp_d);
+                    return tmp_d;
+                })
                 .join('rect')
                 .attr('class', 'media_matrix_rect')
                 .attr("x", d=> {
@@ -213,17 +219,21 @@ export default {
                 })
                 .attr("height", d=> {
                     if (flag === 'single'){
+                        if(d.value2 == 0) return 0;
                         return d.value2 > 0 ? rectWH(d.value2) : 3;
                     }
                     else if (flag === 'concat') {
+                        if(d.value == 0) return 0;
                         return d.value > 0 ? rectWH2(d.value) : 3;
                     }
                 })
                 .attr("width", d=> {
                     if (flag === 'single'){
+                        if(d.value2 == 0) return 0;
                         return d.value2 > 0 ? rectWH(d.value2) : 3;
                     }
                     else if (flag === 'concat') {
+                        if(d.value == 0) return 0;
                         return d.value > 0 ? rectWH2(d.value) : 3;
                     }
                 })
@@ -244,20 +254,32 @@ export default {
             charts.append('title')
                 .text(d=>`from ${d.date0} to ${d.date1}, avgtone: ${d.value}`);
             
-            
             var topicLocation = {}; // label i-th topic's location index
             var new_ydate = [];
             var t = svg.transition().duration(1000);
-            t.selectAll(".ggg")
-                .attr("transform", function(d, i) {
-                    // console.log(i,'---',row_inv[i]+1);
-                    topicLocation[row_inv[i]+1] = i + 1;
-                    return "translate(0," + y((row_inv[i]+1).toString()) + ")"; 
-                })
+
+            if(reorder_flag){
+                t.selectAll(".ggg")
+                    .attr("transform", function(d, i) {
+                        // console.log(i,'---',row_inv[i]+1);
+                        topicLocation[row_inv[i]+1] = i + 1;
+                        return "translate(0," + y((row_inv[i]+1).toString()) + ")"; 
+                    })
+                
+                t.selectAll(".yG").selectAll("text")
+                    .text((d,i)=> {
+                        return getTopic(topicLocation[i+1].toString())});
+            }
+            // t.selectAll(".ggg")
+            //     .attr("transform", function(d, i) {
+            //         // console.log(i,'---',row_inv[i]+1);
+            //         topicLocation[row_inv[i]+1] = i + 1;
+            //         return "translate(0," + y((row_inv[i]+1).toString()) + ")"; 
+            //     })
             
-            t.selectAll(".yG").selectAll("text")
-                .text((d,i)=> {
-                    return getTopic(topicLocation[i+1].toString())});
+            // t.selectAll(".yG").selectAll("text")
+            //     .text((d,i)=> {
+            //         return getTopic(topicLocation[i+1].toString())});
                 
             new_ydate = Object.values(topicLocation).map(ele=>ele.toString())
             // console.log(new_ydate);
@@ -332,11 +354,18 @@ export default {
                 }
             }
 
-            let brushG = svg.append('g')
-                .attr("class", "brushG")
-                .call(brush)
-                .select('.selection').append('title')
-                .text('aaa');
+            if(reorder_flag){
+                let brushG = svg.append('g')
+                    .attr("class", "brushG")
+                    .call(brush)
+                    .select('.selection').append('title')
+                    .text('aaa');
+            }
+            // let brushG = svg.append('g')
+            //     .attr("class", "brushG")
+            //     .call(brush)
+            //     .select('.selection').append('title')
+            //     .text('aaa');
         }
     }
 }
