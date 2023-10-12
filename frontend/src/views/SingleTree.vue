@@ -194,8 +194,10 @@ export default {
                         let ele_g = d3.select(this.$el).select("#story_tree_node_" + ele.index).append("g")
                             .attr("class", "ele-g");
                         ele_g.append('path')
-                            .attr('d',d3.symbol().type(d3.symbolStar).size(100))
-                            .attr('fill','gray')
+                            .attr('d',d3.symbol().type(d3.symbolCircle).size(70))
+                            .attr('fill','white')
+                            .attr('stroke', 'gray')
+                            .attr('stroke-width', '1px');
                     }
                 })
 

@@ -835,7 +835,7 @@ export default {
 }
 
 .dot_mouseover {
-    fill: steelblue;
+    fill: #4682b4;
     stroke-width: 1px;
     stroke: white;
 }

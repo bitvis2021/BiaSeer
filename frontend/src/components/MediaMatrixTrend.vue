@@ -128,11 +128,11 @@ export default {
             let rect_min = 5;
             let rect_max = 10;
             
-            let rectWH = d3.scaleLinear()
+            let rectWH = d3.scaleSqrt()
                 .domain([0, d3.max(vdata2)])
                 .range([rect_min, rect_max]);
                 
-            let rectWH2 = d3.scaleLinear()
+            let rectWH2 = d3.scaleSqrt()
                 .domain([0, d3.max(vdata)])
                 .range([rect_min, rect_max]);
 
@@ -203,7 +203,8 @@ export default {
                 .selectAll('rect')
                 .data(d=>{
                     let tmp_d = d.details.filter(ele=> ele.value!=0 && ele.value2 != 0);
-                    return tmp_d;
+                    //return tmp_d;
+                    return d.details;
                 })
                 .join('rect')
                 .attr('class', 'media_matrix_rect')

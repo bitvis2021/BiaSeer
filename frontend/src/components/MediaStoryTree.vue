@@ -327,7 +327,7 @@ export default {
                     .attr('class', 'delta_time_rect')
                     .attr('x', (d,i)=>reScale(uni_delta_timescope[i + 1]) - reScale.bandwidth() / 2 + delta_time_space)
                     .attr('y', d => delta_time_space - delta_timeScale(d) / 2)
-                    .attr('rx', d=> delta_timeScale(d) / 2)
+                    // .attr('rx', d=> delta_timeScale(d) / 2)
                     .attr('width', reScale.bandwidth() - 2 * delta_time_space)
                     .attr('height', d=> delta_timeScale(d))
                     .on("mouseover", function(d) {
@@ -393,7 +393,7 @@ export default {
                     .attr("class", "storytree__node")
                     .attr('transform', `translate(${reScale.bandwidth()/2},${0})`)
                     .attr("stroke-linejoin", "round")
-                    .attr("stroke-width", 3)
+                    .attr("stroke-width", 2)
                     .selectAll(".story_tree_node")
                     .data(root.descendants())
                     .join("g")
@@ -442,8 +442,10 @@ export default {
                     // root node
                     if(ele.data.name == "ROOT"){
                         ele_g.append('path')
-                            .attr('d',d3.symbol().type(d3.symbolStar).size(300))
-                            .attr('fill','gray')
+                            .attr('d',d3.symbol().type(d3.symbolCircle).size(300))
+                            .attr('fill','white')
+                            .attr('stroke', 'gray')
+                            .attr('stroke-width', 2);
                     }
                     
                     let pie_r = ele.data.totalbias !="null" ? reScaleCircleRadia(+ele.data.totalbias) : 1;
@@ -475,7 +477,8 @@ export default {
                     .attr("fill", "#4d4d4d")
                     .attr("font-weight", "bold")
                     .text(d=>{
-                        let show_str = d.data.tree_topickey.slice(0,3).toString().replaceAll(",","; ")
+                        let show_str = d.data.tree_topickey.slice(0,3).toString()
+                        // .replaceAll(",","; ")
                         return d.data.tree_topickey.length == 0 ? 'ROOT' : show_str;
                     })
                     .clone(true)
