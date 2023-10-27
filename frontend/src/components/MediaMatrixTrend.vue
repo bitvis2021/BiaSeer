@@ -203,7 +203,8 @@ export default {
                 .data(d=>{
                     let tmp_d = d.details.filter(ele=> ele.value!=0 && ele.value2 != 0);
                     // console.log(tmp_d);
-                    return tmp_d;
+                    //return tmp_d;
+                    return d.details;
                 })
                 .join('rect')
                 .attr('class', 'media_matrix_rect')
