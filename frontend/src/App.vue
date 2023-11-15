@@ -67,14 +67,20 @@
         
       </div>
       <div class="single-event-evolution">
-        <el-card v-for="(item, index) in currentRankMedia" :key="index" :id="item.domain.replaceAll('.','_')" style="margin-right:10px; width:25%">
+        <el-card v-for="(item, index) in currentRankMedia"
+        :key="index"
+        :id="item.domain.replaceAll('.','_')"
+        shadow="hover"
+        @click.native="getTreeDiffData(item.domain)"
+        style="margin-right:10px; width:25%">
 
           <div class="single-domain-tree" ref="singleTree" slot="header" >
-            <span class="mSrcSpan">{{item.domain}}</span>
+            <span class="mSrcSpan" id="mSrcSpanId">{{item.domain}}</span>
             <!-- <svg class="mSrcSvg" width="20" height="15">
               <circle r="5" cx="8" cy="5" :fill=genMsrcColor(item.domain)></circle>
             </svg> -->
-            <el-button style="float: right; padding: 3px 0" type="text" @click="getTreeDiffData(item.domain)">Choose</el-button>
+            <div class="mSrcSvg" :id="'mSrcSvg-'+item.domain.replaceAll('.','_')"></div>
+            <!-- <el-button style="float: right; padding: 3px 0" type="text" @click="getTreeDiffData(item.domain)">Choose</el-button> -->
           </div>
           <SingleTree :storytree__loading="storytree__loading" :domain="item.domain"></SingleTree>
         </el-card>
@@ -120,7 +126,7 @@ export default {
       domain_list: [],
       option_loading: false,
       states: [],
-
+      clicked_medium: "",
       system_topic_event: "RUS_UKR"
 
     }
@@ -173,63 +179,56 @@ export default {
     this.domain_list = this.states.map(item => {
       return { value: `${item}`, label: `${item}` };
     });
-    // self.drawMediaSpan()
-    
-
+    self.drawMediaSpan()
   },
   methods: {
     drawMediaSpan(){
-            let self=this
+      let self=this
+      console.log("span1,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span").selectAll(".mSrcSpan"))
+      console.log("span2,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span"))
+      console.log("span3,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan"))
+      var span_list=d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan")
+      // span_list.selectAll("svg").remove()
+      // span_list.append("svg")
+      //     .attr("class","mSrcCircle")
+      //     .attr("height",12)
+      //     .attr("width",20)
+      //     .append("circle").attr("r",5)
+      //     .attr("cx",9)
+      //     .attr("cy",6)
+      //     .attr("fill",piecolorScale_1())
+      span_list=span_list._groups[0]
+      console.log("in spanlist ",span_list[0])
+      let piecolorScale_1 = (i)=>{
+        let colorArray=['#053061','#e56b10','#a6761d','#c6c361']
+        return colorArray[i%4];
+      }
+      var select_list=self.currentSelectedMedia
+      console.log("select_list",select_list)
+      for(var i=0; i < span_list.length; i++){
+        for(var j=0; j < self.currentSelectedMedia.length; j++){
+          if(d3.select(span_list[i]).text()==select_list[j].domain){
+            console.log("domian and name",d3.select(span_list[i]).text(), j)
             
-            
-            console.log("span1,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span").selectAll(".mSrcSpan"))
-            console.log("span2,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll("span"))
-            console.log("span3,",d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan"))
-            var span_list=d3.select("body").select(".event-evolution").selectAll(".single-event-evolution").selectAll(".mSrcSpan")
-            // span_list.selectAll("svg").remove()
-            // span_list.append("svg")
-            //     .attr("class","mSrcCircle")
-            //     .attr("height",12)
-            //     .attr("width",20)
-            //     .append("circle").attr("r",5)
-            //     .attr("cx",9)
-            //     .attr("cy",6)
-            //     .attr("fill",piecolorScale_1())
-            span_list=span_list._groups[0]
-            console.log("in spanlist ",span_list[0])
-            let piecolorScale_1 = (i)=>{
-                    let colorArray=['#053061','#e56b10','#a6761d','#c6c361']
-                    return colorArray[i%4];
-                }
-            var select_list=self.currentSelectedMedia
-            console.log("select_list",select_list)
-            for(var i=0;i<span_list.length;i++){
-              
-             
-              
-              for(var j=0;j<self.currentSelectedMedia.length;j++){
-                
-                if(d3.select(span_list[i]).text()==select_list[j].domain){
-                  console.log("domian and name",d3.select(span_list[i]).text(),j)
-                  d3.select(span_list[i]).style('color',piecolorScale_1(j))
-                  d3.select(span_list[i]).selectAll("svg").remove()
-                  d3.select(span_list[i]).append("svg")
-                  .attr("class","mSrcCircle")
-                  .attr("height",12)
-                  .attr("width",20)
-                  .append("circle").attr("r",5)
-                  .attr("cx",9)
-                  .attr("cy",6)
-                  .attr("fill",piecolorScale_1(j))
-                  break
-
-                }
-              }
-                
-          
+            if(d3.select(span_list[i]).text() == self.clicked_medium){
+              d3.select("#mSrcSvg-" + self.clicked_medium.replaceAll('.','_')).style('background', piecolorScale_1(j))
             }
-            
-        },
+
+            d3.select(span_list[i]).style('color', piecolorScale_1(j))
+            d3.select(span_list[i]).selectAll("svg").remove()
+            // d3.select(span_list[i]).append("svg")
+            //   .attr("class","mSrcCircle")
+            //   .attr("height",12)
+            //   .attr("width",20)
+            //   .append("circle").attr("r",5)
+            //   .attr("cx",9)
+            //   .attr("cy",6)
+            //   .attr("fill",piecolorScale_1(j))
+            break
+          }
+        }
+      }
+    },
     genMsrcColor1(mSrc_name){
       console.log("in genMsrcColor!!!")
       var mSrc_list=this.currentSelectedMedia
@@ -296,6 +295,7 @@ export default {
     },
     getTreeDiffData(tree_name){
       let self=this;
+      self.clicked_medium = tree_name;
       let treeDifDeferObj=$.Deferred();
       $.when(treeDifDeferObj).then(async () => {
         
@@ -522,10 +522,19 @@ export default {
       right: 0%;
       overflow-x: scroll;
       display: flex;
-      // .single-domain-tree{
-      //   flex: 1;
-      //   margin: 4px;
-      // }
+      .single-domain-tree{
+        display: flex;
+        align-items: center;
+        .mSrcSvg {
+          background: white;
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+        }
+        #mSrcSpanId{
+          flex: 1
+        }
+      }
     }
   }
 }
