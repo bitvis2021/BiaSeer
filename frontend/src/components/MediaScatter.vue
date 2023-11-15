@@ -776,7 +776,9 @@ export default {
 
             // 补丁2：：将已选择的媒体名称显示
             sysDatasetObj.mediaScatterSelected.forEach(ele=>{
-                doaminText[ele] = circlesLocation[ele.replaceAll(".", "_")]
+                if(self.currentViewedMediaList.includes(ele)){
+                    doaminText[ele] = circlesLocation[ele.replaceAll(".", "_")]
+                }
             })
 
             
