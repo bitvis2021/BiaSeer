@@ -738,6 +738,10 @@ export default {
 
             const t = d3.select(self.$el).select(".media__contour__svg").select(".media-point-graph-g").transition()
                 .duration(300);
+            
+            self.graph_g
+                .selectAll("path").remove()
+            
             self.graph_g
                 .selectAll("path")
                 .data(Object.keys(domainOneStep),function(d, i) {
@@ -752,15 +756,15 @@ export default {
                         })
                         .attr('stroke-width', d=> edgeScale(domainOneStep[d]['value'] + 1))
                         ,
-                    update => update
-                        .call(update => update.transition(t)
-                            .attr("d", d=>{
-                                console.log(d.split("_"));
-                                console.log("update");
-                                return self.lineGenerator(domainOneStep[d]['location']);
-                            })
-                            .attr('stroke-width', d=> edgeScale(domainOneStep[d]['value'] + 1))
-                        ),
+                    // update => update
+                    //     .call(update => update.transition(t)
+                    //         .attr("d", d=>{
+                    //             console.log(d.split("_"));
+                    //             console.log("update");
+                    //             return self.lineGenerator(domainOneStep[d]['location']);
+                    //         })
+                    //         .attr('stroke-width', d=> edgeScale(domainOneStep[d]['value'] + 1))
+                    //     ),
                     exit => exit
                         .remove()
                 )
@@ -781,6 +785,8 @@ export default {
                 }
             })
 
+            self.label_g
+                .selectAll("text").remove()
             
             self.label_g
                 .selectAll("text")
@@ -795,15 +801,15 @@ export default {
                         .attr("paint-order", "stroke")
                         .text(d=>d)
                         ,
-                    update => update
-                        .call(update => update.transition(t)
-                        .attr("x", d=> doaminText[d][0])
-                        .attr("y", d=> doaminText[d][1])
-                        .attr("dy", "-0.75em")
-                        .attr('text-anchor',"middle")
-                        .attr("paint-order", "stroke")
-                        .text(d=>d)
-                        ),
+                    // update => update
+                    //     .call(update => update.transition(t)
+                    //     .attr("x", d=> doaminText[d][0])
+                    //     .attr("y", d=> doaminText[d][1])
+                    //     .attr("dy", "-0.75em")
+                    //     .attr('text-anchor',"middle")
+                    //     .attr("paint-order", "stroke")
+                    //     .text(d=>d)
+                        // ),
                     exit => exit
                         .remove()
                 )
@@ -868,6 +874,7 @@ export default {
 }
 
 .text_label{
+    counter-increment: none;
     font-size: 10px;
     fill: black;
     stroke: white;

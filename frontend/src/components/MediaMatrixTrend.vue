@@ -280,7 +280,7 @@ export default {
             
             var topicLocation = {}; // label i-th topic's location index
             var new_ydate = [];
-            var t = svg.transition().duration(1000);
+            var t = svg.transition().duration(1);
             t.selectAll(".ggg")
                 .attr("transform", function(d, i) {
                     // console.log(i,'---',row_inv[i]+1);

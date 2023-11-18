@@ -526,7 +526,7 @@ export default {
         display: flex;
         align-items: center;
         .mSrcSvg {
-          background: white;
+          background: rgb(229, 228, 228);
           border-radius: 50%;
           width: 20px;
           height: 20px;
@@ -541,7 +541,7 @@ export default {
 
 .search-input {
   width: 230px;
-  margin-left: 36.4%;
+  margin-left: 37.5%;
   margin-top: 0.1%;
   .el-input__inner{
     height: 23px;
