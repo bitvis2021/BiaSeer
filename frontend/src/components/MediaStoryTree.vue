@@ -576,92 +576,92 @@ export default {
                         sub_div.innerHTML += d.data.name.split("+")[0] + ".";
                         let sub_div_height = sub_div.getBoundingClientRect().height;
                         let m_height_all = m_height + sub_div_height
-                        add_div
-                            .style('position','absolute')
-                            .style('top', d=>{
-                                // console.log("location: ", m[1], m_height_all, m[1] + m_height_all, div_height)
-                                if(m[1] + m_height_all > div_height){
-                                    return (div_top + m[1] - m_height_all) + "px"
-                                }
-                                else{
-                                    return div_top + m[1] - m_height +"px"
-                                }
-                            })
-                            .style('left', function(){
-                                if(m[0] + m_width  > div_width){
-                                    return (div_left + m[0] - m_width) + "px"
-                                }
-                                else{
-                                    return div_left + m[0] - 2 * m_height_all + "px"
-                                }
-                            })
-                            .style('width', m_width + "px")
-                            .style('background-color', "white");
+                        // add_div
+                        //     .style('position','absolute')
+                        //     .style('top', d=>{
+                        //         // console.log("location: ", m[1], m_height_all, m[1] + m_height_all, div_height)
+                        //         if(m[1] + m_height_all > div_height){
+                        //             return (div_top + m[1] - m_height_all) + "px"
+                        //         }
+                        //         else{
+                        //             return div_top + m[1] - m_height +"px"
+                        //         }
+                        //     })
+                        //     .style('left', function(){
+                        //         if(m[0] + m_width  > div_width){
+                        //             return (div_left + m[0] - m_width) + "px"
+                        //         }
+                        //         else{
+                        //             return div_left + m[0] - 2 * m_height_all + "px"
+                        //         }
+                        //     })
+                        //     .style('width', m_width + "px")
+                        //     .style('background-color', "white");
 
                         
-                        let hover_toltip = add_div.append("svg")
-                            .attr("class", "tree_node_hover_tooltip")
-                            .attr("width", m_width)
-                            .attr("height", m_height_all)
-                            .append("g")
-                            .attr("transform",`translate(${m_margin.left} , ${m_margin.top} )`);
+                        // let hover_toltip = add_div.append("svg")
+                        //     .attr("class", "tree_node_hover_tooltip")
+                        //     .attr("width", m_width)
+                        //     .attr("height", m_height_all)
+                        //     .append("g")
+                        //     .attr("transform",`translate(${m_margin.left} , ${m_margin.top} )`);
                         
-                        let x_Attrs = ["tone","impact","#mentions","#articles","#sources", "#ratio"]//"#nums"]
-                        let dataset = []
-                        dataset.push(+d.data.tree_vari_avgTone)
-                        dataset.push(+d.data.tree_vari_gold)
-                        dataset.push(+d.data.tree_vari_nummention)
-                        dataset.push(+d.data.tree_vari_numarticle)
-                        dataset.push(+d.data.tree_vari_numresouce)
-                        dataset.push(+d.data.tree_vari_mSrcN)
+                        // let x_Attrs = ["tone","impact","#mentions","#articles","#sources", "#ratio"]//"#nums"]
+                        // let dataset = []
+                        // dataset.push(+d.data.tree_vari_avgTone)
+                        // dataset.push(+d.data.tree_vari_gold)
+                        // dataset.push(+d.data.tree_vari_nummention)
+                        // dataset.push(+d.data.tree_vari_numarticle)
+                        // dataset.push(+d.data.tree_vari_numresouce)
+                        // dataset.push(+d.data.tree_vari_mSrcN)
 
-                        // // Add X axis
-                        var x = d3.scaleBand()
-                            .domain(x_Attrs)
-                            .range([0, m_innerWidth])
-                            .padding(0.1);
+                        // // // Add X axis
+                        // var x = d3.scaleBand()
+                        //     .domain(x_Attrs)
+                        //     .range([0, m_innerWidth])
+                        //     .padding(0.1);
                         
-                        hover_toltip.append("g")
-                            .attr("transform", "translate(0," + m_innerHeight + ")")
-                            .call(d3.axisBottom(x).ticks(4))
-                            .selectAll("text")
-                            .attr("transform", "translate(-6,0)rotate(-30)")
-                            .style("text-anchor", "end");
+                        // hover_toltip.append("g")
+                        //     .attr("transform", "translate(0," + m_innerHeight + ")")
+                        //     .call(d3.axisBottom(x).ticks(4))
+                        //     .selectAll("text")
+                        //     .attr("transform", "translate(-6,0)rotate(-30)")
+                        //     .style("text-anchor", "end");
                         
-                        // Y axis
-                        var y = d3.scaleLinear()
-                            .range([m_innerHeight, 0])
-                            .domain(d3.extent(attrsMaxMin));
+                        // // Y axis
+                        // var y = d3.scaleLinear()
+                        //     .range([m_innerHeight, 0])
+                        //     .domain(d3.extent(attrsMaxMin));
                         
-                        hover_toltip.append("g")
-                            .attr("class", "hover_toltip_axisYg")
-                            .call(d3.axisLeft(y).ticks(3));
+                        // hover_toltip.append("g")
+                        //     .attr("class", "hover_toltip_axisYg")
+                        //     .call(d3.axisLeft(y).ticks(3));
                         
-                        hover_toltip.append("g").selectAll("rect")
-                            .data(dataset)
-                            .enter()
-                            .append("rect")
-                            .attr("class", "myRect")
-                            .attr("fill", "steelblue")
-                            .attr("opacity", 0.4)
-                            .attr("x", function (d, i) {
-                                return x(x_Attrs[i]);
-                            })
-                            .attr("y", function (d) {
-                                return y(d);
-                            })
-                            .attr("width", x.bandwidth())
-                            .attr("height", function (d) {
-                                return m_innerHeight - y(d);
-                            });   
-                        hover_toltip.selectAll(".hover_toltip_axisYg").append('text')
-                            .attr('class', 'variance_of_characteristics')
-                            .attr('y', 3)
-                            .attr('x', m_innerWidth)
-                            .attr('fill', '#606266')
-                            .attr('font-size', '1.3em')
-                            .style('text-anchor', 'end')
-                            .text("features variance");
+                        // hover_toltip.append("g").selectAll("rect")
+                        //     .data(dataset)
+                        //     .enter()
+                        //     .append("rect")
+                        //     .attr("class", "myRect")
+                        //     .attr("fill", "steelblue")
+                        //     .attr("opacity", 0.4)
+                        //     .attr("x", function (d, i) {
+                        //         return x(x_Attrs[i]);
+                        //     })
+                        //     .attr("y", function (d) {
+                        //         return y(d);
+                        //     })
+                        //     .attr("width", x.bandwidth())
+                        //     .attr("height", function (d) {
+                        //         return m_innerHeight - y(d);
+                        //     });   
+                        // hover_toltip.selectAll(".hover_toltip_axisYg").append('text')
+                        //     .attr('class', 'variance_of_characteristics')
+                        //     .attr('y', 3)
+                        //     .attr('x', m_innerWidth)
+                        //     .attr('fill', '#606266')
+                        //     .attr('font-size', '1.3em')
+                        //     .style('text-anchor', 'end')
+                        //     .text("features variance");
                         
                         // compute this path node selection
                         const path__node = [];
