@@ -354,10 +354,12 @@ export default {
   padding: 2px 10px !important;
   /* background-color: palegoldenrod; */
   background-color: rgb(229, 228, 228);
+  height: 10%; 
   
 }
 .el-card__body {
   padding: 0px !important;
+  height: 90%;
   /* background-color: powderblue; */
 }
 

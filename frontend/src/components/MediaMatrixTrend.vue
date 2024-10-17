@@ -147,10 +147,21 @@ export default {
             let y = d3.scaleBand()
                 .domain(ydata)
                 .range([m.t, height - m.b]);
+
+            const chineseMonths = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+
             
+            // let xAxis = g => g.append('g')
+            //     .attr('transform', `translate(0, ${height - m.b})`)
+            //     .call(d3.axisBottom(x).tickFormat(d => chineseMonths[d.getMonth()]))
+
             let xAxis = g => g.append('g')
                 .attr('transform', `translate(0, ${height - m.b})`)
-                .call(d3.axisBottom(x))
+                .call(d3.axisBottom(x).tickFormat(d => {
+                    let month = d.getMonth();
+                    let year = d.getFullYear();
+                    return month === 0 ? `${year} ${chineseMonths[month]}` : chineseMonths[month];
+                }));
 
             let yAxis = g => g.append('g')
                 .attr('transform', `translate(${m.l}, ${0})`)

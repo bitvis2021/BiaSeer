@@ -33,7 +33,7 @@
             filterable
             remote
             clearable
-            placeholder="Searching domain"
+            placeholder="媒体搜索" 
             :remote-method="remoteMethod"
             :loading="option_loading">
             <el-option
@@ -72,7 +72,7 @@
         :id="item.domain.replaceAll('.','_')"
         shadow="hover"
         @click.native="getTreeDiffData(item.domain)"
-        style="margin-right:10px; width:25%">
+        style="margin-right:10px; width:25%; height: 100%;">
 
           <div class="single-domain-tree" ref="singleTree" slot="header" >
             <span class="mSrcSpan" id="mSrcSpanId">{{item.domain}}</span>
@@ -113,7 +113,7 @@ export default {
   name: 'App',
   data() {
     return {
-      appName: "BiaSeer",
+      appName: "事件演变可视分析系统",
       loadingData: true,
       topicCodeList: null,
       storytree__loading: false,
@@ -514,6 +514,13 @@ export default {
       }
     }
 
+    .el-card__header {
+      height: 25px; 
+      line-height: 50px;
+      padding: 0 20px; 
+      box-sizing: border-box;
+    }
+
     .single-event-evolution {
       position: absolute;
       top: 70%;
@@ -525,11 +532,12 @@ export default {
       .single-domain-tree{
         display: flex;
         align-items: center;
+        height: 100%;
         .mSrcSvg {
           background: rgb(229, 228, 228);
           border-radius: 50%;
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
         }
         #mSrcSpanId{
           flex: 1

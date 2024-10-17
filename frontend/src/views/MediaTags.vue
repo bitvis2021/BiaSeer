@@ -3,7 +3,8 @@
         <div class="mediatags" style="order:1;">
             <div class="concat_text">
                 <span>
-                    SELECTED MEDIA:
+                    <!-- SELECTED MEDIA: -->
+                     已选定媒体：
                 </span>
             </div>
             <el-tag size="medium" :key="tag" v-for="tag in dynamicTags" closable :disable-transitions="false"
@@ -12,7 +13,7 @@
             </el-tag>
         </div>
         <div class="concatswitch" style="order:2;">
-            <el-switch v-model="isConcated" active-text="concat" @change="changeConcatStatus" class="concat-switch">
+            <el-switch v-model="isConcated" active-text="转换" @change="changeConcatStatus" class="concat-switch">
             </el-switch>
         </div>
     </div>
